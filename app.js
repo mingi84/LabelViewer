@@ -10,7 +10,7 @@ var __dirname = path.resolve();
 
 // server config
 const app = express()
-const port = 7000
+const port = 7007
 
 var http = require("http").createServer(app);
 
@@ -31,6 +31,12 @@ app.set('views', './views')
 app.set('view engine', 'ejs')
 
 var TAB = "\t";
+
+app.get('/', (req, res) => {
+    res.render('gallerylist');
+    console.log(Date() + TAB + req.socket.localAddress + TAB + req.url);
+})
+
 
 app.get('/galleryList', (req, res) => {
     res.render('gallerylist');
