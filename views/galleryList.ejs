@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Label Viewer</title>
+    <script language="javascript" type="text/javascript" src="js/jquery-3.6.4.min.js"></script>
+    <script language="javascript" type="text/javascript" src="js/bootstrap.bundle.js"></script>
+    <script language="javascript" type="text/javascript" src="js/fontawesome.all.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/fontawesome.all.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+</head>
+<style>
+    .card {
+        height: 280px;
+        cursor: pointer;
+    }
+
+    .dataset:hover {
+        background-color: #f4f4f4;
+    }
+</style>
+<!--
+
+-->
+
+<body>
+    <%- include('./header') %>
+    <div class="container my-4">
+        <div class="row row-cols-4 g-4" id="gallerylist">
+            <div class="col" id="add-dataset">
+                <div class="card w-100 dataset" style="border: 2px dashed #D9D9D9;">
+                    <div class="card-body d-flex justify-content-center align-items-center"
+                        onclick="pageMove('addfiles');">
+                        <p class="card-text">+ Add Dataset</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal" id="delete-popup" tabindex="-1">
+            
+        </div>
+    </div>
+</body>
+<script>
+    function pageMove(page) {
+        var params;
+        var url = "http://127.0.0.1:7000/";
+        switch (page) {
+            case "addfiles":
+                params = "addFiles"
+                break;
+            case "soccer":
+                params = "imagegallery"
+                break;
+            default:
+                params = "imagegallery"
+                break;
+        }
+        window.location.href = url + params;
+
+    }
+
+
+    var dataset = [{
+            "datasetID": 0,
+            "name": "축구1",
+            "updateDate": "2023-04-17"
+        },
+        {
+            "datasetID": 1,
+            "name": "축구2",
+            "updateDate": "2023-04-21"
+        }
+    ]
+
+    $(document).ready(function () {
+        drawCard();
+    });
+
+    /* 
+        데이터셋을 불러온다.
+        Ajax get
+    */
+    function loadInfo() {
+        /*
+        $.ajax({
+            type: 'get', //데이터 전송 타입,
+            url: _WEBSERVER_ROOT_URL + 'StorageList', //데이터를 주고받을 파일 주소 입력,
+            //data: datasetInfo,
+            //보내는 데이터,
+            dataType: 'JSON', //문자형식으로 받기 , 
+            success: function (result) {
+                window.location.reload();
+            },
+            error: function () {
+                alert("error");
+            }
+        });*/
+    }
+
+    /* 
+        데이터셋을 불러온다.
+        Ajax delete
+    */
+    function delteDataset(datasetID){
+        /*
+        $.ajax({
+            type: 'get', //데이터 전송 타입,
+            url: _WEBSERVER_ROOT_URL + 'StorageList', //데이터를 주고받을 파일 주소 입력,
+            //data: datasetInfo,
+            //보내는 데이터,
+            dataType: 'JSON', //문자형식으로 받기 , 
+            success: function (result) {
+                window.location.reload();
+            },
+            error: function () {
+                alert("error");
+            }
+        });*/
+    }
+
+    var imageSrc =
+        "http://49.50.160.122:3000/soccer_kick_sample/%2F220802%208%EB%B0%A9%ED%96%A5%EC%B9%B4%EB%A9%94%EB%9D%BC%20%ED%82%A5%201%ED%9A%8C%205%EC%9E%A5%EC%82%AC%EC%A7%84%EC%B6%94%EC%B6%9C%2F1-1%2F175303_661_CH1.jpg"
+    /*
+    데이터셋 정보를 담은 카드를 그린다.
+
+    각 카드의 ID
+    datasetID-{type}
+    */
+    function drawCard() {
+
+        var cardContainer = document.getElementById("gallerylist");
+        var cardText = ``;
+
+        var datasetInfo = dataset;
+
+        for (var i = 0; i < datasetInfo.length; i++) {
+
+
+            cardText += `
+                <div class="col" id="${dataset[i].datasetID}-card">
+                    <div class=" card w-100 dataset" >
+                        <div class="" style="position: absolute; margin: 1em; right: 0;">
+                            <div class="btn btn-light btn-group dropend" data-bs-toggle="dropdown" aria-expanded="false"
+                                style="float: right; border-radius: 10px; background-color: #666666bb; ">
+                                <i class="fa-solid fa-ellipsis-vertical " style="color: #f4f4f4; font-size: 20px;"></i>
+                            </div>
+                            <ul class="dropdown-menu">
+                                <li><button class="dropdown-item" id="${dataset[i].datasetID}-edit" type="button" onclick="editDataset('${dataset[i].datasetID}')">Edit</button></li>
+                                <li><button class="dropdown-item" id="${dataset[i].datasetID}-delete" type="button" onclick="showPopupDelete('${dataset[i].name}', '${dataset[i].datasetID}')"
+                                >Delete</button></li>
+                            </ul>
+                        </div>
+                        <img id="${dataset[i].datasetID}-image" src="${imageSrc}"
+                            class="card-img-top" alt="..."  onclick="pageMove('${imageSrc}');">
+                        <div class="card-body" onclick="pageMove('${imageSrc}');">
+                            <div class="gallery-title" id="${dataset[i].datasetID}-name" style="">${dataset[i].name}</div>
+                            <span class="" style="color: #666666;">Updated</span>
+                            <span class="" id="${dataset[i].datasetID}-updateDate">${dataset[i].updateDate}</span>
+                        </div>
+                    </div>
+                </div>
+            `
+        }
+
+        cardContainer.innerHTML += cardText;
+    }
+
+    function showPopupDelete(datasetName, datasetID) {
+        document.getElementById("popup-datasetName").innerText = datasetName;
+        document.getElementById("delete-popup").innerHTML = `
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirm</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" >
+                        Delete that dataset &lt;<span style="font-size: 600; color: #0D6EFD;" id="popup-datasetName"></span>&gt;?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" onclick="delteDataset('${datasetID}')">Delete</button>
+                    </div>
+                </div>
+            </div>
+        `
+        $('#delete-popup').modal('toggle');
+    }
+
+    /*
+    뷰어세팅(데이터셋 정보입력)화면으로 이동하면서,
+    파라미터로 데이터셋아이디를 넘겨준다.
+    */
+    function editDataset(datasetID){
+
+    }
+
+    function closePopup(){
+        $('#delete-popup').modal('toggle');
+    }
+
+</script>
+
+</html>

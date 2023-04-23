@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Label Viewer</title>
+    <script language="javascript" type="text/javascript" src="js/jquery-3.6.4.min.js"></script>
+    <script language="javascript" type="text/javascript" src="js/bootstrap.bundle.js"></script>
+    <script language="javascript" type="text/javascript" src="js/fontawesome.all.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/fontawesome.all.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <script language="javascript" type="text/javascript" src="js/globalconst.js"></script>
+
+</head>
+<style>
+    .import-type:hover {
+        background: #EBECF1;
+    }
+
+    .import-type {
+        cursor: pointer;
+    }
+
+    .active {
+        background-color: #F1F1F1;
+    }
+</style>
+<!--
+
+-->
+
+<body>
+    <%- include('./header') %>
+    <div class="container my-4">
+        <div class="row" id="gallerylist">
+            <form>
+                <div class="col">
+                    <h4>Set Viewer</h4>
+                    <div class="mb-4" style="color: #666666;">Set a gallery to Label Viewer</div>
+
+                    <h5>Dataset Name</h5>
+                    <div class="input-group mb-4" style="max-width: 400px;">
+                        <input type="text" class="form-control" id="datasetname" placeholder="" aria-label="Username"
+                            aria-describedby="basic-addon1" required>
+                    </div>
+
+                    <h5>Dataset Import</h5>
+                    <div class="row row-cols-3 mb-4" id="gallerylist">
+                        <div class="col">
+                            <input type="radio" name="type-import" class="btn-check" id="type-api" value="api"
+                                autocomplete="off" onclick="return false;" checked>
+                            <label class="w-100" for="type-api">
+                                <div class="card w-100 import-type active" style="width: 18rem;" id="">
+                                    <div class="card-body ">
+                                        <div class="d-flex justify-content-between mb-4">
+                                            <h5>API</h5>
+                                            <img src="img/LogoGXAI.svg"
+                                                style="height: 40px; filter: drop-shadow(2px 2px 2px #666666);">
+                                        </div>
+                                        <div style="color: #666666;">Registers a dataset located on Object storage.
+                                        </div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="col">
+                            <input type="radio" name="type-import" class="btn-check" id="type-objectstorage"
+                                value="objectstorage" onclick="return false;" autocomplete="off">
+                            <label class="w-100" for="type-objectstorage">
+                                <div class="card w-100 import-type" style="width: 18rem;">
+                                    <div class="card-body ">
+                                        <div class="d-flex justify-content-between mb-4">
+                                            <h5>Object Storage (Coming Soon)</h5>
+                                            <i class="fa-solid fa-box-open" style="font-size: 40px;"></i>
+                                        </div>
+                                        <div style="color: #666666;">Register the dataset located on the Google drive.
+                                        </div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="col">
+                            <input type="radio" name="type-import" class="btn-check" id="type-googledrive"
+                                value="googledrive" onclick="return false;" autocomplete="off">
+                            <label class="w-100" for="type-googledrive">
+                                <div class="card w-100 import-type" style="width: 18rem;">
+                                    <div class="card-body ">
+                                        <div class="d-flex justify-content-between mb-4">
+                                            <h5>Google Drive (Coming Soon)</h5>
+                                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Google_Drive_icon_%282020%29.svg/512px-Google_Drive_icon_%282020%29.svg.png"
+                                                style="width: 40px;">
+                                        </div>
+                                        <div style="color: #666666;">Add storage registered to an existing datainjector.
+                                        </div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <h5>Source List</h5>
+                    <div class="input-group mb-4" style="max-width: 400px;">
+                        <select class="form-select" id="sourcelist" aria-label=".form-select-sm example" required>
+                            <option value="">--Please select Source--</option>
+                        </select >
+                    </div>
+
+                    <h5>Source File Info</h5>
+                    <div class="" style="color: #666666;">The image file name and label file name must be the same.
+                    </div>
+                    <div class="form-check my-2">
+                        <input class="form-check-input" type="checkbox" value="" id="samelocation" onclick="copypath(document.getElementById('location-image').value);" checked>
+                        <label class="form-check-label" for="samelocation" style="color: #666666;">
+                            Image file and label file are in the same location
+                        </label>
+                    </div>
+                    <div class="">Image File Location</div>
+
+                    <div class="input-group mb-2" style="max-width: 400px;">
+                        <div class="input-group mb-2" style="max-width: 400px;">
+                            <input type="text" class="form-control" id="location-image" placeholder=""
+                                aria-describedby="basic-addon1" onchange="copypath(this.value);" required>
+                        </div>
+                    </div>
+
+                    <div class="">Label File Location</div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="json" name="label-ext" id="type-JSON"
+                            onclick="return false;" checked required>
+                        <label class="form-check-label" for="type-JSON" style="color: #666666;">
+                            JSON
+                        </label>
+                    </div>
+                    <div class="input-group" style="max-width: 400px;">
+                        <div class="input-group mb-4" style="max-width: 400px;">
+                            <input type="text" class="form-control" id="location-label" placeholder=""
+                                aria-describedby="basic-addon1" required>
+                        </div>
+                    </div>
+                    <div class="col d-flex justify-content-between">
+                        <button type="button" class="btn btn-lg btn-outline-primary"
+                            onclick="pageMove('gallerylist');">Back</button>
+                        <button type="submit" class="btn btn-lg btn-primary" onclick="infoValidation()">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</body>
+<script>
+    function pageMove(page) {
+        var params;
+        var url = "http://127.0.0.1:7000/";
+        switch (page) {
+            case "gallerylist":
+                params = "gallerylist"
+                break;
+            case "selecttemplate":
+                params = "selecttemplate"
+                break;
+        }
+        window.location.href = url + params;
+
+    }
+
+    $(document).ready(function () {
+        getDIStorage();
+    });
+
+    function getDIStorage() {
+        $.ajax({
+            type: 'get', //데이터 전송 타입,
+            url: _WEBSERVER_ROOT_URL + 'StorageList', //데이터를 주고받을 파일 주소 입력,
+            //data: datasetInfo,
+            //보내는 데이터,
+            dataType: 'JSON', //문자형식으로 받기 , 
+            success: function (result) {
+                addSourcelist(result);
+            },
+            error: function () {
+                alert("error");
+            }
+        });
+    }
+
+    function sendInfo(name, locationType, dataset, imgLocation, labelLocation, labelEXT) {
+
+        var data = {}
+
+        /*
+        $.ajax({
+            type: 'get', //데이터 전송 타입,
+            url: _WEBSERVER_ROOT_URL + 'StorageList', //데이터를 주고받을 파일 주소 입력,
+            //data: datasetInfo,
+            //보내는 데이터,
+            dataType: 'JSON', //문자형식으로 받기 , 
+            success: function (result) {
+                addSourcelist(result);
+                pageMove("gallerylist");
+            },
+            error: function () {
+                alert("error");
+            }
+        });*/
+
+    }
+
+    function addSourcelist(result) {
+        //#sourcelist selectbox
+        var selectbox = document.querySelector("#sourcelist");
+        var objOption = document.createElement("option");
+
+        for (var i = 0; i < result.storageinfo.length; i++) {
+            $('#sourcelist').append(
+                `<option value='${result.storageinfo[i].storageid}'> ${result.storageinfo[i].name}</option>`);
+        }
+    }
+
+    /*
+    데이터셋 이름 : id="datasetname"
+    데이터셋 위치(0,1,2) : name="type-import" id="type-api", id="type-objectstorage", id="type-googledrive"
+    (api)데이터셋 리스트 : id="sourcelist" 
+    (api)이미지파일 위치 : id="location-image"
+    라벨파일 확장자 : name="label-ext", id="type-JSON"
+    (api)라벨파일 위치 : id="location-label"
+    */
+    /*
+     var option = select.options[select.selectedIndex];
+
+     document.getElementById('value').value = option.value;
+     document.getElementById('text').value = option.text;
+     $('input:radio[name=이름]').is(":checked");*/
+
+    function infoValidation() {
+        var inputName, inputLocatype, inputDataset, inputImgloca, inputLabelloca, inputLabelext;
+
+
+        inputName = document.getElementById("datasetname").value;
+        inputImgloca = document.getElementById("location-image").value;
+        inputLabelloca = document.getElementById("datasetname").value;
+        inputName = document.getElementById("location-label").value;
+
+        //데이터셋 이름
+        if (inputName == "") {
+            return;
+        }
+
+        //데이터셋 위치 타입
+        //api, objectstorage, googledrive
+        if ($('input[name="type-import"]:checked').val() == "") {
+            return;
+        } else {
+            inputLocatype = $('input[name="type-import"]:checked').val();
+
+            switch (inputLocatype) {
+                case "api":
+
+                    //데이터셋리스트 (api)
+                    //val = ..datasetid
+                    var optionSC = $("#sourcelist :selected").val();
+                    if (optionSC == "none-source") {
+                        console.log(optionSC);
+                        return;
+                    } else {
+                        inputDataset = optionSC;
+                    }
+
+                    //이미지파일 위치 (api)
+                    if (inputImgloca == "") {
+                        return;
+                    }
+
+                    //라벨파일 위치(api)
+                    if (inputLabelloca == "") {
+                        return;
+                    }
+
+                    //라벨파일 확장자 (api)
+                    if ($('input[name="label-ext"]:checked').val() == "") {
+                        return;
+                    } else {
+                        inputLabelext = $('input[name="label-ext"]:checked').val();
+                    }
+
+                    break;
+                case "objectstorage":
+                    break;
+                case "googledrive":
+                    break;
+            }
+        }
+
+        sendInfo(inputName, inputLocatype, inputDataset, inputImgloca, inputLabelloca, inputLabelext);
+    }
+
+    function copypath(imgpath){
+        var checkSameLoca = document.getElementById("samelocation").checked;
+        var inputLabel = document.getElementById("location-label");
+
+        if(checkSameLoca == true){
+            inputLabel.readOnly = true;
+            inputLabel.value = imgpath;
+        }
+        else{//체크 안되어 있을 때.
+            inputLabel.readOnly = false;
+        }
+    }
+</script>
+
+</html>

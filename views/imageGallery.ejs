@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Label Viewer</title>
+    <script language="javascript" type="text/javascript" src="js/jquery-3.6.4.min.js"></script>
+    <script language="javascript" type="text/javascript" src="js/bootstrap.bundle.js"></script>
+    <script language="javascript" type="text/javascript" src="js/fontawesome.all.min.js"></script>
+    <script language="javascript" type="text/javascript" src="js/jquery.nanogallery2.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/fontawesome.all.css">
+    <link rel="stylesheet" type="text/css" href="css/nanogallery2.min.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <script language="javascript" type="text/javascript" src="js/globalconst.js"></script>
+
+</head>
+<style>
+    .card {
+        height: 280px;
+    }
+
+    .btn-check:checked+.btn {
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+    }
+</style>
+<!--
+
+-->
+
+<body>
+    <div class="d-flex">
+        <div class="col">
+            <%- include('./header') %>
+        </div>
+        <div class="col align-self-center d-flex justify-content-end"
+            style="float: right; margin-right: 2em; cursor: pointer;" onclick="pageMove('gallerylist')">
+            <i class="fa-solid fa-arrow-left" style="font-size: 36px;"></i>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row my-2">
+            <div class="col-2">
+                <div style="color: #666666;">Gallery Name</div>
+                <div> 축구 </div>
+            </div>
+            <div class="col-8">
+                <div style="color: #666666;">Label Show</div>
+
+                <input type="checkbox" class="btn-check" id="btn-all" autocomplete="off" onclick="draw();">
+                <label class="btn btn-outline-primary" for="btn-all">All</label>
+
+                <input type="checkbox" class="btn-check" id="btn-none" autocomplete="off" onclick="noneLabel(this);">
+                <label class="btn" for="btn-none" style="background-color: #f4f4f4;">None</label>
+
+                <input type="checkbox" class="btn-check" name="tag-label" id="B-box-soccer" autocomplete="off">
+                <label class="btn tag-label" for="B-box-soccer" style="background-color: #FFB9B9;">B-box-soccer</label>
+
+                <input type="checkbox" class="btn-check " name="tag-label" id="B-box-s" autocomplete="off">
+                <label class="btn tag-label" for="B-box-s" style="background-color: #D9D9D9;">B-box-s</label>
+            </div>
+            <div class="col-2 d-flex align-items-end justify-content-end">
+                <button type="button" class="btn btn-outline-secondary" id="btn-edit-gallery"
+                    onclick="pageMove('addfiles')">Edit Gallery</button>
+            </div>
+        </div>
+
+        <div style="overflow-y: scroll; height:75vh;">
+            <div ID="imageGallery"></div>
+        </div>
+
+        <div class="d-flex justify-content-between my-2" style="background-color: #fff;">
+            <div class="col align-self-center">
+                <span style="color: #666666;">Total</span>
+                <span id="totalcount"> 15,000 </span>
+            </div>
+            <div class="col d-flex align-items-end gap-2" style="justify-content: flex-end;">
+                <button class="btn btn-outline-secondary">
+                    <i class="fa-solid fa-chevron-left align-self-center" style="font-size: 20px;"></i>
+                </button>
+                <div class="input-group align-self-center" style="width: 4em;">
+                    <input type="text" class="form-control" placeholder="1" aria-label="Username"
+                        aria-describedby="basic-addon1">
+                </div>
+                <div class="align-self-center">/</div>
+                <div class="align-self-center" id="page-count">50</div>
+                <button class="btn btn-outline-secondary">
+                    <i class="fa-solid fa-chevron-right align-self-center" style="font-size: 20px;"></i>
+                </button>
+            </div>
+
+        </div>
+    </div>
+</body>
+<script>
+    function pageMove(page) {
+        var params;
+        var url = "http://127.0.0.1:7000/";
+        switch (page) {
+            case "addfiles":
+                params = "addFiles"
+                break;
+            case "gallerylist":
+                params = "gallerylist"
+                break;
+        }
+        window.location.href = url + params;
+
+    }
+
+    $(document).ready(function () {
+        getImage();
+    });
+
+    function draw() {
+        var canvas = document.getElementById('canvas1');
+            var ctx = canvas.getContext('2d');
+            ctx.beginPath();
+            ctx.rect(100, 100, 200, 100);
+            ctx.fillStyle = 'yellow';
+            ctx.fill();
+            ctx.lineWidth = 5;
+            ctx.strokeStyle = 'black';
+            ctx.stroke();
+
+
+        
+    }
+
+
+    function getImage() {
+        var env_path = 'D:\\MgnSData\\Datas\\';
+
+        $.ajax({
+            type: 'post', //데이터 전송 타입,
+            url: _WEBSERVER_ROOT_URL +
+                'Report/DetectionImageView/All?&StorageID=&PageNum=1&CountOfPage=50&ErrorType=&SShot=1', //데이터를 주고받을 파일 주소 입력,
+            //data: datasetInfo,
+            //보내는 데이터,
+            dataType: 'JSON', //문자형식으로 받기 , 
+            success: function (result) {
+                console.log(result);
+                imagePath(result);
+            },
+            error: function () {
+                alert("error");
+            }
+        })
+    }
+
+    /* misun
+    D/I의 Image path를 만들어준다. 
+    result information: 
+    api : http://49.50.160.122:9070/OpenAPI/Report/DetectionImageView/All
+    errorinfo
+
+    Apipath: D:\\MgnSData\\Datas\\2022\\7\\22\\9\\24863\\Thumb_24863_0_0x80000000_0.jpg
+    Imagepath: http://49.50.160.122:3000/errorimages/2022/7/22/9/24863/24863_0_0x80000000_0.jpg
+    */
+    function imagePath(result) {
+
+        var data = result.errorinfo;
+
+        //url 매핑을 위해 url을 만들어준다.
+
+        var originParam, excludeParam;
+        var pathArr = [];
+
+        for (i = 0; i < data.length; i++) {
+            originParam = result.errorinfo[i].thumbnailpath;
+            excludeParam = 'D:\\MgnSData\\Datas\\';
+            originParam = originParam.replace(excludeParam, "");
+            originParam = originParam.replace("Thumb_", "");
+
+
+            originParam = originParam.replace(/\\/ig, "/");
+            //originParam = originParam.replace(/\\/ig, "/");
+
+
+            object = {
+                src: originParam,
+                srct: originParam,
+                title: result.errorinfo[i].mediatitle
+            }
+
+            pathArr.push(object);
+        }
+        console.log(pathArr);
+
+        makeGallery(pathArr)
+    }
+
+    /*갤러리를 보여준다*/
+
+    function makeGallery(pathArr) {
+        var myLightboxTool = function (customElementName, $customIcon, item) {
+            alert('Media title :' + item.title);
+        }
+
+        $("#imageGallery").nanogallery2({
+            // ### gallery settings ###
+            thumbnailHeight: 300,
+            thumbnailWidth: "auto",
+            itemsBaseURL: 'http://49.50.160.122:3000/errorimages/',
+            thumbnailBorderVertical: 0,
+            thumbnailBorderHorizontal: 0,
+            colorScheme: {
+                thumbnail: {
+                    background: "rgba(255,255,255,100)"
+                }
+            },
+            thumbnailLabel: {
+                position: "overImageOnBottom",
+                display: true,
+                displayDescription: true,
+                hideIcons: false,
+            },
+            thumbnailAlignment: "center",
+            galleryMaxItems: 50,
+            thumbnailGutterWidth: 5,
+            thumbnailGutterHeight: 5,
+            thumbnailOpenImage: true,
+            viewerToolbar: {
+                standard: 'minimizeButton, label, shareButton, fullscreenButton',
+                minimized: 'minimizeButton, label, fullscreenButton, downloadButton, infoButton'
+            },
+            viewerTools: {
+                topLeft: 'label',
+                topRight: 'playPauseButton, zoomButton, fullscreenButton, closeButton'
+            },
+            icons: {
+                viewerCustomTool1: 'myScript'
+            },
+            fnImgToolbarCustClick: myLightboxTool,
+
+
+            // ### gallery content ###
+            items: pathArr
+        });
+    }
+
+    /*
+    템플릿을 선택하지 않는 경우에 대한 행동 처리
+    :템플릿을 선택하면 none 선택 풀리고, none선택하면 템플릿 선택 못함
+
+    라벨 리스트 : name="tag-label"
+    */
+    /*
+     function allLabel(buttonAll) {
+         if (buttonAll.checked == true) {
+             $("input:checkbox[name='tag-label']").prop("checked", true);
+         } else {
+             $("input:checkbox[name='tag-label']").prop("disabled", false);
+         }
+     }*/
+    function noneLabel(buttonNone) {
+        if (buttonNone.checked == true) {
+            $("input:checkbox[name='tag-label']").prop("checked", false);
+            $("input:checkbox[name='tag-label']").prop("disabled", true);
+        } else {
+            $("input:checkbox[name='tag-label']").prop("disabled", false);
+        }
+    }
+</script>
+
+</html>
