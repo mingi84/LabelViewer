@@ -12,6 +12,7 @@
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="css/fontawesome.all.css">
     <link rel="stylesheet" type="text/css" href="css/main.css">
+    <script language="javascript" type="text/javascript" src="js/globalconst.js"></script>
 </head>
 <style>
     .img-thumbnail:hover {
@@ -42,23 +43,14 @@
                 <div class="row mb-4 " id="gallerylist">
                     <div class="col">
                         <div class="card" style="height: 280px;" id="type-api">
-                            <div class="card-body">
+                            <div class="card-body" id="template-list">
                                 <button type="button" class="btn btn-primary" onclick="pageMove('createtemplate')">+
                                     add</button>
 
-                                <input type="checkbox" class="btn-check" id="btn-none" autocomplete="off"
-                                    onclick="noneLabel(this);">
+                                <input type="checkbox" class="btn-check" id="btn-none" name="none" autocomplete="off"
+                                    onclick="clickLabel(this.name);">
                                 <label class="btn" for="btn-none" style="background-color: #f4f4f4;">none</label>
 
-                                <input type="checkbox" class="btn-check" name="tag-label" id="B-box-soccer"
-                                    autocomplete="off">
-                                <label class="btn tag-label" for="B-box-soccer"
-                                    style="background-color: #FFB9B9;">B-box-soccer</label>
-
-                                <input type="checkbox" class="btn-check " name="tag-label" id="B-box-s"
-                                    autocomplete="off">
-                                <label class="btn tag-label" for="B-box-s"
-                                    style="background-color: #D9D9D9;">B-box-s</label>
                             </div>
                         </div>
                     </div>
@@ -87,7 +79,8 @@
                                             <div class="" style="color: #666666;">Draw type</div>
                                             <div id="bbox-drawtype" class="mb-2">-</div>
 
-                                            <button type="button" class="btn btn-outline-primary">Edit Template</button>
+                                            <button type="button" class="btn btn-outline-primary"
+                                                onclick="pageMove('createtemplate')">Edit Template</button>
                                         </div>
                                         <div class="border border-1 rounded" style="width: 240px;"></div>
                                     </div>
@@ -103,7 +96,8 @@
 
                                             <div class="" style="color: #666666;">Key Point</div>
                                             <div id="keypoint-count" class="mb-2">-</div>
-                                            <button type="button" class="btn btn-outline-primary">Edit Template</button>
+                                            <button type="button" class="btn btn-outline-primary"
+                                                onclick="pageMove('createtemplate')">Edit Template</button>
                                         </div>
                                         <div class="border border-1 rounded" style="width: 240px;"></div>
                                     </div>
@@ -120,56 +114,56 @@
 
                 <div class="row mb-4" id="gallerylist">
                     <div class="col">
-                        <div class="card w-100" style="width: 18rem;" id="type-api">
+                        <div class="card w-100" style="width: 18rem;">
                             <div class="card-body d-flex gap-2">
                                 <div class="w-100 border border-1" id="image-plus" style="height: 360px;">
-                                    <img class="img-thumbnail"
+                                    <img class="img-thumbnail" id="image-zoom-in" onclick=""
                                         src="http://49.50.160.122:3000/soccer_kick_sample/%2F220802%208%EB%B0%A9%ED%96%A5%EC%B9%B4%EB%A9%94%EB%9D%BC%20%ED%82%A5%201%ED%9A%8C%205%EC%9E%A5%EC%82%AC%EC%A7%84%EC%B6%94%EC%B6%9C%2F1-2%2F175305_629_CH2.jpg"
                                         alt="">
                                 </div>
-                                <div class="w-100  row row-cols-3">
-                                    <div class="col thumbnail align-self-center" style="object-fit: contain;">
-                                        <img class="img-thumbnail" id="image-1"
+                                <div class="w-100  row row-cols-3" id="list-thumbnail">
+                                    <div class="thumbnail align-self-center" style="object-fit: contain;">
+                                        <img class="img-thumbnail" id="image-1"  onclick="clickThumbnail(this.src)"
                                             src="http://49.50.160.122:3000/soccer_kick_sample/%2F220802%208%EB%B0%A9%ED%96%A5%EC%B9%B4%EB%A9%94%EB%9D%BC%20%ED%82%A5%201%ED%9A%8C%205%EC%9E%A5%EC%82%AC%EC%A7%84%EC%B6%94%EC%B6%9C%2F1-2%2F175305_629_CH2.jpg"
                                             alt="">
                                     </div>
-                                    <div class="col thumbnail align-self-center" style="object-fit: contain;">
-                                        <img class="img-thumbnail" id="image-2"
+                                    <div class=" thumbnail align-self-center" style="object-fit: contain;">
+                                        <img class="img-thumbnail" id="image-2"  onclick="clickThumbnail(this.src)"
                                             src="http://49.50.160.122:3000/soccer_kick_sample/%2F220802%208%EB%B0%A9%ED%96%A5%EC%B9%B4%EB%A9%94%EB%9D%BC%20%ED%82%A5%201%ED%9A%8C%205%EC%9E%A5%EC%82%AC%EC%A7%84%EC%B6%94%EC%B6%9C%2F1-2%2F175305_629_CH2.jpg"
                                             alt="">
                                     </div>
-                                    <div class="col thumbnail align-self-center" style="object-fit: contain;">
-                                        <img class="img-thumbnail" id="image-3"
+                                    <div class=" thumbnail align-self-center" style="object-fit: contain;">
+                                        <img class="img-thumbnail" id="image-3"  onclick="clickThumbnail(this.src)"
                                             src="http://49.50.160.122:3000/soccer_kick_sample/%2F220802%208%EB%B0%A9%ED%96%A5%EC%B9%B4%EB%A9%94%EB%9D%BC%20%ED%82%A5%201%ED%9A%8C%205%EC%9E%A5%EC%82%AC%EC%A7%84%EC%B6%94%EC%B6%9C%2F1-2%2F175305_629_CH2.jpg"
                                             alt="">
                                     </div>
-                                    <div class="col thumbnail align-self-center" style="object-fit: contain;">
-                                        <img class="img-thumbnail" id="image-4"
+                                    <div class=" thumbnail align-self-center" style="object-fit: contain;">
+                                        <img class="img-thumbnail" id="image-4"  onclick="clickThumbnail(this.src)"
                                             src="http://49.50.160.122:3000/soccer_kick_sample/%2F220802%208%EB%B0%A9%ED%96%A5%EC%B9%B4%EB%A9%94%EB%9D%BC%20%ED%82%A5%201%ED%9A%8C%205%EC%9E%A5%EC%82%AC%EC%A7%84%EC%B6%94%EC%B6%9C%2F1-2%2F175305_629_CH2.jpg"
                                             alt="">
                                     </div>
-                                    <div class="col thumbnail align-self-center" style="object-fit: contain;">
-                                        <img class="img-thumbnail" id="image-5"
+                                    <div class=" thumbnail align-self-center" style="object-fit: contain;">
+                                        <img class="img-thumbnail" id="image-5"  onclick="clickThumbnail(this.src)"
                                             src="http://49.50.160.122:3000/soccer_kick_sample/%2F220802%208%EB%B0%A9%ED%96%A5%EC%B9%B4%EB%A9%94%EB%9D%BC%20%ED%82%A5%201%ED%9A%8C%205%EC%9E%A5%EC%82%AC%EC%A7%84%EC%B6%94%EC%B6%9C%2F1-2%2F175305_629_CH2.jpg"
                                             alt="">
                                     </div>
-                                    <div class="col thumbnail align-self-center" style="object-fit: contain;">
-                                        <img class="img-thumbnail" id="image-6"
+                                    <div class=" thumbnail align-self-center" style="object-fit: contain;">
+                                        <img class="img-thumbnail" id="image-6"  onclick="clickThumbnail(this.src)"
                                             src="http://49.50.160.122:3000/soccer_kick_sample/%2F220802%208%EB%B0%A9%ED%96%A5%EC%B9%B4%EB%A9%94%EB%9D%BC%20%ED%82%A5%201%ED%9A%8C%205%EC%9E%A5%EC%82%AC%EC%A7%84%EC%B6%94%EC%B6%9C%2F1-2%2F175305_629_CH2.jpg"
                                             alt="">
                                     </div>
-                                    <div class="col thumbnail align-self-center" style="object-fit: contain;">
-                                        <img class="img-thumbnail" id="image-7"
+                                    <div class=" thumbnail align-self-center" style="object-fit: contain;">
+                                        <img class="img-thumbnail" id="image-7"  onclick="clickThumbnail(this.src)"
                                             src="http://49.50.160.122:3000/soccer_kick_sample/%2F220802%208%EB%B0%A9%ED%96%A5%EC%B9%B4%EB%A9%94%EB%9D%BC%20%ED%82%A5%201%ED%9A%8C%205%EC%9E%A5%EC%82%AC%EC%A7%84%EC%B6%94%EC%B6%9C%2F1-2%2F175305_629_CH2.jpg"
                                             alt="">
                                     </div>
-                                    <div class="col thumbnail align-self-center" style="object-fit: contain;">
-                                        <img class="img-thumbnail" id="image-8"
+                                    <div class=" thumbnail align-self-center" style="object-fit: contain;">
+                                        <img class="img-thumbnail" id="image-8"  onclick="clickThumbnail(this.src)"
                                             src="http://49.50.160.122:3000/soccer_kick_sample/%2F220802%208%EB%B0%A9%ED%96%A5%EC%B9%B4%EB%A9%94%EB%9D%BC%20%ED%82%A5%201%ED%9A%8C%205%EC%9E%A5%EC%82%AC%EC%A7%84%EC%B6%94%EC%B6%9C%2F1-2%2F175305_629_CH2.jpg"
                                             alt="">
                                     </div>
-                                    <div class="col thumbnail align-self-center" style="object-fit: contain;">
-                                        <img class="img-thumbnail" id="image-9"
+                                    <div class=" thumbnail align-self-center" style="object-fit: contain;">
+                                        <img class="img-thumbnail" id="image-9"  onclick="clickThumbnail(this.src)"
                                             src="http://49.50.160.122:3000/soccer_kick_sample/%2F220802%208%EB%B0%A9%ED%96%A5%EC%B9%B4%EB%A9%94%EB%9D%BC%20%ED%82%A5%201%ED%9A%8C%205%EC%9E%A5%EC%82%AC%EC%A7%84%EC%B6%94%EC%B6%9C%2F1-2%2F175305_629_CH2.jpg"
                                             alt="">
                                     </div>
@@ -181,9 +175,12 @@
 
                 <div class="col d-flex justify-content-between">
                     <button type="button" class="btn btn-lg btn-outline-primary"
-                        onclick="pageMove('addfiles')">Back</button>
-                    <button type="button" class="btn btn-lg btn-primary" onclick="pageMove('gallerylist')">Next</button>
+                        onclick="pageMove('imagegallery')">Back</button>
+                    <button type="button" class="btn btn-lg btn-primary" onclick="pageMove('imagegallery')">Next</button>
                 </div>
+            </div>
+            <div class="modal" id="delete-popup" tabindex="-1">
+            
             </div>
         </div>
 
@@ -192,10 +189,10 @@
 <script>
     function pageMove(page) {
         var params;
-        var url = "http://127.0.0.1:7000/";
+        var url = _PAGE_URL;
         switch (page) {
-            case "addfiles":
-                params = "addfiles"
+            case "imagegallery":
+                params = "imagegallery"
                 break;
             case "createtemplate":
                 params = "createtemplate"
@@ -208,18 +205,22 @@
 
     }
 
+    $(document).ready(function () {
+        loadTemplate();
+    });
+
     /*
     템플릿을 선택하지 않는 경우에 대한 행동 처리
     :템플릿을 선택하면 none 선택 풀리고, none선택하면 템플릿 선택 못함
 
     라벨 리스트 : name="tag-label"
     */
-    function noneLabel(buttonNone) {
-        if (buttonNone.checked == true) {
+    function clickLabel(buttonName) {
+        if (buttonName == "none") {
             $("input:checkbox[name='tag-label']").prop("checked", false);
-            $("input:checkbox[name='tag-label']").prop("disabled", true);
-        } else {
-            $("input:checkbox[name='tag-label']").prop("disabled", false);
+        }
+        if (buttonName == "tag-label") {
+            $("input:checkbox[name='none']").prop("checked", false);
         }
     }
 
@@ -230,7 +231,7 @@
     function changeTemplate(tabID) {
         $('.type-template').removeClass(' active');
         $(`#${tabID}`).addClass(' active');
-        
+
         if (tabID == "tab-boundingbox") {
             $("#page-boundingbox").show();
             $("#page-keypoint").hide();
@@ -240,6 +241,105 @@
             $("#page-boundingbox").hide();
 
         }
+    }
+
+    /*
+    기존 템플릿 정보 불러오기
+    */
+    function loadTemplate() {
+
+        var templateInfo = [{
+            "templateID": "0",
+            "name": "B-box-soccer",
+            "color": "FFB9B9"
+        },
+        {
+            "templateID": "1",
+            "name": "Skeleton-soccer",
+            "color": "D9D9D9"
+        }
+    ]
+
+        drawTemplate(templateInfo);
+    }
+
+    /*
+    Ajax 템플릿 정보 삭제
+    */
+    function deleteTemplate(templateID){
+        /*
+        $.ajax({
+            type: 'get', //데이터 전송 타입,
+            url: _WEBSERVER_ROOT_URL + 'StorageList', //데이터를 주고받을 파일 주소 입력,
+            //data: datasetInfo,
+            //보내는 데이터,
+            dataType: 'JSON', //문자형식으로 받기 , 
+            success: function (result) {
+                */
+                window.location.reload();/*
+            },
+            error: function () {
+                alert("error");
+            }
+        });*/
+    }
+
+
+    /*
+    템플릿 정보로 템플릿 그리기
+    */
+    function drawTemplate(templateInfo) {
+        const template = document.getElementById("template-list");
+
+        for(var i=0; i<templateInfo.length; i++){
+            template.innerHTML += `
+                                <input type="checkbox" class="btn-check" name="tag-label" id="template-${templateInfo[i].templateID}"
+                                onclick="clickLabel(this.name);" autocomplete="off">
+                                <label class="btn tag-label" for="template-${templateInfo[i].templateID}"
+                                    style="background-color: #${templateInfo[i].color};">
+                                    <div class="d-flex">
+                                        <div id="template-name">${templateInfo[i].name}</div>
+                                        <i class="fa-solid fa-xmark btn-close ms-2" onclick="deletePopup('${templateInfo[i].name}','${templateInfo[i].templateID}'); return false;"></i>
+                                    </div>
+                                </label>`
+        }
+        
+    }
+
+    /*
+    템플릿 삭제 팝업 띄우기
+    */
+    function deletePopup(templateName, templateID){
+
+        document.getElementById("delete-popup").innerHTML = `
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirm</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" >
+                        Delete that template &lt;<span style="font-size: 600; color: #0D6EFD;" id="popup-datasetName">${templateName}</span>&gt;?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" onclick="deleteTemplate('${templateID}')">Delete</button>
+                    </div>
+                </div>
+            </div>
+        `
+
+        $('#delete-popup').modal('toggle');
+
+    }
+
+
+    /*
+    썸네일을 클릭하면 선택한 이미지와 왼쪽의 확대 이미지에 템플릿을 적용하여 보여준다.
+    */
+    function clickThumbnail(clickSrc){
+        //console.log(clickSrc)
+        document.getElementById("image-zoom-in").src = clickSrc;
     }
 </script>
 

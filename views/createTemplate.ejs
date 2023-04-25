@@ -12,6 +12,7 @@
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="css/fontawesome.all.css">
     <link rel="stylesheet" type="text/css" href="css/main.css">
+    <script language="javascript" type="text/javascript" src="js/globalconst.js"></script>
 </head>
 <style>
     .b-box-type{
@@ -185,7 +186,7 @@
 <script>
     function pageMove(page){
         var params;
-        var url = "http://127.0.0.1:7000/";
+        var url = _PAGE_URL;
         switch (page){
             case "selecttemplate" :
                 params = "selecttemplate"

@@ -12,6 +12,8 @@
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="css/fontawesome.all.css">
     <link rel="stylesheet" type="text/css" href="css/main.css">
+    <script language="javascript" type="text/javascript" src="js/globalconst.js"></script>
+
 </head>
 <style>
     .card {
@@ -46,15 +48,18 @@
     </div>
 </body>
 <script>
-    function pageMove(page) {
+    function pageMove(page, datasetID) {
         var params;
-        var url = "http://127.0.0.1:7000/";
+        var url = _PAGE_URL;
         switch (page) {
             case "addfiles":
                 params = "addFiles"
                 break;
             case "soccer":
                 params = "imagegallery"
+                break;
+            case "edit":
+                params = "addFiles?" + datasetID
                 break;
             default:
                 params = "imagegallery"
@@ -106,7 +111,7 @@
         데이터셋을 불러온다.
         Ajax delete
     */
-    function delteDataset(datasetID){
+    function deleteDataset(datasetID){
         /*
         $.ajax({
             type: 'get', //데이터 전송 타입,
@@ -150,7 +155,7 @@
                                 <i class="fa-solid fa-ellipsis-vertical " style="color: #f4f4f4; font-size: 20px;"></i>
                             </div>
                             <ul class="dropdown-menu">
-                                <li><button class="dropdown-item" id="${dataset[i].datasetID}-edit" type="button" onclick="editDataset('${dataset[i].datasetID}')">Edit</button></li>
+                                <li><button class="dropdown-item" id="${dataset[i].datasetID}-edit" type="button" onclick="pageMove('edit','${dataset[i].datasetID}')">Edit</button></li>
                                 <li><button class="dropdown-item" id="${dataset[i].datasetID}-delete" type="button" onclick="showPopupDelete('${dataset[i].name}', '${dataset[i].datasetID}')"
                                 >Delete</button></li>
                             </ul>
@@ -184,7 +189,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" onclick="delteDataset('${datasetID}')">Delete</button>
+                        <button type="button" class="btn btn-primary" onclick="deleteDataset('${datasetID}')">Delete</button>
                     </div>
                 </div>
             </div>
