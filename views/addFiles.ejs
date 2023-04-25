@@ -53,7 +53,7 @@
                             <input type="radio" name="type-import" class="btn-check" id="type-api" value="api"
                                 autocomplete="off" onclick="return false;" checked>
                             <label class="w-100" for="type-api">
-                                <div class="card w-100 import-type active" style="width: 18rem;" id="">
+                                <div class="card w-100 import-type active" style="width: 18rem;" id="card-api">
                                     <div class="card-body ">
                                         <div class="d-flex justify-content-between mb-4">
                                             <h5>API</h5>
@@ -70,7 +70,7 @@
                             <input type="radio" name="type-import" class="btn-check" id="type-objectstorage"
                                 value="objectstorage" onclick="return false;" autocomplete="off">
                             <label class="w-100" for="type-objectstorage">
-                                <div class="card w-100 import-type" style="width: 18rem;">
+                                <div class="card w-100 import-type" style="width: 18rem;" id="card-objectstorage">
                                     <div class="card-body ">
                                         <div class="d-flex justify-content-between mb-4">
                                             <h5>Object Storage (Coming Soon)</h5>
@@ -86,7 +86,7 @@
                             <input type="radio" name="type-import" class="btn-check" id="type-googledrive"
                                 value="googledrive" onclick="return false;" autocomplete="off">
                             <label class="w-100" for="type-googledrive">
-                                <div class="card w-100 import-type" style="width: 18rem;">
+                                <div class="card w-100 import-type" style="width: 18rem;" id="card-googledrive">
                                     <div class="card-body ">
                                         <div class="d-flex justify-content-between mb-4">
                                             <h5>Google Drive (Coming Soon)</h5>
@@ -104,15 +104,16 @@
                     <h5>Source List</h5>
                     <div class="input-group mb-4" style="max-width: 400px;">
                         <select class="form-select" id="sourcelist" aria-label=".form-select-sm example" required>
-                            <option value="">--Please select Source--</option>
-                        </select >
+                            <option value="" selected>--Please select Source--</option>
+                        </select>
                     </div>
 
                     <h5>Source File Info</h5>
                     <div class="" style="color: #666666;">The image file name and label file name must be the same.
                     </div>
                     <div class="form-check my-2">
-                        <input class="form-check-input" type="checkbox" value="" id="samelocation" onclick="copypath(document.getElementById('location-image').value);" checked>
+                        <input class="form-check-input" type="checkbox" value="" id="samelocation"
+                            onclick="copypath(document.getElementById('location-image').value);" checked>
                         <label class="form-check-label" for="samelocation" style="color: #666666;">
                             Image file and label file are in the same location
                         </label>
@@ -143,7 +144,7 @@
                     <div class="col d-flex justify-content-between">
                         <button type="button" class="btn btn-lg btn-outline-primary"
                             onclick="pageMove('gallerylist');">Back</button>
-                        <button type="submit" class="btn btn-lg btn-primary" onclick="infoValidation()">Save</button>
+                        <button type="button" class="btn btn-lg btn-primary" onclick="infoValidation()">Save</button>
                     </div>
                 </div>
             </form>
@@ -167,10 +168,21 @@
 
     }
 
+    let query = window.location.search;
+    let param = new URLSearchParams(query);
+    let datasetID = param.get('id');
+
     $(document).ready(function () {
         getDIStorage();
+
+        if (datasetID !== null) {
+            getDataset(datasetID)
+        }
     });
 
+    /*
+    Data Injector storagelist를 가져온다.
+    */
     function getDIStorage() {
         $.ajax({
             type: 'get', //데이터 전송 타입,
@@ -180,6 +192,11 @@
             dataType: 'JSON', //문자형식으로 받기 , 
             success: function (result) {
                 addSourcelist(result);
+
+                //데이터인젝터 스토리지 목록을 그린 후에 기존 선택 값을 넣어준다.
+                if (datasetID !== null) {
+                    $("#sourcelist").val("40").prop("selected", true);
+                }
             },
             error: function () {
                 alert("error");
@@ -187,28 +204,149 @@
         });
     }
 
-    function sendInfo(name, locationType, dataset, imgLocation, labelLocation, labelEXT) {
 
-        var data = {}
+    /*
+    뷰어 정보를 전송한다.
+    http://127.0.0.1:8008/apidataset/write
+    */
+    function sendInfo(name, importType, locationType, dataset, imgLocation, labelLocation, labelEXT) {
+        if (datasetID !== null) {
+            updateDataset(datasetID, name, importType, locationType, dataset, imgLocation, labelLocation, labelEXT);
+            return;
+        }
 
-        /*
+        datasetInfo = {
+            "user_id": 1,
+            "dataset_name": name,
+            "dataset_import_type": importType,
+            "source_list_sto": dataset,
+            "image_location": imgLocation,
+            "label_location": labelLocation
+        }
+
         $.ajax({
-            type: 'get', //데이터 전송 타입,
-            url: _WEBSERVER_ROOT_URL + 'StorageList', //데이터를 주고받을 파일 주소 입력,
-            //data: datasetInfo,
-            //보내는 데이터,
+            type: 'post', //데이터 전송 타입,
+            url: _PAGE_URL + 'apidataset/write', //데이터를 주고받을 파일 주소 입력,
+            data: JSON.stringify(datasetInfo), //보내는 데이터,
             dataType: 'JSON', //문자형식으로 받기 , 
+            contentType: "application/json",
             success: function (result) {
-                addSourcelist(result);
                 pageMove("gallerylist");
             },
             error: function () {
                 alert("error");
             }
-        });*/
+        });
+    }
+
+    /*
+    뷰어 정보를 수정한다.
+    http://127.0.0.1:8008/apidataset/write
+    */
+    function updateDataset(datasetID, name, importType, locationType, dataset, imgLocation, labelLocation, labelEXT) {
+
+        datasetInfo = {
+            "user_id": 1,
+            "dataset_name": name,
+            "dataset_import_type": importType,
+            "source_list_sto": dataset,
+            "image_location": imgLocation,
+            "label_location": labelLocation
+        }
+
+        console.log(datasetID);
+
+        $.ajax({
+            type: 'post', //데이터 전송 타입,
+            url: _PAGE_URL + 'apidataset/updataset?datasetId=' + datasetID, //데이터를 주고받을 파일 주소 입력,
+            data: JSON.stringify(datasetInfo), //보내는 데이터,
+            dataType: 'JSON', //문자형식으로 받기 , 
+            contentType: "application/json",
+            success: function (result) {
+                pageMove("gallerylist");
+            },
+            error: function () {
+                alert("error");
+            }
+        });
 
     }
 
+
+    /*
+    뷰어 정보를 가져온다.
+    http://127.0.0.1:8008/apidataset/write
+    */
+    function getDataset(datasetID) {
+        $.ajax({
+            type: 'get', //데이터 전송 타입,
+            url: _PAGE_URL + 'apidataset', //데이터를 주고받을 파일 주소 입력,
+            //data: JSON.stringify(datasetInfo), //보내는 데이터,
+            dataType: 'JSON', //문자형식으로 받기 , 
+            contentType: "application/json",
+            success: function (result) {
+                compareID(result, datasetID);
+            },
+            error: function () {
+                alert("error");
+            }
+        });
+
+    }
+
+    /*
+    파라미터 아이디와 스토리지 아이디를 비교한 후, 필요한 정보만 만들어주는 함수
+    */
+    function compareID(result, datasetID) {
+        for (var i = 0; i < result.length; i++) {
+            if (result[i]._id == datasetID) {
+                drawExistInfo(result[i]);
+                return;
+            }
+        }
+    }
+
+    /*
+    function compareID(result, datasetID)에서 가져온 기존 정보를 그려준다.
+    데이터셋 이름 : id="datasetname"
+    데이터셋 위치(0,1,2) : name="type-import" id="type-api", id="type-objectstorage", id="type-googledrive"
+    (api)데이터셋 리스트 : id="sourcelist" 
+    (api)이미지파일 위치 : id="location-image"
+    라벨파일 확장자 : name="label-ext", id="type-JSON"
+    (api)라벨파일 위치 : id="location-label"
+    */
+    function drawExistInfo(result) {
+
+        document.getElementById("datasetname").value = result.dataset_name;
+        /*
+        클릭한 카드 active해주는 코드는 여기에 작성하기, 
+        objectstorage와 googledrive 사용 가능한 상태일 때 작성하도록 함
+        */
+
+        /*
+        선택한 스토리지는 스토리지를 그린 후에 선택해야함, addSourcelist() result 받은 이후에 선택하도록 한다.
+        */
+
+        var inputLabel = document.getElementById("location-label");
+        if (result.image_location == result.label_location) {
+            document.getElementById("samelocation").checked = true;
+            inputLabel.readOnly = true;
+        } else {
+            inputLabel.readOnly = false;
+
+            document.getElementById("samelocation").checked = false;
+        }
+
+        document.getElementById("location-image").value = result.image_location;
+        inputLabel.value = result.image_location;
+
+    }
+
+
+
+    /*
+     D/I 스토리지 선택 옵션을 만들어준다.
+    */
     function addSourcelist(result) {
         //#sourcelist selectbox
         var selectbox = document.querySelector("#sourcelist");
@@ -236,13 +374,12 @@
      $('input:radio[name=이름]').is(":checked");*/
 
     function infoValidation() {
-        var inputName, inputLocatype, inputDataset, inputImgloca, inputLabelloca, inputLabelext;
+        var inputName, inputLocatype, importType, inputDataset, inputImgloca, inputLabelloca, inputLabelext;
 
 
         inputName = document.getElementById("datasetname").value;
         inputImgloca = document.getElementById("location-image").value;
-        inputLabelloca = document.getElementById("datasetname").value;
-        inputName = document.getElementById("location-label").value;
+        inputLabelloca = document.getElementById("location-label").value;
 
         //데이터셋 이름
         if (inputName == "") {
@@ -286,26 +423,28 @@
                         inputLabelext = $('input[name="label-ext"]:checked').val();
                     }
 
+                    importType = 1;
                     break;
                 case "objectstorage":
+                    importType = 2;
                     break;
                 case "googledrive":
+                    importType = 3;
                     break;
             }
         }
 
-        sendInfo(inputName, inputLocatype, inputDataset, inputImgloca, inputLabelloca, inputLabelext);
+        sendInfo(inputName, importType, inputLocatype, inputDataset, inputImgloca, inputLabelloca, inputLabelext);
     }
 
-    function copypath(imgpath){
+    function copypath(imgpath) {
         var checkSameLoca = document.getElementById("samelocation").checked;
         var inputLabel = document.getElementById("location-label");
 
-        if(checkSameLoca == true){
+        if (checkSameLoca == true) {
             inputLabel.readOnly = true;
             inputLabel.value = imgpath;
-        }
-        else{//체크 안되어 있을 때.
+        } else { //체크 안되어 있을 때.
             inputLabel.readOnly = false;
         }
     }

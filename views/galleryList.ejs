@@ -53,16 +53,16 @@
         var url = _PAGE_URL;
         switch (page) {
             case "addfiles":
-                params = "addFiles"
+                params = "addFiles";
                 break;
             case "soccer":
-                params = "imagegallery"
+                params = "imagegallery";
                 break;
             case "edit":
-                params = "addFiles?" + datasetID
+                params = "addFiles?id=" + datasetID;
                 break;
             default:
-                params = "imagegallery"
+                params = "imagegallery";
                 break;
         }
         window.location.href = url + params;
@@ -83,7 +83,7 @@
     ]
 
     $(document).ready(function () {
-        drawCard();
+        loadInfo();
     });
 
     /* 
@@ -91,31 +91,31 @@
         Ajax get
     */
     function loadInfo() {
-        /*
+        
         $.ajax({
             type: 'get', //데이터 전송 타입,
-            url: _WEBSERVER_ROOT_URL + 'StorageList', //데이터를 주고받을 파일 주소 입력,
+            url: _PAGE_URL + 'apidataset', //데이터를 주고받을 파일 주소 입력,
             //data: datasetInfo,
             //보내는 데이터,
             dataType: 'JSON', //문자형식으로 받기 , 
             success: function (result) {
-                window.location.reload();
+                console.log(result);
+                drawCard(result);
             },
             error: function () {
                 alert("error");
             }
-        });*/
+        });
     }
 
     /* 
         데이터셋을 불러온다.
         Ajax delete
     */
-    function deleteDataset(datasetID){
-        /*
+    function deleteDataset(datasetID){  
         $.ajax({
             type: 'get', //데이터 전송 타입,
-            url: _WEBSERVER_ROOT_URL + 'StorageList', //데이터를 주고받을 파일 주소 입력,
+            url: _PAGE_URL + 'apidataset/deldataset?datasetId=' + datasetID, //데이터를 주고받을 파일 주소 입력,
             //data: datasetInfo,
             //보내는 데이터,
             dataType: 'JSON', //문자형식으로 받기 , 
@@ -125,7 +125,7 @@
             error: function () {
                 alert("error");
             }
-        });*/
+        });
     }
 
     var imageSrc =
@@ -136,7 +136,7 @@
     각 카드의 ID
     datasetID-{type}
     */
-    function drawCard() {
+    function drawCard(dataset) {
 
         var cardContainer = document.getElementById("gallerylist");
         var cardText = ``;
@@ -147,7 +147,7 @@
 
 
             cardText += `
-                <div class="col" id="${dataset[i].datasetID}-card">
+                <div class="col" id="${datasetInfo[i]._id}-card">
                     <div class=" card w-100 dataset" >
                         <div class="" style="position: absolute; margin: 1em; right: 0;">
                             <div class="btn btn-light btn-group dropend" data-bs-toggle="dropdown" aria-expanded="false"
@@ -155,17 +155,17 @@
                                 <i class="fa-solid fa-ellipsis-vertical " style="color: #f4f4f4; font-size: 20px;"></i>
                             </div>
                             <ul class="dropdown-menu">
-                                <li><button class="dropdown-item" id="${dataset[i].datasetID}-edit" type="button" onclick="pageMove('edit','${dataset[i].datasetID}')">Edit</button></li>
-                                <li><button class="dropdown-item" id="${dataset[i].datasetID}-delete" type="button" onclick="showPopupDelete('${dataset[i].name}', '${dataset[i].datasetID}')"
+                                <li><button class="dropdown-item" id="${dataset[i]._id}-edit" type="button" onclick="pageMove('edit','${dataset[i]._id}')">Edit</button></li>
+                                <li><button class="dropdown-item" id="${dataset[i]._id}-delete" type="button" onclick="showPopupDelete('${dataset[i].dataset_name}', '${dataset[i]._id}')"
                                 >Delete</button></li>
                             </ul>
                         </div>
-                        <img id="${dataset[i].datasetID}-image" src="${imageSrc}"
+                        <img id="${dataset[i]._id}-image" src="${imageSrc}"
                             class="card-img-top" alt="..."  onclick="pageMove('${imageSrc}');">
                         <div class="card-body" onclick="pageMove('${imageSrc}');">
-                            <div class="gallery-title" id="${dataset[i].datasetID}-name" style="">${dataset[i].name}</div>
+                            <div class="gallery-title" id="${dataset[i]._id}-name" style="">${dataset[i].dataset_name}</div>
                             <span class="" style="color: #666666;">Updated</span>
-                            <span class="" id="${dataset[i].datasetID}-updateDate">${dataset[i].updateDate}</span>
+                            <span class="" id="${dataset[i]._id}-updateDate">${dataset[i].dataset_last_update}</span>
                         </div>
                     </div>
                 </div>
@@ -176,7 +176,7 @@
     }
 
     function showPopupDelete(datasetName, datasetID) {
-        document.getElementById("popup-datasetName").innerText = datasetName;
+
         document.getElementById("delete-popup").innerHTML = `
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
@@ -185,7 +185,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body" >
-                        Delete that dataset &lt;<span style="font-size: 600; color: #0D6EFD;" id="popup-datasetName"></span>&gt;?
+                        Delete that dataset &lt;<span style="font-size: 600; color: #0D6EFD;" id="popup-datasetName">${datasetName}</span>&gt;?
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -194,6 +194,7 @@
                 </div>
             </div>
         `
+
         $('#delete-popup').modal('toggle');
     }
 
