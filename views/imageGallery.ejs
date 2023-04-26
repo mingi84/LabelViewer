@@ -25,6 +25,25 @@
     .btn-check:checked+.btn {
         box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
     }
+
+    ::-webkit-scrollbar {
+        width: 8px;
+        /* 스크롤바의 너비 */
+    }
+
+    ::-webkit-scrollbar-thumb {
+        height: 30%;
+        /* 스크롤바의 길이 */
+        background: #217af4;
+        /* 스크롤바의 색상 */
+
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: rgba(33, 122, 244, .1);
+        /*스크롤바 뒷 배경 색상*/
+    }
 </style>
 <!--
 
@@ -35,9 +54,9 @@
         <div class="col">
             <%- include('./header') %>
         </div>
-        <div class="col align-self-center d-flex justify-content-end"
-            style="float: right; margin-right: 2em; cursor: pointer;" onclick="pageMove('gallerylist')">
-            <i class="fa-solid fa-arrow-left" style="font-size: 36px;"></i>
+        <div class="col align-self-center d-flex justify-content-end" style="float: right; margin-right: 2em;">
+            <i class="fa-solid fa-arrow-left" style="font-size: 36px; cursor: pointer;"
+                onclick="pageMove('gallerylist')"></i>
         </div>
     </div>
     <div class="container-fluid">
@@ -49,21 +68,21 @@
             <div class="col-8">
                 <div style="color: #666666;">Label Show</div>
 
-                <input type="checkbox" class="btn-check" id="btn-all" autocomplete="off" onclick="draw();">
-                <label class="btn btn-outline-primary" for="btn-all">All</label>
+                <input type="checkbox" class="btn-check" id="btn-none" name="none" autocomplete="off"
+                    onclick="clickLabel(this.name); draw();">
+                <label class="btn" for="btn-none" style="background-color: #f4f4f4;">none</label>
 
-                <input type="checkbox" class="btn-check" id="btn-none" autocomplete="off" onclick="noneLabel(this);">
-                <label class="btn" for="btn-none" style="background-color: #f4f4f4;">None</label>
-
-                <input type="checkbox" class="btn-check" name="tag-label" id="B-box-soccer" autocomplete="off">
+                <input type="checkbox" class="btn-check" name="tag-label" id="B-box-soccer"
+                    onclick="clickLabel(this.name);" autocomplete="off">
                 <label class="btn tag-label" for="B-box-soccer" style="background-color: #FFB9B9;">B-box-soccer</label>
 
-                <input type="checkbox" class="btn-check " name="tag-label" id="B-box-s" autocomplete="off">
+                <input type="checkbox" class="btn-check " name="tag-label" id="B-box-s" onclick="clickLabel(this.name);"
+                    autocomplete="off">
                 <label class="btn tag-label" for="B-box-s" style="background-color: #D9D9D9;">B-box-s</label>
             </div>
             <div class="col-2 d-flex align-items-end justify-content-end">
                 <button type="button" class="btn btn-outline-secondary" id="btn-edit-gallery"
-                    onclick="pageMove('addfiles')">Edit Gallery</button>
+                    onclick="pageMove('selecttemplate')">Set Template</button>
             </div>
         </div>
 
@@ -74,33 +93,57 @@
         <div class="d-flex justify-content-between my-2" style="background-color: #fff;">
             <div class="col align-self-center">
                 <span style="color: #666666;">Total</span>
-                <span id="totalcount"> 15,000 </span>
+                <span id="totalcount"></span>
             </div>
             <div class="col d-flex align-items-end gap-2" style="justify-content: flex-end;">
-                <button class="btn btn-outline-secondary">
+                <button class="btn btn-outline-secondary" onclick="countPage('down');">
                     <i class="fa-solid fa-chevron-left align-self-center" style="font-size: 20px;"></i>
                 </button>
                 <div class="input-group align-self-center" style="width: 4em;">
-                    <input type="text" class="form-control" placeholder="1" aria-label="Username"
-                        aria-describedby="basic-addon1">
+                    <input type="number" class="form-control" id="page-count" value="1" aria-label="pageCount" min="1"
+                        aria-describedby="basic-addon1" onchange="getImage(this.value);">
                 </div>
                 <div class="align-self-center">/</div>
-                <div class="align-self-center" id="page-count">50</div>
-                <button class="btn btn-outline-secondary">
+                <div class="align-self-center" id="page-total"></div>
+                <button class="btn btn-outline-secondary" onclick="countPage('up');">
                     <i class="fa-solid fa-chevron-right align-self-center" style="font-size: 20px;"></i>
                 </button>
-            </div>
+                <button type="button" class="btn btn-primary" id="liveToastBtn">Show live toast</button>
 
+            </div>
+        </div>
+
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+            <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <strong class="me-auto">Bootstrap</strong>
+                    <small>11 mins ago</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>s
+                <div class="toast-body">
+                    Hello, world! This is a toast message.
+                </div>
+            </div>
         </div>
     </div>
 </body>
 <script>
+    const toastTrigger = document.getElementById('liveToastBtn')
+    const toastLiveExample = document.getElementById('liveToast')
+
+    if (toastTrigger) {
+        const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample)
+        toastTrigger.addEventListener('click', () => {
+            toastBootstrap.show()
+        })
+    }
+
     function pageMove(page) {
         var params;
-        var url = "http://127.0.0.1:7000/";
+        var url = _PAGE_URL;
         switch (page) {
-            case "addfiles":
-                params = "addFiles"
+            case "selecttemplate":
+                params = "selecttemplate"
                 break;
             case "gallerylist":
                 params = "gallerylist"
@@ -111,38 +154,40 @@
     }
 
     $(document).ready(function () {
-        getImage();
+        getImage(1);
     });
 
     function draw() {
         var canvas = document.getElementById('canvas1');
-            var ctx = canvas.getContext('2d');
-            ctx.beginPath();
-            ctx.rect(100, 100, 200, 100);
-            ctx.fillStyle = 'yellow';
-            ctx.fill();
-            ctx.lineWidth = 5;
-            ctx.strokeStyle = 'black';
-            ctx.stroke();
-
-
-        
+        var ctx = canvas.getContext('2d');
+        ctx.beginPath();
+        ctx.rect(100, 100, 200, 100);
+        ctx.fillStyle = 'yellow';
+        ctx.fill();
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = 'black';
+        ctx.stroke();
     }
 
 
-    function getImage() {
+    function getImage(pageCount) {
+        console.log(pageCount);
         var env_path = 'D:\\MgnSData\\Datas\\';
 
         $.ajax({
             type: 'post', //데이터 전송 타입,
             url: _WEBSERVER_ROOT_URL +
-                'Report/DetectionImageView/All?&StorageID=&PageNum=1&CountOfPage=50&ErrorType=&SShot=1', //데이터를 주고받을 파일 주소 입력,
+                'Report/DetectionImageView/All?&StorageID=&PageNum=' + pageCount +
+                '&CountOfPage=50&ErrorType=&SShot=1', //데이터를 주고받을 파일 주소 입력,
             //data: datasetInfo,
             //보내는 데이터,
             dataType: 'JSON', //문자형식으로 받기 , 
             success: function (result) {
                 console.log(result);
                 imagePath(result);
+                document.getElementById("totalcount").innerText = result.totalerrorcount.toLocaleString(
+                    'ko-KR');
+                document.getElementById("page-total").innerText = parseInt(result.totalerrorcount / 50) + 1;
             },
             error: function () {
                 alert("error");
@@ -187,9 +232,8 @@
 
             pathArr.push(object);
         }
-        console.log(pathArr);
 
-        makeGallery(pathArr)
+        makeGallery(pathArr);
     }
 
     /*갤러리를 보여준다*/
@@ -199,6 +243,8 @@
             alert('Media title :' + item.title);
         }
 
+        //$('#imageGallery').nanogallery2('refresh');
+        $('#imageGallery').nanogallery2('destroy');
         $("#imageGallery").nanogallery2({
             // ### gallery settings ###
             thumbnailHeight: 300,
@@ -228,18 +274,32 @@
             },
             viewerTools: {
                 topLeft: 'label',
-                topRight: 'playPauseButton, zoomButton, fullscreenButton, closeButton'
+                topRight: 'custom1,playPauseButton, zoomButton, fullscreenButton, viewerShoppingcart, closeButton '
             },
             icons: {
-                viewerCustomTool1: 'myScript'
+                viewerCustomTool1: '<i class="fa-regular fa-copy" id="btn-copy"  data-clipboard-target="#test1"></i>'
             },
-            fnImgToolbarCustClick: myLightboxTool,
-
-
+            fnImgToolbarCustClick: myToolbarCustClick,
             // ### gallery content ###
             items: pathArr
         });
+
     }
+
+    // Click event on custom lightbox toolbar element
+    function myToolbarCustClick(customElementName, $customIcon, item) {
+        // Display the title of the current displayed image
+        if (customElementName == 'custom1') {
+            //alert('Image path: ' + item.src);
+            var tempElement = document.createElement("textarea");
+            document.body.appendChild(tempElement);
+            tempElement.value = item.src;
+            tempElement.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempElement);
+        }
+    }
+
 
     /*
     템플릿을 선택하지 않는 경우에 대한 행동 처리
@@ -255,12 +315,42 @@
              $("input:checkbox[name='tag-label']").prop("disabled", false);
          }
      }*/
-    function noneLabel(buttonNone) {
-        if (buttonNone.checked == true) {
+    function clickLabel(buttonName) {
+        if (buttonName == "none") {
             $("input:checkbox[name='tag-label']").prop("checked", false);
-            $("input:checkbox[name='tag-label']").prop("disabled", true);
-        } else {
-            $("input:checkbox[name='tag-label']").prop("disabled", false);
+        }
+        if (buttonName == "tag-label") {
+            $("input:checkbox[name='none']").prop("checked", false);
+        }
+    }
+
+
+    /*
+    페이지 카운트를 높이고 줄인다.
+    pagecount : id = page-count
+    */
+    function countPage(attr) {
+        var pageCnt = document.getElementById("page-count").value;
+        var pageMax = Number(document.getElementById("page-total").innerText);
+
+        if (attr == "up") {
+            if (pageCnt >= pageMax) {
+                return;
+            }
+            document.getElementById("page-count").value = Number(pageCnt) + 1;
+
+            getImage(Number(pageCnt) + 1);
+
+        }
+        if (attr == "down") {
+            if (pageCnt <= 1) {
+                return;
+            }
+
+            document.getElementById("page-count").value = Number(pageCnt) - 1;
+
+            getImage(Number(pageCnt) - 1);
+
         }
     }
 </script>
