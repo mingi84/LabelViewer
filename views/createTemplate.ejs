@@ -15,22 +15,38 @@
     <script language="javascript" type="text/javascript" src="js/globalconst.js"></script>
 </head>
 <style>
-    .b-box-type{
+    .b-box-type {
         font-weight: 800;
         height: 240px;
     }
-    
-    .template-type:hover{
+
+    .template-type:hover {
         background: #EBECF1;
     }
 
-    .b-box-type:hover{
+    .b-box-type:hover {
         background: #EBECF1;
     }
-    
 
-    .highlight-text{
+
+    .highlight-text {
         color: #5174EE;
+    }
+
+    canvas {
+        cursor: crosshair;
+    }
+
+    .checkbutton {
+        cursor: pointer;
+    }
+
+    .active {
+        background-color: #F1F1F1;
+    }
+
+    .hide {
+        display: none;
     }
 </style>
 <!--
@@ -40,160 +56,617 @@
 <body>
     <%- include('./header') %>
     <div class="container my-4">
-        <div class="row" id="gallerylist">
-            <div class="col">
-                <h4>Create Template</h4>
-                <div class="mb-4" style="color: #666666;">Add a gallery to Label Viewer</div>
+        <form>
+            <div class="row" id="gallerylist">
+                <div class="col">
+                    <h4>Create Template</h4>
+                    <div class="mb-4" style="color: #666666;">Add a gallery to Label Viewer</div>
 
-                <div class="row row-cols-3 mb-4" id="gallerylist">
-                    <div class="col">
-                        <div class="card w-100 template-type" style="width: 18rem;" id="type-api">
-                            <div class="card-body ">
-                                <div class="d-flex justify-content-between mb-4">
-                                    <i class="fa-regular fa-square" style="font-size: 40px;"></i>
-                                    <h5>Bounding Box</h5>
+                    <div class="row row-cols-3 mb-4" id="gallerylist">
+                        <div class="col">
+                            <input type="checkbox" class="btn-check" id="btn-boundingbox" name="template-type"
+                                autocomplete="off" onclick="typeClick('boundingbox');" checked>
+                            <label class="checkbutton w-100" for="btn-boundingbox">
+                                <div class="card w-100 active" style="width: 18rem;" id="card-boundingbox">
+                                    <div class="card-body ">
+                                        <div class="d-flex justify-content-between mb-4">
+                                            <i class="fa-regular fa-square" style="font-size: 40px;"></i>
+                                            <h5>Bounding Box</h5>
+                                        </div>
+                                        <div style="color: #666666;">Enter the information for drawing the bounding box.
+                                        </div>
+                                    </div>
                                 </div>
-                                <div style="color: #666666;">Enter the information for drawing the bounding box.</div>
-                            </div>
+                            </label>
                         </div>
-                    </div>
-                    <div class="col">
-                        <div class="card w-100 template-type" style="width: 18rem;" id="type-objectstorage">
-                            <div class="card-body ">
-                                <div class="d-flex justify-content-between mb-4">
-                                    <i class="fa-solid fa-draw-polygon" style="font-size: 40px;"></i>
-                                    <h5>Key Point</h5>
+                        <div class="col">
+                            <input type="checkbox" class="btn-check" id="btn-keypoint" name="template-type"
+                                autocomplete="off" onclick="typeClick('keypoint');" checked>
+                            <label class="checkbutton w-100" for="btn-keypoint">
+                                <div class="card w-100 active" style="width: 18rem;" id="card-keypoint">
+                                    <div class="card-body ">
+                                        <div class="d-flex justify-content-between mb-4">
+                                            <i class="fa-solid fa-draw-polygon" style="font-size: 40px;"></i>
+                                            <h5>Key Point</h5>
+                                        </div>
+                                        <div style="color: #666666;">Draw and match keypoints with Json information.
+                                        </div>
+                                    </div>
                                 </div>
-                                <div style="color: #666666;">Draw and match keypoints with Json information.</div>
-                            </div>
+                            </label>
                         </div>
-                    </div>
-                    <div class="col">
-                        <div class="card w-100 template-type" style="width: 18rem;" id="type-googledrive">
-                            <div class="card-body ">
-                                <div class="d-flex justify-content-between mb-4">
-                                    <i class="fa-solid fa-draw-polygon" style="font-size: 40px; color: #666666;"></i>
-                                    <h5>Polygon (Coming soon)</h5>
+                        <div class="col">
+                            <input type="checkbox" class="btn-check" id="btn-polygon" name="template-type"
+                                autocomplete="off">
+                            <label class="checkbutton w-100" for="btn-polygon" style="cursor: not-allowed;">
+                                <div class="card w-100" style="width: 18rem;" id="card-googledrive">
+                                    <div class="card-body ">
+                                        <div class="d-flex justify-content-between mb-4">
+                                            <i class="fa-solid fa-draw-polygon"
+                                                style="font-size: 40px; color: #666666;"></i>
+                                            <h5>Polygon (Coming soon)</h5>
+                                        </div>
+                                        <div style="color: #666666;">Add storage registered to an existing data
+                                            injector.
+                                        </div>
+                                    </div>
                                 </div>
-                                <div style="color: #666666;">Add storage registered to an existing data injector.</div>
-                            </div>
+                            </label>
                         </div>
                     </div>
-                </div>
 
-                <h5>Template Name</h5>
-                <div class="d-flex align-items-center column-gap-2">
-                    <div class="input-group mb-4" style="max-width: 400px;">
-                        <input type="text" class="form-control" placeholder="template name" aria-label="Username"
-                            aria-describedby="basic-addon1">
+                    <h5>Template Name</h5>
+                    <div class="d-flex align-items-center column-gap-2">
+                        <div class="input-group mb-4" style="max-width: 400px;">
+                            <input type="text" class="form-control" id="template-name" placeholder="template name"
+                                value="" required>
+                        </div>
+                        <div class="input-group mb-4 ">
+                            <input type="color" name="mycolor" value="#FF4444" id="template-color"
+                                style="width: 2em; height: 2em; border: none;" data-bs-toggle="tooltip"
+                                data-bs-placement="right" data-bs-title="Color Picker">
+                        </div>
                     </div>
-                    <div class="input-group mb-4 "  >
-                        <input type="color" name="mycolor" value="#FF4444" style="width: 2em; height: 2em; border: none;"
-                        data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Color Picker">
-                    </div>
-                </div>
 
-                <h5>Bounding Box Type</h5>
-                <div class="row row-cols-4 mb-4" id="gallerylist">
-                    <div class="col">
-                        <div class="card w-100 b-box-type" id="type-1">
-                            <div class="card-body d-flex flex-column ">
-                                <img class="align-self-center"  src="img/type1.png" >
-                                <div class="mt-auto align-self-center">(x,y),w,h</div>
+                    <div id="type-boundingbox">
+                        <h5>Bounding Box Type</h5>
+                        <div class="row row-cols-4 mb-4" id="gallerylist">
+                            <div class="col">
+                                <input type="radio" class="btn-check" name="b-box-type" id="type-1" value="type-1"
+                                    autocomplete="off" onclick="selectBboxdraw(this)" checked>
+                                <label class="w-100" for="type-1">
+                                    <div class="card w-100 b-box-type" id="card-type-1">
+                                        <div class="card-body d-flex flex-column ">
+                                            <img class="align-self-center" src="img/type1.png">
+                                            <div class="mt-auto align-self-center">(x,y),w,h</div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="col">
+                                <input type="radio" class="btn-check" name="b-box-type" id="type-2" value="type-2"
+                                    autocomplete="off" onclick="selectBboxdraw(this)">
+                                <label class="w-100" for="type-2">
+                                    <div class="card w-100 b-box-type" id="card-type-2">
+                                        <div class="card-body d-flex flex-column ">
+                                            <img class="align-self-center" src="img/type2.png">
+                                            <div class="mt-auto align-self-center">(x1,y1),(x2,y2)</div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="col">
+                                <input type="radio" class="btn-check" name="b-box-type" id="type-3" value="type-3"
+                                    autocomplete="off" onclick="selectBboxdraw(this)">
+                                <label class="w-100" for="type-3">
+                                    <div class="card w-100 b-box-type" id="card-type-3">
+                                        <div class="card-body d-flex flex-column">
+                                            <img class="align-self-center" src="img/type3.png">
+                                            <div class="mt-auto align-self-center">(x,y),w,h</div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="col">
+                                <input type="radio" class="btn-check" name="b-box-type" id="type-etc" value="type-etc"
+                                    autocomplete="off">
+                                <label class="w-100" for="type-etc">
+                                    <div class="card w-100 b-box-type" id="card-type-etc">
+                                        <div class="card-body d-flex justify-content-center  align-content-center">
+                                            <div class="card-text align-self-center">ETC (Coming Soon) </div>
+                                        </div>
+                                    </div>
+                                </label>
                             </div>
                         </div>
-                    </div>
-                    <div class="col">
-                        <div class="card w-100 b-box-type" id="type-2">
-                            <div class="card-body d-flex flex-column ">
-                                <img class="align-self-center"  src="img/type2.png">
-                                <div class="mt-auto align-self-center">(x1,y1),(x2,y2)</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="card w-100 b-box-type" id="type-3">
-                            <div class="card-body d-flex flex-column">
-                                    <img class="align-self-center" src="img/type3.png">
-                                    <div class="mt-auto align-self-center">(x,y),w,h</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="card w-100 b-box-type" id="type-etc">
-                            <div class="card-body d-flex justify-content-center  align-content-center">
-                                    <div class="card-text align-self-center">ETC</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="" style="color: #666666;">Please enter the information of the label JSON in the selected bounding box type.</div>
-                <div class="mb-4" style="color: #666666;">* JSON substructure <span class="highlight-text">>></span>, Array <span class="highlight-text">[]</span></div>
+                        <div class="" style="color: #666666;">Please enter the information of the label JSON in the
+                            selected
+                            bounding box type.</div>
+                        <div class="mb-4" style="color: #666666;">* JSON substructure <span
+                                class="highlight-text">>></span>, Array <span class="highlight-text">[]</span></div>
 
-                <div class="row">
-                    <div class="col">
-                        <div class="">X1</div>
-                        <div class="input-group mb-2">
-                            <div class="input-group mb-2">
-                                <input type="text" class="form-control" aria-label="Username"
-                                    aria-describedby="basic-addon1">
+                        <div id="input-drawtype">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="">X1</div>
+                                    <div class="input-group mb-2">
+                                        <div class="input-group mb-2">
+                                            <input type="text" class="form-control" id="bbox-x"
+                                                aria-describedby="basic-addon1">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="">Y1</div>
+                                    <div class="input-group mb-2">
+                                        <div class="input-group mb-2">
+                                            <input type="text" class="form-control" id="bbox-y"
+                                                aria-describedby="basic-addon1">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-4">
+                                <div class="col">
+                                    <div class="">X2</div>
+                                    <div class="input-group mb-2">
+                                        <div class="input-group mb-2">
+                                            <input type="text" class="form-control" id="bbox-w"
+                                                aria-describedby="basic-addon1">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="">Y2</div>
+                                    <div class="input-group mb-2">
+                                        <div class="input-group mb-2">
+                                            <input type="text" class="form-control" id="bbox-h"
+                                                aria-describedby="basic-addon1">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col">
-                        <div class="">Y1</div>
-                        <div class="input-group mb-2">
-                            <div class="input-group mb-2">
-                                <input type="text" class="form-control" aria-label="Username"
-                                    aria-describedby="basic-addon1">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mb-4">
-                    <div class="col">
-                        <div class="">X2</div>
-                        <div class="input-group mb-2" >
-                            <div class="input-group mb-2">
-                                <input type="text" class="form-control" aria-label="Username"
-                                    aria-describedby="basic-addon1">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="">Y2</div>
-                        <div class="input-group mb-2" >
-                            <div class="input-group mb-2">
-                                <input type="text" class="form-control" aria-label="Username"
-                                    aria-describedby="basic-addon1">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="" style="color: #666666;">Isn't the structure of the dataset you're trying to use here?</div>
-                <button type="button" class="btn btn-success mb-4">Contact Us</button>
+                    <div id="type-keypoint">
+                        <h5>Draw Keypoint</h5>
+                        <div class="row row-cols-2 mb-4" id="gallerylist">
+                            <div class="col">
+                                <div class="card w-100" id="type-1">
+                                    <button id="clearButton"
+                                        class="btn btn-md btn-outline-secondary position-absolute m-2">
+                                        <i class="fa-solid fa-eraser"></i>
+                                    </button>
+                                    <canvas id="poseCanvas" width="800" height="600"></canvas>
+                                </div>
 
-                <div class="col d-flex justify-content-between">
-                    <button type="button" class="btn btn-lg btn-outline-primary" onclick="pageMove('selecttemplate')">Back</button>
-                    <button type="button" class="btn btn-lg btn-primary" onclick="pageMove('selecttemplate')">Next</button>
-                </div>
+                            </div>
+                            <div class="col">
+                                <div class="card w-100 h-100" id="type-2">
+                                    <div class="card-body d-flex flex-column ">
+                                        <div style="height: 45vh; overflow-y: auto; overflow-x: hidden;">
+                                            <div class="row row-cols-3 ">
+                                                <div class="col col-2 ">Point</div>
+                                                <div class="col col-5">JSON Key - X</div>
+                                                <div class="col col-5">JSON Key - Y</div>
+                                            </div>
+                                            <div id="keylist"></div>
+                                            <!--<button id="saveButton" class="btn btn-md btn-primary">Save</button>-->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
+
+                    </div>
+                    <!--
+                <div class="" style="color: #666666;">Isn't the structure of the dataset you're trying to use here?
+                </div>
+                <button type="button" class="btn btn-success mb-4">Contact Us</button>-->
+
+                    <div class="col d-flex justify-content-between">
+                        <button type="button" class="btn btn-lg btn-outline-primary"
+                            onclick="pageMove('selecttemplate')">Back</button>
+                        <button type="submit" class="btn btn-lg btn-primary" id="saveButton"
+                            onclick="infoValidation()">Next</button>
+                    </div>
+
+                </div>
             </div>
-        </div>
-
+        </form>
     </div>
 </body>
 <script>
-    function pageMove(page){
+    function pageMove(page) {
         var params;
         var url = _PAGE_URL;
-        switch (page){
-            case "selecttemplate" :
+        switch (page) {
+            case "selecttemplate":
                 params = "selecttemplate"
                 break;
         }
         window.location.href = url + params;
 
     }
+
+    /*
+    템플릿 정보를 전송한다.
+    http://127.0.0.1:8008/apidataset/keypwrite
+    */
+    function sendInfo(templateInfo) {
+        $.ajax({
+            type: 'post', //데이터 전송 타입,
+            url: _PAGE_URL + 'apidataset/keypwrite', //데이터를 주고받을 파일 주소 입력,
+            data: JSON.stringify(templateInfo), //보내는 데이터,
+            dataType: 'JSON', //문자형식으로 받기 , 
+            contentType: "application/json",
+            success: function (result) {
+                pageMove("selecttemplate");
+            },
+            error: function () {
+                alert("error");
+            }
+        });
+    }
+
+    /*
+    템플릿 저장했을 때, 필수 값 검증
+    */
+    function infoValidation() {
+        var templateName = document.getElementById("template-name").value;
+        var templateColor = document.getElementById("template-color").value;
+
+        if (templateName == "") {
+            return;
+        }
+        if (templateColor == "") {
+            return;
+        }
+
+        templateInfo(templateName, templateColor);
+    }
+
+    /*body로 보낼 템플릿 JSON을 만들어준다.*/
+    function templateInfo(templateName, templateColor) {
+
+        templateJson = {
+            "kypt_name": templateName,
+            "kypt_json": {
+                "color": templateColor,
+                "bbox": {
+                    "drawtype": 1,
+                    "drawjson": {
+                        "X": "",
+                        "Y": "",
+                        "W": "",
+                        "H": ""
+                    }
+                },
+                "keypoint": {
+                    "drawInfo": {
+                        "keypoints": [{
+                                "x": 131,
+                                "y": 137
+                            },
+                            {
+                                "x": 408,
+                                "y": 380
+                            },
+                            {
+                                "x": 483,
+                                "y": 96
+                            },
+                            {
+                                "x": 529,
+                                "y": 484
+                            }
+                        ],
+                        "lines": [{
+                                "from": {
+                                    "x": 131,
+                                    "y": 137
+                                },
+                                "to": {
+                                    "x": 408,
+                                    "y": 380
+                                }
+                            },
+                            {
+                                "from": {
+                                    "x": 483,
+                                    "y": 96
+                                },
+                                "to": {
+                                    "x": 408,
+                                    "y": 380
+                                }
+                            },
+                            {
+                                "from": {
+                                    "x": 483,
+                                    "y": 96
+                                },
+                                "to": {
+                                    "x": 529,
+                                    "y": 484
+                                }
+                            }
+                        ]
+                    },
+                    "drawjson": [{
+                            "X": "result>>json>>0>>x",
+                            "Y": "result>>json>>0>>y"
+                        },
+                        {
+                            "X": "result>>json>>1>>x",
+                            "Y": "result>>json>>1>>y"
+                        }
+                    ]
+                }
+            }
+        }
+        
+        sendInfo(templateJson);
+    }
+
+    /*
+    템플릿 타입 선택
+    */
+    function typeClick(type) {
+        var id;
+
+        switch (type) {
+            case "boundingbox":
+                id = "card-boundingbox"
+                break;
+            case "keypoint":
+                id = "card-keypoint"
+                break;
+        }
+        $('#' + id).toggleClass('active');
+        typeShow(type);
+    }
+
+    /*
+    선택한 템플릿 타입에 따라 해당하는 div를 보여준다.
+    */
+    function typeShow(id) {
+        var clickBtn = document.getElementById("btn-" + id);
+
+        if (clickBtn.checked == true) {
+            $("#type-" + id).show();
+        }
+        if (clickBtn.checked == false) {
+            $("#type-" + id).hide();
+        }
+
+        return;
+    }
+
+    /*
+    선택한 drawtype에 맞추어, bbox input의 input박스를 바꿔준다.
+    */
+    function selectBboxdraw(clickradio) {
+        var clickValue = $('input[name="b-box-type"]:checked').val();
+
+        $('.b-box-type').removeClass('active');
+        $('#card-' + clickValue).toggleClass('active');
+
+        showBboxInput(clickValue);
+    }
+
+    /*
+    선택한 drawtype에 맞추어, bbox input의 input박스를 바꿔준다.
+    */
+    function showBboxInput(id) {
+        document.getElementById("input-drawtype");
+
+        var x1, x2, y1, y2;
+
+        if (id == "type-1" || id == "type-3") {
+
+            x1 = "X";
+            y1 = "Y";
+            x2 = "W";
+            y2 = "H";
+
+        }
+        if (id == "type-2") {
+            x1 = "X1";
+            y1 = "Y1";
+            x2 = "X2";
+            y2 = "Y2";
+        }
+
+        document.getElementById("input-drawtype").innerHTML = `
+        <div class="row">
+                        <div class="col">
+                            <div class="">${x1}</div>
+                            <div class="input-group mb-2">
+                                <div class="input-group mb-2">
+                                    <input type="text" class="form-control" id="bbox-${x1}"
+                                        aria-describedby="basic-addon1">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="">${y1}</div>
+                            <div class="input-group mb-2">
+                                <div class="input-group mb-2">
+                                    <input type="text" class="form-control" id="bbox-${y1}"
+                                        aria-describedby="basic-addon1">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col">
+                            <div class="">${x2}</div>
+                            <div class="input-group mb-2">
+                                <div class="input-group mb-2">
+                                    <input type="text" class="form-control" id="bbox-${x2}"
+                                        aria-describedby="basic-addon1">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="">${y2}</div>
+                            <div class="input-group mb-2">
+                                <div class="input-group mb-2">
+                                    <input type="text" class="form-control" id="bbox-${y2}"
+                                        aria-describedby="basic-addon1">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        `
+    }
+
+
+
+    const canvas = document.getElementById('poseCanvas');
+    const ctx = canvas.getContext('2d');
+    const {
+        width,
+        height
+    } = canvas.getBoundingClientRect();
+    canvas.width = width;
+    canvas.height = height;
+    const saveButton = document.getElementById('saveButton');
+    const clearButton = document.getElementById('clearButton');
+    const divkeylist = document.getElementById('keylist');
+    let keypoints = [];
+    let lines = [];
+    let selectedKeypoint = null;
+    let connecting = false;
+    let dragging = false;
+
+    canvas.addEventListener('mousedown', (e) => {
+        if (selectedKeypoint) {
+            dragging = true;
+        }
+    });
+
+    canvas.addEventListener('mouseup', (e) => {
+        dragging = false;
+    });
+
+    canvas.addEventListener('click', (e) => {
+        if (selectedKeypoint && connecting) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const clickedKeypoint = keypoints.find((keypoint) => Math.sqrt(Math.pow(x - keypoint.x, 2) + Math
+                .pow(y - keypoint.y, 2)) <= 5);
+
+            if (clickedKeypoint) {
+                lines.push({
+                    from: selectedKeypoint,
+                    to: clickedKeypoint
+                });
+                connecting = false;
+                selectedKeypoint = null;
+            }
+        } else if (selectedKeypoint) {
+            connecting = true;
+        } else {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const newKeypoint = {
+                x,
+                y
+            };
+            keypoints.push(newKeypoint);
+        }
+        console.log(keypoints);
+        draw();
+        listkeypoints();
+    });
+
+    function listkeypoints() {
+        listItem = "";
+        if (keypoints.length > 0) {
+            for (i = 0; i < keypoints.length; i++) {
+                // listItem += '<div>index = ' + i + ' x= ' + keypoints[i].x + ' y = ' + keypoints[i].y + '</div>';
+
+                listItem += `<div class="row row-cols-3  my-2">
+                    <div class="col col-2 d-flex align-items-center">
+                        <div>${i}</div>
+                    </div>
+                    <div class="col col-5">
+                        <input type="text" id="x${i}" class="form-control form-control-sm"aria-describedby="addon-wrapping">
+                    </div>
+                    <div class="col col-5">
+                        <input type="text" id="y${i}" class="form-control form-control-sm" aria-describedby="addon-wrapping">
+                    </div>
+                </div>`;
+            }
+            //console.log(listItem);
+            console.log(divkeylist);
+            divkeylist.innerHTML = listItem;
+        }
+    }
+
+    //연결상태가 아닐 때의 마우스 이동에 대한 처리
+    canvas.addEventListener('mousemove', (e) => {
+        if (!connecting) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            if (dragging && selectedKeypoint) {
+                selectedKeypoint.x = x;
+                selectedKeypoint.y = y;
+            } else {
+                selectedKeypoint = keypoints.find((keypoint) => Math.sqrt(Math.pow(x - keypoint.x, 2) + Math
+                    .pow(y - keypoint.y, 2)) <= 5);
+            }
+        }
+
+        draw();
+    });
+
+    //저장 버튼
+    function saveKeypoint() {
+        const json = JSON.stringify({
+            keypoints,
+            lines
+        });
+        console.log(json);
+    }
+
+    //클리어 버튼
+    clearButton.addEventListener('click', () => {
+        keypoints = [];
+        lines = [];
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        document.getElementById("keylist").innerHTML = "";
+    })
+
+    /*
+    키포인트를 그린다
+    */
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        lines.forEach((line) => {
+            ctx.beginPath();
+            ctx.moveTo(line.from.x, line.from.y);
+            ctx.lineTo(line.to.x, line.to.y);
+            ctx.stroke();
+        });
+
+        keypoints.forEach((keypoint, index) => {
+            ctx.beginPath();
+            ctx.arc(keypoint.x, keypoint.y, 5, 0, 2 * Math.PI);
+            ctx.fillStyle = selectedKeypoint === keypoint ? (connecting ? 'green' : 'red') : 'blue';
+            ctx.fill();
+        });
+    }
 </script>
+
 </html>
