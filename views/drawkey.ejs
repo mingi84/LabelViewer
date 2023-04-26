@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draw Keypoint</title>
+    <script language="javascript" type="text/javascript" src="js/jquery-3.6.4.min.js"></script>
+    <script language="javascript" type="text/javascript" src="js/bootstrap.bundle.js"></script>
+    <script language="javascript" type="text/javascript" src="js/fontawesome.all.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/fontawesome.all.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <script language="javascript" type="text/javascript" src="js/globalconst.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        canvas {
+            border: 1px solid black;
+            display: inline-block;
+            cursor: crosshair;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Draw Keypoint</h1>
+
+    <div class="container col-xl-10 col-xxl-8 px-4 py-5">
+        <div class="row align-items-center g-lg-5 py-5">
+            <div class="col-lg-7 text-center text-lg-start">
+                <canvas id="poseCanvas" width="800" height="600"></canvas>
+            </div>
+            <div class="col-md-10 mx-auto col-lg-5">
+                <div id="keylist"></div>
+                <button id="saveButton" class="btn btn-md btn-primary">Save</button>
+                <button id="clearButton" class="btn btn-md btn-secundary">Clean template</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('poseCanvas');
+        const ctx = canvas.getContext('2d');
+        const saveButton = document.getElementById('saveButton');
+        const clearButton = document.getElementById('clearButton');
+        const divkeylist = document.getElementById('keylist');
+        let keypoints = [];
+        let lines = [];
+        let selectedKeypoint = null;
+        let connecting = false;
+        let dragging = false;
+
+        canvas.addEventListener('mousedown', (e) => {
+            if (selectedKeypoint) {
+                dragging = true;
+            }
+        });
+
+        canvas.addEventListener('mouseup', (e) => {
+            dragging = false;
+        });
+
+        canvas.addEventListener('click', (e) => {
+            if (selectedKeypoint && connecting) {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const clickedKeypoint = keypoints.find((keypoint) => Math.sqrt(Math.pow(x - keypoint.x, 2) + Math.pow(y - keypoint.y, 2)) <= 5);
+
+                if (clickedKeypoint) {
+                    lines.push({ from: selectedKeypoint, to: clickedKeypoint });
+                    connecting = false;
+                    selectedKeypoint = null;
+                }
+            } else if (selectedKeypoint) {
+                connecting = true;
+            } else {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const newKeypoint = { x, y };
+                keypoints.push(newKeypoint);
+            }
+            console.log(keypoints);
+            draw();
+            listkeypoints();
+        });
+
+        function listkeypoints() {
+            listItem = "";
+            if (keypoints.length > 0) {
+                for (i = 0; i < keypoints.length; i++) {
+                    listItem += '<div>index = '+ i +' x= '+ keypoints[i].x +' y = '+ keypoints[i].y +'</div>';
+                }
+                console.log(listItem);
+                console.log(divkeylist);
+                divkeylist.innerHTML = listItem;
+            }
+        }
+
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!connecting) {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                if (dragging && selectedKeypoint) {
+                    selectedKeypoint.x = x;
+                    selectedKeypoint.y = y;
+                } else {
+                    selectedKeypoint = keypoints.find((keypoint) => Math.sqrt(Math.pow(x - keypoint.x, 2) + Math.pow(y - keypoint.y, 2)) <= 5);
+                }
+            }
+
+            draw();
+        });
+
+        saveButton.addEventListener('click', () => {
+            const json = JSON.stringify({ keypoints, lines });
+            console.log(json);
+        });
+
+        clearButton.addEventListener('click', () => {
+            keypoints = []; 
+            lines = [];
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        })
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            lines.forEach((line) => {
+                ctx.beginPath();
+                ctx.moveTo(line.from.x, line.from.y);
+                ctx.lineTo(line.to.x, line.to.y);
+                ctx.stroke();
+            });
+
+            keypoints.forEach((keypoint, index) => {
+                ctx.beginPath();
+                ctx.arc(keypoint.x, keypoint.y, 5, 0, 2 * Math.PI);
+                ctx.fillStyle = selectedKeypoint === keypoint ? (connecting ? 'green' : 'red') : 'blue';
+                ctx.fill();
+            });
+        }
+
+
+/*
+JSON sample
+{"keypoints":[{"x":219,"y":160},{"x":243,"y":146},{"x":264,"y":162},{"x":284,"y":145},{"x":306,"y":162},{"x":265,"y":223},{"x":326,"y":226},{"x":205,"y":229},{"x":245,"y":375},{"x":297,"y":375},{"x":245,"y":439},{"x":301,"y":436},{"x":241,"y":496},{"x":303,"y":497},{"x":349,"y":301},{"x":184,"y":301},{"x":164,"y":368},{"x":381,"y":372}],"lines":[{"from":{"x":219,"y":160},"to":{"x":243,"y":146}},{"from":{"x":243,"y":146},"to":{"x":264,"y":162}},{"from":{"x":264,"y":162},"to":{"x":284,"y":145}},{"from":{"x":284,"y":145},"to":{"x":306,"y":162}},{"from":{"x":264,"y":162},"to":{"x":265,"y":223}},{"from":{"x":265,"y":223},"to":{"x":326,"y":226}},{"from":{"x":265,"y":223},"to":{"x":205,"y":229}},{"from":{"x":265,"y":223},"to":{"x":245,"y":375}},{"from":{"x":265,"y":223},"to":{"x":297,"y":375}},{"from":{"x":297,"y":375},"to":{"x":301,"y":436}},{"from":{"x":245,"y":375},"to":{"x":245,"y":439}},{"from":{"x":245,"y":439},"to":{"x":241,"y":496}},{"from":{"x":301,"y":436},"to":{"x":303,"y":497}},{"from":{"x":326,"y":226},"to":{"x":349,"y":301}},{"from":{"x":349,"y":301},"to":{"x":381,"y":372}},{"from":{"x":205,"y":229},"to":{"x":184,"y":301}},{"from":{"x":184,"y":301},"to":{"x":164,"y":368}}]}
+*/
+
+
+
+
+    </script>
+</body>
+
+</html>
