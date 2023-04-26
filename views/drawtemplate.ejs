@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Drawing</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="myCanvas" width="800" height="600"></canvas>
+    <script>
+
+        /*
+        JSON sample
+        {"keypoints":[{"x":219,"y":160},{"x":243,"y":146},{"x":264,"y":162},{"x":284,"y":145},{"x":306,"y":162},{"x":265,"y":223},{"x":326,"y":226},{"x":205,"y":229},{"x":245,"y":375},{"x":297,"y":375},{"x":245,"y":439},{"x":301,"y":436},{"x":241,"y":496},{"x":303,"y":497},{"x":349,"y":301},{"x":184,"y":301},{"x":164,"y":368},{"x":381,"y":372}],"lines":[{"from":{"x":219,"y":160},"to":{"x":243,"y":146}},{"from":{"x":243,"y":146},"to":{"x":264,"y":162}},{"from":{"x":264,"y":162},"to":{"x":284,"y":145}},{"from":{"x":284,"y":145},"to":{"x":306,"y":162}},{"from":{"x":264,"y":162},"to":{"x":265,"y":223}},{"from":{"x":265,"y":223},"to":{"x":326,"y":226}},{"from":{"x":265,"y":223},"to":{"x":205,"y":229}},{"from":{"x":265,"y":223},"to":{"x":245,"y":375}},{"from":{"x":265,"y":223},"to":{"x":297,"y":375}},{"from":{"x":297,"y":375},"to":{"x":301,"y":436}},{"from":{"x":245,"y":375},"to":{"x":245,"y":439}},{"from":{"x":245,"y":439},"to":{"x":241,"y":496}},{"from":{"x":301,"y":436},"to":{"x":303,"y":497}},{"from":{"x":326,"y":226},"to":{"x":349,"y":301}},{"from":{"x":349,"y":301},"to":{"x":381,"y":372}},{"from":{"x":205,"y":229},"to":{"x":184,"y":301}},{"from":{"x":184,"y":301},"to":{"x":164,"y":368}}]}
+        */
+
+
+
+
+        const drawingData = { "keypoints": [{ "x": 219, "y": 160 }, { "x": 243, "y": 146 }, { "x": 264, "y": 162 }, { "x": 284, "y": 145 }, { "x": 306, "y": 162 }, { "x": 265, "y": 223 }, { "x": 326, "y": 226 }, { "x": 205, "y": 229 }, { "x": 245, "y": 375 }, { "x": 297, "y": 375 }, { "x": 245, "y": 439 }, { "x": 301, "y": 436 }, { "x": 241, "y": 496 }, { "x": 303, "y": 497 }, { "x": 349, "y": 301 }, { "x": 184, "y": 301 }, { "x": 164, "y": 368 }, { "x": 381, "y": 372 }], "lines": [{ "from": { "x": 219, "y": 160 }, "to": { "x": 243, "y": 146 } }, { "from": { "x": 243, "y": 146 }, "to": { "x": 264, "y": 162 } }, { "from": { "x": 264, "y": 162 }, "to": { "x": 284, "y": 145 } }, { "from": { "x": 284, "y": 145 }, "to": { "x": 306, "y": 162 } }, { "from": { "x": 264, "y": 162 }, "to": { "x": 265, "y": 223 } }, { "from": { "x": 265, "y": 223 }, "to": { "x": 326, "y": 226 } }, { "from": { "x": 265, "y": 223 }, "to": { "x": 205, "y": 229 } }, { "from": { "x": 265, "y": 223 }, "to": { "x": 245, "y": 375 } }, { "from": { "x": 265, "y": 223 }, "to": { "x": 297, "y": 375 } }, { "from": { "x": 297, "y": 375 }, "to": { "x": 301, "y": 436 } }, { "from": { "x": 245, "y": 375 }, "to": { "x": 245, "y": 439 } }, { "from": { "x": 245, "y": 439 }, "to": { "x": 241, "y": 496 } }, { "from": { "x": 301, "y": 436 }, "to": { "x": 303, "y": 497 } }, { "from": { "x": 326, "y": 226 }, "to": { "x": 349, "y": 301 } }, { "from": { "x": 349, "y": 301 }, "to": { "x": 381, "y": 372 } }, { "from": { "x": 205, "y": 229 }, "to": { "x": 184, "y": 301 } }, { "from": { "x": 184, "y": 301 }, "to": { "x": 164, "y": 368 } }] };
+
+        function drawCanvas(data) {
+            const canvas = document.getElementById('myCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // Draw keypoints
+            data.keypoints.forEach(point => {
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI);
+                ctx.fillStyle = 'blue';
+                ctx.fill();
+                ctx.closePath();
+            });
+
+            // Draw lines
+            data.lines.forEach(line => {
+                ctx.beginPath();
+                ctx.moveTo(line.from.x, line.from.y);
+                ctx.lineTo(line.to.x, line.to.y);
+                ctx.strokeStyle = 'red';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.closePath();
+            });
+        }
+
+        drawCanvas(drawingData);
+
+    </script>
+</body>
+
+</html>

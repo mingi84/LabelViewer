@@ -25,16 +25,16 @@ router.get('/deldataset', controller.deleteDatasetById); //http://127.0.0.1:8008
 router.get('/keyp', controller.keypointget); // http://127.0.0.1:8008/apidataset/keyp
 
 // Write
-router.post('/keypwrite', controller.keypointwrite); // http://127.0.0.1:8008/apidataset/write  test page=> http://127.0.0.1:8008/posttest
+router.post('/keypwrite', controller.keypointwrite); // http://127.0.0.1:8008/apidataset/keypwrite  
 
 // Update Key by ID
-router.post('/updatekeyp', controller.keypointUpdate); //http://127.0.0.1:8008/apidataset/updataset?datasetId=64463cb109f85dcf382a7409
+router.post('/updatekeyp', controller.keypointUpdate); //http://127.0.0.1:8008/apidataset/updatekeyp?keypointId=64463cb109f85dcf382a7409
 
 // Get Key by ID
-router.get('/getkeyp', controller.getKeypById); //http://127.0.0.1:8008/apidataset/updataset?datasetId=64463cb109f85dcf382a7409
+router.get('/getkeyp', controller.getKeypById); //http://127.0.0.1:8008/apidataset/getkeyp?keypointId=6447230bc8466699848eacfe
 
 // Delete Key by ID
-router.get('/delkeyp', controller.delKeypById); //http://127.0.0.1:8008/apidataset/updataset?datasetId=64463cb109f85dcf382a7409
+router.get('/delkeyp', controller.delKeypById); //http://127.0.0.1:8008/apidataset/delkeyp?keypointId=6447230bc8466699848eacfe
 
 
 module.exports = router;

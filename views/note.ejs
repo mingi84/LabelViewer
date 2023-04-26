@@ -1,0 +1,78 @@
+
+<!--CRIA PONTO AO CLICAR NO CANVAS-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Human Pose Estimation Keypoints</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.1.0/fabric.all.min.js"></script>
+</head>
+
+<body>
+    <canvas id="pose-canvas" width="800" height="600" style="border:1px solid black"></canvas>
+    <button id="save">Save Keypoints</button>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const canvas = new fabric.Canvas("pose-canvas");
+            const saveBtn = document.getElementById("save");
+
+            canvas.on("mouse:down", function (options) {
+                if (options.target && options.target.type === "circle") {
+                    return;
+                }
+
+                const pointer = canvas.getPointer(options.e);
+                const circle = new fabric.Circle({
+                    left: pointer.x,
+                    top: pointer.y,
+                    radius: 5,
+                    fill: "blue",
+                    originX: "center",
+                    originY: "center",
+                });
+
+                circle.hasControls = false;
+                circle.hasBorders = false;
+
+                canvas.add(circle);
+            });
+
+            canvas.on("mouse:over", function (options) {
+                if (options.target && options.target.type === "circle") {
+                    options.target.setStroke("red");
+                    options.target.setStrokeWidth(2);
+                    canvas.renderAll();
+                }
+            });
+
+            canvas.on("mouse:out", function (options) {
+                if (options.target && options.target.type === "circle") {
+                    options.target.setStroke(null);
+                    options.target.setStrokeWidth(0);
+                    canvas.renderAll();
+                }
+            });
+
+            saveBtn.addEventListener("click", function () {
+                const keypoints = [];
+                canvas.getObjects().forEach(function (obj) {
+                    if (obj.type === "circle") {
+                        keypoints.push({
+                            x: obj.left,
+                            y: obj.top,
+                        });
+                    }
+                });
+
+                const json = JSON.stringify(keypoints);
+                console.log(json);
+            });
+        });
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Human Pose Estimation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        canvas {
+            border: 1px solid black;
+            display: inline-block;
+            cursor: crosshair;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Human Pose Estimation</h1>
+    <canvas id="poseCanvas" width="800" height="600"></canvas>
+    <button id="saveButton">Save</button>
+    <button id="cleanButton">Clean template</button>
+    <script>
+        const canvas = document.getElementById('poseCanvas');
+        const ctx = canvas.getContext('2d');
+        const saveButton = document.getElementById('saveButton');
+        const keypoints = [];
+        const lines = [];
+        let selectedKeypoint = null;
+        let connecting = false;
+        let dragging = false;
+
+        canvas.addEventListener('mousedown', (e) => {
+            if (selectedKeypoint) {
+                dragging = true;
+            }
+        });
+
+        canvas.addEventListener('mouseup', (e) => {
+            dragging = false;
+        });
+
+        canvas.addEventListener('click', (e) => {
+            if (selectedKeypoint && connecting) {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const clickedKeypoint = keypoints.find((keypoint) => Math.sqrt(Math.pow(x - keypoint.x, 2) + Math.pow(y - keypoint.y, 2)) <= 5);
+
+                if (clickedKeypoint) {
+                    lines.push({ from: selectedKeypoint, to: clickedKeypoint });
+                    connecting = false;
+                    selectedKeypoint = null;
+                }
+            } else if (selectedKeypoint) {
+                connecting = true;
+            } else {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const newKeypoint = { x, y };
+                keypoints.push(newKeypoint);
+            }
+
+            draw();
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!connecting) {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                if (dragging && selectedKeypoint) {
+                    selectedKeypoint.x = x;
+                    selectedKeypoint.y = y;
+                } else {
+                    selectedKeypoint = keypoints.find((keypoint) => Math.sqrt(Math.pow(x - keypoint.x, 2) + Math.pow(y - keypoint.y, 2)) <= 5);
+                }
+            }
+
+            draw();
+        });
+
+        saveButton.addEventListener('click', () => {
+            const json = JSON.stringify({ keypoints, lines });
+            console.log(json);
+        });
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            lines.forEach((line) => {
+                ctx.beginPath();
+                ctx.moveTo(line.from.x, line.from.y);
+                ctx.lineTo(line.to.x, line.to.y);
+                ctx.stroke();
+            });
+
+            keypoints.forEach((keypoint, index) => {
+                ctx.beginPath();
+                ctx.arc(keypoint.x, keypoint.y, 5, 0, 2 * Math.PI);
+                ctx.fillStyle = selectedKeypoint === keypoint ? (connecting ? 'green' : 'red') : 'blue';
+                ctx.fill();
+            });
+        }
+
+    </script>
+</body>
+
+</html>

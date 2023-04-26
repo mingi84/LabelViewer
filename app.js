@@ -42,11 +42,15 @@ app.get('/', (req, res) => {
     console.log(Date() + TAB + req.socket.localAddress + TAB + req.url);
 })
 
-app.get('/todo', (req, res) => {
-    res.render('todo');
+app.get('/drawkey', (req, res) => {
+    res.render('drawkey');
     console.log(Date() + TAB + req.socket.localAddress + TAB + req.url);
 })
 
+app.get('/drawtemplate', (req, res) => {
+    res.render('drawtemplate');
+    console.log(Date() + TAB + req.socket.localAddress + TAB + req.url);
+})
 
 app.get('/galleryList', (req, res) => {
     res.render('gallerylist');
