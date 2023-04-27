@@ -132,10 +132,10 @@
                         <h5>Bounding Box Type</h5>
                         <div class="row row-cols-4 mb-4" id="gallerylist">
                             <div class="col">
-                                <input type="radio" class="btn-check" name="b-box-type" id="type-1" value="type-1"
-                                    autocomplete="off" onclick="selectBboxdraw(this)" checked>
+                                <input type="radio" class="btn-check" name="b-box-type" id="type-1" value="1"
+                                    autocomplete="off" onclick="selectBboxdraw(this.id)" checked>
                                 <label class="w-100" for="type-1">
-                                    <div class="card w-100 b-box-type" id="card-type-1">
+                                    <div class="card w-100 b-box-type active" id="card-type-1">
                                         <div class="card-body d-flex flex-column ">
                                             <img class="align-self-center" src="img/type1.png">
                                             <div class="mt-auto align-self-center">(x,y),w,h</div>
@@ -144,8 +144,8 @@
                                 </label>
                             </div>
                             <div class="col">
-                                <input type="radio" class="btn-check" name="b-box-type" id="type-2" value="type-2"
-                                    autocomplete="off" onclick="selectBboxdraw(this)">
+                                <input type="radio" class="btn-check" name="b-box-type" id="type-2" value="2"
+                                    autocomplete="off" onclick="selectBboxdraw(this.id)">
                                 <label class="w-100" for="type-2">
                                     <div class="card w-100 b-box-type" id="card-type-2">
                                         <div class="card-body d-flex flex-column ">
@@ -156,8 +156,8 @@
                                 </label>
                             </div>
                             <div class="col">
-                                <input type="radio" class="btn-check" name="b-box-type" id="type-3" value="type-3"
-                                    autocomplete="off" onclick="selectBboxdraw(this)">
+                                <input type="radio" class="btn-check" name="b-box-type" id="type-3" value="3"
+                                    autocomplete="off" onclick="selectBboxdraw(this.id)">
                                 <label class="w-100" for="type-3">
                                     <div class="card w-100 b-box-type" id="card-type-3">
                                         <div class="card-body d-flex flex-column">
@@ -168,7 +168,7 @@
                                 </label>
                             </div>
                             <div class="col">
-                                <input type="radio" class="btn-check" name="b-box-type" id="type-etc" value="type-etc"
+                                <input type="radio" class="btn-check" name="b-box-type" id="type-etc" value="etc"
                                     autocomplete="off">
                                 <label class="w-100" for="type-etc">
                                     <div class="card w-100 b-box-type" id="card-type-etc">
@@ -180,15 +180,14 @@
                             </div>
                         </div>
                         <div class="" style="color: #666666;">Please enter the information of the label JSON in the
-                            selected
-                            bounding box type.</div>
+                            selected bounding box type.</div>
                         <div class="mb-4" style="color: #666666;">* JSON substructure <span
                                 class="highlight-text">>></span>, Array <span class="highlight-text">[]</span></div>
 
                         <div id="input-drawtype">
                             <div class="row">
                                 <div class="col">
-                                    <div class="">X1</div>
+                                    <div class="" id="name-x">X</div>
                                     <div class="input-group mb-2">
                                         <div class="input-group mb-2">
                                             <input type="text" class="form-control" id="bbox-x"
@@ -197,7 +196,7 @@
                                     </div>
                                 </div>
                                 <div class="col">
-                                    <div class="">Y1</div>
+                                    <div class="" id="name-y">Y</div>
                                     <div class="input-group mb-2">
                                         <div class="input-group mb-2">
                                             <input type="text" class="form-control" id="bbox-y"
@@ -208,7 +207,7 @@
                             </div>
                             <div class="row mb-4">
                                 <div class="col">
-                                    <div class="">X2</div>
+                                    <div class="" id="name-w">W</div>
                                     <div class="input-group mb-2">
                                         <div class="input-group mb-2">
                                             <input type="text" class="form-control" id="bbox-w"
@@ -217,7 +216,7 @@
                                     </div>
                                 </div>
                                 <div class="col">
-                                    <div class="">Y2</div>
+                                    <div class="" id="name-h">H</div>
                                     <div class="input-group mb-2">
                                         <div class="input-group mb-2">
                                             <input type="text" class="form-control" id="bbox-h"
@@ -230,10 +229,14 @@
                     </div>
                     <div id="type-keypoint">
                         <h5>Draw Keypoint</h5>
+                        <div class="" style="color: #666666;">Please enter the information of the label JSON in the
+                            selected bounding box type.</div>
+                        <div class="mb-4" style="color: #666666;">* JSON substructure <span
+                                class="highlight-text">>></span>, Array <span class="highlight-text">[]</span></div>
                         <div class="row row-cols-2 mb-4" id="gallerylist">
                             <div class="col">
-                                <div class="card w-100" id="type-1">
-                                    <button id="clearButton"
+                                <div class="card w-100">
+                                    <button type="button" id="clearButton"
                                         class="btn btn-md btn-outline-secondary position-absolute m-2">
                                         <i class="fa-solid fa-eraser"></i>
                                     </button>
@@ -242,7 +245,7 @@
 
                             </div>
                             <div class="col">
-                                <div class="card w-100 h-100" id="type-2">
+                                <div class="card w-100 h-100" id="">
                                     <div class="card-body d-flex flex-column ">
                                         <div style="height: 45vh; overflow-y: auto; overflow-x: hidden;">
                                             <div class="row row-cols-3 ">
@@ -295,6 +298,10 @@
     http://127.0.0.1:8008/apidataset/keypwrite
     */
     function sendInfo(templateInfo) {
+        if (keypointID !== null) {
+            updateTemplate(templateInfo);
+            return;
+        }
         $.ajax({
             type: 'post', //데이터 전송 타입,
             url: _PAGE_URL + 'apidataset/keypwrite', //데이터를 주고받을 파일 주소 입력,
@@ -309,6 +316,27 @@
             }
         });
     }
+
+    /*
+    템플릿 정보를 업데이트한다.
+    */
+    function updateTemplate(templateInfo){
+        $.ajax({
+            type: 'post', //데이터 전송 타입,
+            url: _PAGE_URL + 'apidataset/updatekeyp?keypointId='+ keypointID, //데이터를 주고받을 파일 주소 입력,
+            data: JSON.stringify(templateInfo), //보내는 데이터,
+            dataType: 'JSON', //문자형식으로 받기 , 
+            contentType: "application/json",
+            success: function (result) {
+                pageMove("selecttemplate");
+            },
+            error: function () {
+                alert("error");
+            }
+        });
+    }
+
+
 
     /*
     템플릿 저장했을 때, 필수 값 검증
@@ -329,85 +357,65 @@
 
     /*body로 보낼 템플릿 JSON을 만들어준다.*/
     function templateInfo(templateName, templateColor) {
+        var keypointName = getPointName();
+        var jsonkey = getInputval();
 
         templateJson = {
             "kypt_name": templateName,
             "kypt_json": {
-                "color": templateColor,
-                "bbox": {
-                    "drawtype": 1,
-                    "drawjson": {
-                        "X": "",
-                        "Y": "",
-                        "W": "",
-                        "H": ""
-                    }
-                },
-                "keypoint": {
-                    "drawInfo": {
-                        "keypoints": [{
-                                "x": 131,
-                                "y": 137
-                            },
-                            {
-                                "x": 408,
-                                "y": 380
-                            },
-                            {
-                                "x": 483,
-                                "y": 96
-                            },
-                            {
-                                "x": 529,
-                                "y": 484
-                            }
-                        ],
-                        "lines": [{
-                                "from": {
-                                    "x": 131,
-                                    "y": 137
-                                },
-                                "to": {
-                                    "x": 408,
-                                    "y": 380
-                                }
-                            },
-                            {
-                                "from": {
-                                    "x": 483,
-                                    "y": 96
-                                },
-                                "to": {
-                                    "x": 408,
-                                    "y": 380
-                                }
-                            },
-                            {
-                                "from": {
-                                    "x": 483,
-                                    "y": 96
-                                },
-                                "to": {
-                                    "x": 529,
-                                    "y": 484
-                                }
-                            }
-                        ]
-                    },
-                    "drawjson": [{
-                            "X": "result>>json>>0>>x",
-                            "Y": "result>>json>>0>>y"
-                        },
-                        {
-                            "X": "result>>json>>1>>x",
-                            "Y": "result>>json>>1>>y"
-                        }
-                    ]
-                }
+                "categories": [{
+                    "name": templateName,
+                    "color": templateColor,
+                    "keypoints": keypointName,
+                    "skeleton": connectingInfo
+                }],
+                "annotations": [{
+                    "bbox_type": $('input[name="b-box-type"]:checked').val(),
+                    "bbox": [
+                        document.getElementById("bbox-x").value,
+                        document.getElementById("bbox-y").value,
+                        document.getElementById("bbox-w").value,
+                        document.getElementById("bbox-h").value
+                    ],
+                    "num_keypoints": count,
+                    "keypoints": keyinfo,
+                    "keypoints_json": jsonkey
+                }]
             }
         }
-        
+
         sendInfo(templateJson);
+    }
+
+    /*
+    입력한 keypoint json 정보를 불러온다.
+    */
+    function getInputval() {
+        var pointName = [];
+        var keypointJson = [];
+        var point;
+
+        for (var i = 0; i < keypoints.length; i++) {
+            point = document.getElementById("point-name" + i).innerText;
+            pointName.push(point);
+
+            xVal = document.getElementById(`x${i}`).value;
+            yVal = document.getElementById(`y${i}`).value;
+
+            keypointJson.push([xVal, yVal]);
+        }
+
+        return keypointJson;
+    }
+
+    function getPointName() {
+        var pointName = [];
+        for (var i = 0; i < keypoints.length; i++) {
+            point = document.getElementById("point-name" + i).innerText;
+            pointName.push(point);
+        }
+
+        return pointName;
     }
 
     /*
@@ -418,13 +426,19 @@
 
         switch (type) {
             case "boundingbox":
-                id = "card-boundingbox"
+                btn =
+                    id = "card-boundingbox"
                 break;
             case "keypoint":
                 id = "card-keypoint"
                 break;
         }
-        $('#' + id).toggleClass('active');
+
+        if (document.getElementById("btn-" + type).checked == true) {
+            $('#' + id).addClass('active');
+        } else {
+            $('#' + id).removeClass('active');
+        }
         typeShow(type);
     }
 
@@ -451,7 +465,7 @@
         var clickValue = $('input[name="b-box-type"]:checked').val();
 
         $('.b-box-type').removeClass('active');
-        $('#card-' + clickValue).toggleClass('active');
+        $('#card-type-' + clickValue).toggleClass('active');
 
         showBboxInput(clickValue);
     }
@@ -460,11 +474,9 @@
     선택한 drawtype에 맞추어, bbox input의 input박스를 바꿔준다.
     */
     function showBboxInput(id) {
-        document.getElementById("input-drawtype");
-
         var x1, x2, y1, y2;
 
-        if (id == "type-1" || id == "type-3") {
+        if (id == 1 || id == 3) {
 
             x1 = "X";
             y1 = "Y";
@@ -472,56 +484,20 @@
             y2 = "H";
 
         }
-        if (id == "type-2") {
+        if (id == 2) {
             x1 = "X1";
             y1 = "Y1";
             x2 = "X2";
             y2 = "Y2";
         }
 
-        document.getElementById("input-drawtype").innerHTML = `
-        <div class="row">
-                        <div class="col">
-                            <div class="">${x1}</div>
-                            <div class="input-group mb-2">
-                                <div class="input-group mb-2">
-                                    <input type="text" class="form-control" id="bbox-${x1}"
-                                        aria-describedby="basic-addon1">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="">${y1}</div>
-                            <div class="input-group mb-2">
-                                <div class="input-group mb-2">
-                                    <input type="text" class="form-control" id="bbox-${y1}"
-                                        aria-describedby="basic-addon1">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mb-4">
-                        <div class="col">
-                            <div class="">${x2}</div>
-                            <div class="input-group mb-2">
-                                <div class="input-group mb-2">
-                                    <input type="text" class="form-control" id="bbox-${x2}"
-                                        aria-describedby="basic-addon1">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="">${y2}</div>
-                            <div class="input-group mb-2">
-                                <div class="input-group mb-2">
-                                    <input type="text" class="form-control" id="bbox-${y2}"
-                                        aria-describedby="basic-addon1">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-        `
+        console.log(x1, y1);
+
+        document.getElementById("name-x").innerHTML = x1;
+        document.getElementById("name-y").innerHTML = y1;
+        document.getElementById("name-w").innerHTML = x2;
+        document.getElementById("name-h").innerHTML = y2;
+
     }
 
 
@@ -542,6 +518,9 @@
     let selectedKeypoint = null;
     let connecting = false;
     let dragging = false;
+    let count = 0;
+    let connectingInfo = []; //line info 전송할 때
+    let keyinfo = []; //keypoints 정보 전송할 때
 
     canvas.addEventListener('mousedown', (e) => {
         if (selectedKeypoint) {
@@ -566,6 +545,7 @@
                     from: selectedKeypoint,
                     to: clickedKeypoint
                 });
+                connectingInfo.push([selectedKeypoint.count, clickedKeypoint.count]);
                 connecting = false;
                 selectedKeypoint = null;
             }
@@ -576,16 +556,25 @@
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
             const newKeypoint = {
+                count,
                 x,
                 y
             };
+            count++;
+            keyinfo.push(x);
+            keyinfo.push(y);
+
             keypoints.push(newKeypoint);
         }
-        console.log(keypoints);
+
         draw();
         listkeypoints();
     });
 
+
+    /*
+    키포인트의 json 정보를 입력할 수 있는 input 칸을 만들어준다.
+    */
     function listkeypoints() {
         listItem = "";
         if (keypoints.length > 0) {
@@ -594,7 +583,7 @@
 
                 listItem += `<div class="row row-cols-3  my-2">
                     <div class="col col-2 d-flex align-items-center">
-                        <div>${i}</div>
+                        <div id="point-name${i}">${i}</div>
                     </div>
                     <div class="col col-5">
                         <input type="text" id="x${i}" class="form-control form-control-sm"aria-describedby="addon-wrapping">
@@ -652,7 +641,6 @@
     */
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-
         lines.forEach((line) => {
             ctx.beginPath();
             ctx.moveTo(line.from.x, line.from.y);
@@ -666,6 +654,126 @@
             ctx.fillStyle = selectedKeypoint === keypoint ? (connecting ? 'green' : 'red') : 'blue';
             ctx.fill();
         });
+    }
+
+
+    let query = window.location.search;
+    let param = new URLSearchParams(query);
+    let keypointID = param.get('id');
+
+    $(document).ready(function () {
+        if (keypointID !== null) {
+            getInfo(keypointID);
+        }
+    });
+
+    /*
+    수정할 때, 템플릿 정보를 가져온다.
+    */
+    function getInfo(templateID) {
+
+        $.ajax({
+            type: 'get', //데이터 전송 타입,
+            url: _PAGE_URL + 'apidataset/keyp', //데이터를 주고받을 파일 주소 입력,
+            //data: JSON.stringify(templateInfo), //보내는 데이터,
+            dataType: 'JSON', //문자형식으로 받기 , 
+            contentType: "application/json",
+            success: function (result) {
+                compareID(result, templateID)
+            },
+            error: function () {
+                alert("error");
+            }
+        });
+    }
+
+    /*
+    파라미터 아이디와 키포인트 아이디를 비교한 후, 필요한 정보만 만들어주는 함수
+    */
+    function compareID(result, templateID) {
+        for (var i = 0; i < result.length; i++) {
+            if (result[i]._id == templateID) {
+                drawExistInfo(result[i]);
+                return;
+            }
+        }
+    }
+    /*
+    존재하는 정보 화면에 그려주기
+    */
+    function drawExistInfo(result) {
+        console.log(result)
+        document.getElementById("template-name").value = result.kypt_name;
+
+        //바운딩박스 선택했을 때
+        if (result.kypt_json.annotations[0].bbox.length > 0) {
+            document.getElementById("btn-boundingbox").checked = true;
+            typeClick("boundingbox");
+
+            $("#type-boundingbox").show();
+
+            switch (result.kypt_json.annotations[0].bbox_type) {
+                case 1:
+                    document.getElementById("type-1").checked = true;
+                    selectBboxdraw("type-1");
+                    break;
+                case 2:
+                    document.getElementById("type-2").checked = true;
+                    selectBboxdraw("type-2");
+                    break;
+                case 3:
+                    document.getElementById("type-3").checked = true;
+                    selectBboxdraw("type-3");
+                    break;
+            }
+
+            document.getElementById("bbox-x").value = result.kypt_json.annotations[0].bbox[0];
+            document.getElementById("bbox-y").value = result.kypt_json.annotations[0].bbox[1];
+            document.getElementById("bbox-w").value = result.kypt_json.annotations[0].bbox[2];
+            document.getElementById("bbox-h").value = result.kypt_json.annotations[0].bbox[3];
+
+        } else {
+            document.getElementById("btn-boundingbox").checked = false;
+            $("#type-boundingbox").hide();
+        }
+
+        //키포인트 선택했을 때
+        if (result.kypt_json.annotations[0].num_keypoints > 0) {
+            document.getElementById("btn-keypoint").checked = true;
+            typeClick("keypoint");
+            inputKeypointinfo(result, result.kypt_json.annotations[0].num_keypoints);
+
+            connectingInfo = result.kypt_json.categories[0].skeleton; //초기값을 만들어준다.
+            keyinfo = result.kypt_json.annotations[0].keypoints; //초기값을 만들어준다.
+
+        } else {
+            document.getElementById("btn-keypoint").checked = false;
+            $("#type-keypoint").hide();
+        }
+    }
+
+
+    //키포인트 input - json을 만들어준다.
+    function inputKeypointinfo(result, keypointTotal) {
+        listItem = "";
+        var jsoninfo = result.kypt_json.annotations[0].keypoints_json;
+
+        for (i = 0; i < keypointTotal; i++) {
+            listItem += `<div class="row row-cols-3  my-2">
+                    <div class="col col-2 d-flex align-items-center">
+                        <div id="point-name${i}">${i}</div>
+                    </div>
+                    <div class="col col-5">
+                        <input type="text" id="x${i}" class="form-control form-control-sm"aria-describedby="addon-wrapping" value="${jsoninfo[i][0]}">
+                    </div>
+                    <div class="col col-5">
+                        <input type="text" id="y${i}" class="form-control form-control-sm" aria-describedby="addon-wrapping" value="${jsoninfo[i][1]}">
+                    </div>
+                </div>`;
+        }
+        console.log(listItem);
+        document.getElementById('keylist').innerHTML = listItem;
+
     }
 </script>
 
