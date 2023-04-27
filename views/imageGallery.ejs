@@ -154,10 +154,18 @@
     }
 
     $(document).ready(function () {
-        getImage(1);
+        const urlParams = new URLSearchParams(window.location.search);
+        const sto_id = urlParams.get('source_list_sto');
+        const dataset_id = urlParams.get('dataset_id');
+        if (sto_id) {
+            getDatasetInfo(dataset_id, sto_id);
+        } else {
+            getImage(1, '');
+        }
     });
 
     function draw() {
+
         var canvas = document.getElementById('canvas1');
         var ctx = canvas.getContext('2d');
         ctx.beginPath();
@@ -170,21 +178,41 @@
     }
 
 
-    function getImage(pageCount) {
+
+    async function getDatasetInfo(data_id, sto_id) {
+        var apiUrl = _PAGE_URL + 'apidataset/getdataset?datasetId=' + data_id;
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            console.log('getdatasetinfo')
+            const datasetInfo = await response.json();
+            console.log(datasetInfo);
+            const img_folder = datasetInfo.image_location;
+            const label_folder = datasetInfo.label_location;
+            console.log(img_folder);
+            getImage(1, sto_id, img_folder, label_folder);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+
+
+    function getImage(pageCount, stoid, img_folder, label_folder) {
         console.log(pageCount);
         var env_path = 'D:\\MgnSData\\Datas\\';
 
         $.ajax({
             type: 'post', //데이터 전송 타입,
             url: _WEBSERVER_ROOT_URL +
-                'Report/DetectionImageView/All?&StorageID=&PageNum=' + pageCount +
+                'Report/DetectionImageView/All?&StorageID=' + stoid + '&PageNum=' + pageCount +
                 '&CountOfPage=50&ErrorType=&SShot=1', //데이터를 주고받을 파일 주소 입력,
             //data: datasetInfo,
             //보내는 데이터,
             dataType: 'JSON', //문자형식으로 받기 , 
             success: function (result) {
-                console.log(result);
-                imagePath(result);
+                imagePath(result, img_folder, label_folder);
                 document.getElementById("totalcount").innerText = result.totalerrorcount.toLocaleString(
                     'ko-KR');
                 document.getElementById("page-total").innerText = parseInt(result.totalerrorcount / 50) + 1;
@@ -204,41 +232,59 @@
     Apipath: D:\\MgnSData\\Datas\\2022\\7\\22\\9\\24863\\Thumb_24863_0_0x80000000_0.jpg
     Imagepath: http://49.50.160.122:3000/errorimages/2022/7/22/9/24863/24863_0_0x80000000_0.jpg
     */
-    function imagePath(result) {
+    function imagePath(result, img_folder, label_folder) {
+        console.log('imagePath');
+        console.log(img_folder);
 
         var data = result.errorinfo;
+        console.log(data)
 
         //url 매핑을 위해 url을 만들어준다.
 
-        var originParam, excludeParam;
+        var originParam, excludeParam, jsonParam;
         var pathArr = [];
+        var jsonArr = [];
 
-        for (i = 0; i < data.length; i++) {
-            originParam = result.errorinfo[i].thumbnailpath;
-            excludeParam = 'D:\\MgnSData\\Datas\\';
-            originParam = originParam.replace(excludeParam, "");
-            originParam = originParam.replace("Thumb_", "");
+        for (i = 0; i < data.length - 1; i++) {
+            //originParam = result.errorinfo[i].thumbnailpath;
+            originParam = img_folder + result.errorinfo[i].mediapath + result.errorinfo[i].mediatitle;
+            if (originParam != "") {
+
+                excludeParam = 'D:\\MgnSData\\Datas\\';
+                originParam = originParam.replace(excludeParam, img_folder);
+                originParam = originParam.replace("Thumb_", "");
 
 
-            originParam = originParam.replace(/\\/ig, "/");
-            //originParam = originParam.replace(/\\/ig, "/");
+                originParam = originParam.replace(/\\/ig, "/");
+                //originParam = originParam.replace(/\\/ig, "/");
+                jsonParam = originParam.replace(/JPG|\.jpg/g, (match) => {
+                    if (match === "JPG") {
+                        return "JSON";
+                    } else if (match === ".jpg") {
+                        return ".json";
+                    }
+                });
 
 
-            object = {
-                src: originParam,
-                srct: originParam,
-                title: result.errorinfo[i].mediatitle
+                object = {
+                    src: originParam,
+                    srct: originParam,
+                    title: result.errorinfo[i].mediatitle
+                }
+                pathArr.push(object);
+                jsonArr.push(jsonParam);
             }
-
-            pathArr.push(object);
         }
 
         makeGallery(pathArr);
+        transfUrlJson(jsonArr);
     }
 
     /*갤러리를 보여준다*/
 
-    function makeGallery(pathArr) {
+
+
+    function makeGallery(pathArr, jsonArr) {
         var myLightboxTool = function (customElementName, $customIcon, item) {
             alert('Media title :' + item.title);
         }
@@ -249,7 +295,7 @@
             // ### gallery settings ###
             thumbnailHeight: 300,
             thumbnailWidth: "auto",
-            itemsBaseURL: 'http://49.50.160.122:3000/errorimages/',
+            itemsBaseURL: 'http://49.50.160.122:3000/',
             thumbnailBorderVertical: 0,
             thumbnailBorderHorizontal: 0,
             colorScheme: {
@@ -265,6 +311,8 @@
             },
             thumbnailAlignment: "center",
             galleryMaxItems: 50,
+            lazyLoad: false, // Disable lazy loading
+            pagination: false, // Disable pagination
             thumbnailGutterWidth: 5,
             thumbnailGutterHeight: 5,
             thumbnailOpenImage: true,
@@ -283,8 +331,11 @@
             // ### gallery content ###
             items: pathArr
         });
-
+        console.log('makegallery')
     }
+
+
+
 
     // Click event on custom lightbox toolbar element
     function myToolbarCustClick(customElementName, $customIcon, item) {
@@ -353,6 +404,292 @@
 
         }
     }
+
+
+
+
+
+
+    async function fetchAndCombineJson(urlList) {
+        const jsonPromises = urlList.map(async (url) => {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        });
+
+        try {
+            const combinedJsonArray = await Promise.all(jsonPromises);
+            combinedJsonTemplate(combinedJsonArray);
+        } catch (error) {
+            console.error('Error fetching JSON data:', error);
+        }
+    }
+
+    function transfUrlJson(jsonArr) {
+        var jsonlistgalery = [];
+        jsonArr.forEach((json) => {
+            var jsonUrlLoc = _WEBSERVER_DI_URL + json;
+            jsonlistgalery.push(jsonUrlLoc);
+        });
+        fetchAndCombineJson(jsonlistgalery);
+    }
+
+
+    function waitForCanvas(i) {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                console.log('Function wait 1s is finished');
+                resolve();
+            }, 300);
+        });
+    }
+
+
+    const listformatedkeys = [];
+
+
+    async function combinedJsonTemplate(JSONlist) {
+        await waitForCanvas();
+        for (let i = 0; i < JSONlist.length; i++) {   //JSONlist.length
+            const key1 = 'labelingInfo';
+            const key1index = 0;
+            const key2 = 'pose';
+            const key3 = 'location';
+            const schemaloc = '.labelingInfo[0].pose.location';
+            const locationkey = JSONlist[i][key1][key1index][key2][key3];
+            const entries = Object.entries(locationkey);
+            const listofpoints = [];
+            for (let j = 0; j < entries.length; j++) {
+                const [key, value] = entries[j];
+                const multipliedValue = {
+                    x: value.x * 0.1555,
+                    y: value.y * 0.14,
+                    key: key
+                };
+                listofpoints.push(multipliedValue);
+            }
+            var formatedkey = { "keypoints": listofpoints };
+            listformatedkeys.push(formatedkey);
+        }
+    }
+
+    /*
+        x: value.x * 0.1555,
+                        y: value.y * 0.14,
+    */
+
+
+    const lineslink = {
+        "lines": [
+            [
+                10,
+                15
+            ],
+            [
+                10,
+                3
+            ],
+            [
+                10,
+                2
+            ],
+            [
+                2,
+                16
+            ],
+            [
+                15,
+                9
+            ],
+            [
+                2,
+                10
+            ],
+            [
+                2,
+                10
+            ],
+            [
+                2,
+                10
+            ],
+            [
+                2,
+                10
+            ],
+            [
+                2,
+                10
+            ],
+            [
+                2,
+                10
+            ],
+            [
+                2,
+                10
+            ],
+            [
+                2,
+                10
+            ],
+            [
+                2,
+                10
+            ],
+            [
+                2,
+                10
+            ],
+            [
+                2,
+                10
+            ],
+            [
+                2,
+                10
+            ]
+        ]
+    }
+
+    async function drawpointsindex(idx) {
+        await waitForCanvas();
+        const index = idx - 1;
+        const canvasindex = "canvas" + (index + 1);
+        const zoomcanvindex = "canvas" + (index + 1);
+
+        const canvas = document.getElementById(canvasindex);
+        const ctx = canvas.getContext('2d');
+        const zoomcanv = document.getElementById(zoomcanvindex)
+        const zctx = zoomcanv.getContext('2d');
+
+
+        // Draw keypoints
+        listformatedkeys[index].keypoints.forEach(point => {
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, 1, 0, 2 * Math.PI);
+            ctx.fillStyle = 'blue';
+            ctx.fill();
+            ctx.closePath();
+
+            zctx.beginPath();
+            zctx.arc(point.x, point.y, 1, 0, 2 * Math.PI);
+            zctx.fillStyle = 'blue';
+            zctx.fill();
+            zctx.closePath();
+
+
+            // Draw the text with the key value over the point
+            ctx.font = '4px Arial';
+            ctx.fillStyle = 'yellow';
+            ctx.fillText(point.key + 1, point.x, point.y + 4);
+
+        });
+
+        // Draw lines
+        lineslink.lines.forEach(line => {
+            const from = listformatedkeys[index].keypoints[line[0] - 1];
+            const to = listformatedkeys[index].keypoints[line[1] - 1];
+
+            ctx.beginPath();
+            ctx.moveTo(from.x, from.y);
+            ctx.lineTo(to.x, to.y);
+            ctx.strokeStyle = "red";
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+            ctx.closePath();
+        });
+
+
+    }
+
+    async function drawzoomcanv(index) {
+        await waitForCanvas();
+        console.log('ZOOM draw points idx')
+        const zindex = index - 1;
+        const zoomcanvindex = "zoomcanv" + (index + 1);
+
+        const zoomcanv = document.getElementById(zoomcanvindex)
+        const zctx = zoomcanv.getContext('2d');
+
+
+        // Draw keypoints
+        listformatedkeys[index].keypoints.forEach(point => {
+
+            zctx.beginPath();
+            zctx.arc(point.x, point.y, 1, 0, 2 * Math.PI);
+            zctx.fillStyle = 'blue';
+            zctx.fill();
+            zctx.closePath();
+
+
+            // Draw the text with the key value over the point
+            zctx.font = '4px Arial';
+            zctx.fillStyle = 'yellow';
+            zctx.fillText(point.key + 1, point.x, point.y + 4);
+
+        });
+
+        // Draw lines
+        lineslink.lines.forEach(line => {
+            const from = listformatedkeys[index].keypoints[line[0] - 1];
+            const to = listformatedkeys[index].keypoints[line[1] - 1];
+
+            zctx.beginPath();
+            zctx.moveTo(from.x, from.y);
+            zctx.lineTo(to.x, to.y);
+            zctx.strokeStyle = "red";
+            zctx.lineWidth = 0.5;
+            zctx.stroke();
+            zctx.closePath();
+        });
+
+
+    }
+
+    //---------------------Draw Template---------------------------------
+
+
+    const drawingData = { "keypoints": [{ "x": 219, "y": 160 }, { "x": 243, "y": 146 }, { "x": 264, "y": 162 }, { "x": 284, "y": 145 }, { "x": 306, "y": 162 }, { "x": 265, "y": 223 }, { "x": 326, "y": 226 }, { "x": 205, "y": 229 }, { "x": 245, "y": 375 }, { "x": 297, "y": 375 }, { "x": 245, "y": 439 }, { "x": 301, "y": 436 }, { "x": 241, "y": 496 }, { "x": 303, "y": 497 }, { "x": 349, "y": 301 }, { "x": 184, "y": 301 }, { "x": 164, "y": 368 }, { "x": 381, "y": 372 }], "lines": [{ "from": { "x": 219, "y": 160 }, "to": { "x": 243, "y": 146 } }, { "from": { "x": 243, "y": 146 }, "to": { "x": 264, "y": 162 } }, { "from": { "x": 264, "y": 162 }, "to": { "x": 284, "y": 145 } }, { "from": { "x": 284, "y": 145 }, "to": { "x": 306, "y": 162 } }, { "from": { "x": 264, "y": 162 }, "to": { "x": 265, "y": 223 } }, { "from": { "x": 265, "y": 223 }, "to": { "x": 326, "y": 226 } }, { "from": { "x": 265, "y": 223 }, "to": { "x": 205, "y": 229 } }, { "from": { "x": 265, "y": 223 }, "to": { "x": 245, "y": 375 } }, { "from": { "x": 265, "y": 223 }, "to": { "x": 297, "y": 375 } }, { "from": { "x": 297, "y": 375 }, "to": { "x": 301, "y": 436 } }, { "from": { "x": 245, "y": 375 }, "to": { "x": 245, "y": 439 } }, { "from": { "x": 245, "y": 439 }, "to": { "x": 241, "y": 496 } }, { "from": { "x": 301, "y": 436 }, "to": { "x": 303, "y": 497 } }, { "from": { "x": 326, "y": 226 }, "to": { "x": 349, "y": 301 } }, { "from": { "x": 349, "y": 301 }, "to": { "x": 381, "y": 372 } }, { "from": { "x": 205, "y": 229 }, "to": { "x": 184, "y": 301 } }, { "from": { "x": 184, "y": 301 }, "to": { "x": 164, "y": 368 } }] };
+
+    function drawCanvas(data, i) {
+        console.log(i);
+        const canvasindex = "canvas" + i;
+        const canvas = document.getElementById(canvasindex);
+        const ctx = canvas.getContext('2d');
+
+        // Draw keypoints
+        data.keypoints.forEach(point => {
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI);
+            ctx.fillStyle = 'blue';
+            ctx.fill();
+            ctx.closePath();
+
+            // Draw the text with the key value over the point
+            ctx.font = '12px Arial';
+            ctx.fillStyle = 'black';
+            ctx.fillText('TEXTO', point.x + 8, point.y + 4);
+        });
+
+        // Draw lines
+        data.lines.forEach(line => {
+            ctx.beginPath();
+            ctx.moveTo(line.from.x, line.from.y);
+            ctx.lineTo(line.to.x, line.to.y);
+            ctx.strokeStyle = 'red';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.closePath();
+        });
+    }
+
+
+
+
+
 </script>
 
 </html>

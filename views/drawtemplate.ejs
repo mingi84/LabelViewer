@@ -5,6 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Canvas Drawing</title>
+    <script language="javascript" type="text/javascript" src="js/jquery-3.6.4.min.js"></script>
+    <script language="javascript" type="text/javascript" src="js/bootstrap.bundle.js"></script>
+    <script language="javascript" type="text/javascript" src="js/fontawesome.all.min.js"></script>
+    <script language="javascript" type="text/javascript" src="js/jquery.nanogallery2.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/fontawesome.all.css">
+    <link rel="stylesheet" type="text/css" href="css/nanogallery2.min.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <script language="javascript" type="text/javascript" src="js/globalconst.js"></script>
+
     <style>
         canvas {
             border: 1px solid black;
@@ -13,7 +23,7 @@
 </head>
 
 <body>
-    <canvas id="myCanvas" width="800" height="600"></canvas>
+    <canvas id="myCanvas" width="1904" height="1000"></canvas>
     <script>
 
         /*
@@ -23,35 +33,232 @@
 
 
 
-
-        const drawingData = { "keypoints": [{ "x": 219, "y": 160 }, { "x": 243, "y": 146 }, { "x": 264, "y": 162 }, { "x": 284, "y": 145 }, { "x": 306, "y": 162 }, { "x": 265, "y": 223 }, { "x": 326, "y": 226 }, { "x": 205, "y": 229 }, { "x": 245, "y": 375 }, { "x": 297, "y": 375 }, { "x": 245, "y": 439 }, { "x": 301, "y": 436 }, { "x": 241, "y": 496 }, { "x": 303, "y": 497 }, { "x": 349, "y": 301 }, { "x": 184, "y": 301 }, { "x": 164, "y": 368 }, { "x": 381, "y": 372 }], "lines": [{ "from": { "x": 219, "y": 160 }, "to": { "x": 243, "y": 146 } }, { "from": { "x": 243, "y": 146 }, "to": { "x": 264, "y": 162 } }, { "from": { "x": 264, "y": 162 }, "to": { "x": 284, "y": 145 } }, { "from": { "x": 284, "y": 145 }, "to": { "x": 306, "y": 162 } }, { "from": { "x": 264, "y": 162 }, "to": { "x": 265, "y": 223 } }, { "from": { "x": 265, "y": 223 }, "to": { "x": 326, "y": 226 } }, { "from": { "x": 265, "y": 223 }, "to": { "x": 205, "y": 229 } }, { "from": { "x": 265, "y": 223 }, "to": { "x": 245, "y": 375 } }, { "from": { "x": 265, "y": 223 }, "to": { "x": 297, "y": 375 } }, { "from": { "x": 297, "y": 375 }, "to": { "x": 301, "y": 436 } }, { "from": { "x": 245, "y": 375 }, "to": { "x": 245, "y": 439 } }, { "from": { "x": 245, "y": 439 }, "to": { "x": 241, "y": 496 } }, { "from": { "x": 301, "y": 436 }, "to": { "x": 303, "y": 497 } }, { "from": { "x": 326, "y": 226 }, "to": { "x": 349, "y": 301 } }, { "from": { "x": 349, "y": 301 }, "to": { "x": 381, "y": 372 } }, { "from": { "x": 205, "y": 229 }, "to": { "x": 184, "y": 301 } }, { "from": { "x": 184, "y": 301 }, "to": { "x": 164, "y": 368 } }] };
+        const jsonData = {
+            "keypoints": [
+                {
+                    "x": "1186",
+                    "y": "774",
+                    "key": "오른쪽 무릎"
+                },
+                {
+                    "x": "1304",
+                    "y": "657",
+                    "key": "왼쪽 손"
+                },
+                {
+                    "x": "1213",
+                    "y": "440",
+                    "key": "오른쪽 눈"
+                },
+                {
+                    "x": "1220",
+                    "y": "522",
+                    "key": "흉골"
+                },
+                {
+                    "x": "1140",
+                    "y": "648",
+                    "key": "오른쪽 손"
+                },
+                {
+                    "x": "1187",
+                    "y": "671",
+                    "key": "오른쪽 허벅지"
+                },
+                {
+                    "x": "1247",
+                    "y": "858",
+                    "key": "왼쪽 발목"
+                },
+                {
+                    "x": "1270",
+                    "y": "522",
+                    "key": "왼쪽 어깨"
+                },
+                {
+                    "x": "1293",
+                    "y": "595",
+                    "key": "왼쪽 팔꿈치"
+                },
+                {
+                    "x": "1255",
+                    "y": "450",
+                    "key": "왼쪽 귀"
+                },
+                {
+                    "x": "1230",
+                    "y": "452",
+                    "key": "코"
+                },
+                {
+                    "x": "1178",
+                    "y": "857",
+                    "key": "오른쪽 발목"
+                },
+                {
+                    "x": "1143",
+                    "y": "583",
+                    "key": "오른쪽 팔꿈치"
+                },
+                {
+                    "x": "1247",
+                    "y": "767",
+                    "key": "왼쪽 무릎"
+                },
+                {
+                    "x": "1170",
+                    "y": "522",
+                    "key": "오른쪽 어깨"
+                },
+                {
+                    "x": "1243",
+                    "y": "440",
+                    "key": "왼쪽 눈"
+                },
+                {
+                    "x": "1186",
+                    "y": "451",
+                    "key": "오른쪽 귀"
+                },
+                {
+                    "x": "1251",
+                    "y": "672",
+                    "key": "왼쪽 허벅지"
+                }
+            ],
+            "lines": [
+            [
+            4,
+                3
+            ],
+            [
+            2,
+                10
+            ],
+            [
+            2,
+                10
+            ],
+            [
+            2,
+                10
+            ],
+            [
+            2,
+                10
+            ],
+            [
+                2,
+                10
+            ],
+            [
+                2,
+                10
+            ],
+            [
+                2,
+                10
+            ],
+            [
+                2,
+                10
+            ],
+            [
+                2,
+                10
+            ],
+            [
+                2,
+                10
+            ],
+            [
+                2,
+                10
+            ],
+            [
+                2,
+                10
+            ],
+            [
+                2,
+                10
+            ],
+            [
+                2,
+                10
+            ],
+            [
+                2,
+                10
+            ],
+            [
+                2,
+                10
+            ]
+        ]
+        };
 
         function drawCanvas(data) {
-            const canvas = document.getElementById('myCanvas');
-            const ctx = canvas.getContext('2d');
+            const canvas = document.getElementById("myCanvas");
+            const ctx = canvas.getContext("2d");
 
             // Draw keypoints
             data.keypoints.forEach(point => {
                 ctx.beginPath();
                 ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI);
-                ctx.fillStyle = 'blue';
+                ctx.fillStyle = "blue";
                 ctx.fill();
                 ctx.closePath();
+
+                // Draw the text with the key value over the point
+                ctx.font = '14px Arial';
+                ctx.fillStyle = 'yellow';
+                console.log(point.key);
+                ctx.fillText(1, point.x, point.y + 4);
             });
 
             // Draw lines
+            console.log(data);
             data.lines.forEach(line => {
+                const from = data.keypoints[line[0] - 1];
+                const to = data.keypoints[line[1] - 1];
+
                 ctx.beginPath();
-                ctx.moveTo(line.from.x, line.from.y);
-                ctx.lineTo(line.to.x, line.to.y);
-                ctx.strokeStyle = 'red';
+                ctx.moveTo(from.x, from.y);
+                ctx.lineTo(to.x, to.y);
+                ctx.strokeStyle = "red";
                 ctx.lineWidth = 2;
                 ctx.stroke();
                 ctx.closePath();
             });
         }
 
-        drawCanvas(drawingData);
+        drawCanvas(jsonData);
+
+
+
+
+        const inputJson = { "keypoints": [{ "x": 219, "y": 160 }, { "x": 243, "y": 146 }, { "x": 264, "y": 162 }, { "x": 284, "y": 145 }, { "x": 306, "y": 162 }, { "x": 265, "y": 223 }, { "x": 326, "y": 226 }, { "x": 205, "y": 229 }, { "x": 245, "y": 375 }, { "x": 297, "y": 375 }, { "x": 245, "y": 439 }, { "x": 301, "y": 436 }, { "x": 241, "y": 496 }, { "x": 303, "y": 497 }, { "x": 349, "y": 301 }, { "x": 184, "y": 301 }, { "x": 164, "y": 368 }, { "x": 381, "y": 372 }], "lines": [{ "from": { "x": 219, "y": 160 }, "to": { "x": 243, "y": 146 } }, { "from": { "x": 243, "y": 146 }, "to": { "x": 264, "y": 162 } }, { "from": { "x": 264, "y": 162 }, "to": { "x": 284, "y": 145 } }, { "from": { "x": 284, "y": 145 }, "to": { "x": 306, "y": 162 } }, { "from": { "x": 264, "y": 162 }, "to": { "x": 265, "y": 223 } }, { "from": { "x": 265, "y": 223 }, "to": { "x": 326, "y": 226 } }, { "from": { "x": 265, "y": 223 }, "to": { "x": 205, "y": 229 } }, { "from": { "x": 265, "y": 223 }, "to": { "x": 245, "y": 375 } }, { "from": { "x": 265, "y": 223 }, "to": { "x": 297, "y": 375 } }, { "from": { "x": 297, "y": 375 }, "to": { "x": 301, "y": 436 } }, { "from": { "x": 245, "y": 375 }, "to": { "x": 245, "y": 439 } }, { "from": { "x": 245, "y": 439 }, "to": { "x": 241, "y": 496 } }, { "from": { "x": 301, "y": 436 }, "to": { "x": 303, "y": 497 } }, { "from": { "x": 326, "y": 226 }, "to": { "x": 349, "y": 301 } }, { "from": { "x": 349, "y": 301 }, "to": { "x": 381, "y": 372 } }, { "from": { "x": 205, "y": 229 }, "to": { "x": 184, "y": 301 } }, { "from": { "x": 184, "y": 301 }, "to": { "x": 164, "y": 368 } }] };
+
+
+
+        const outputJson = {
+            "keypoints": inputJson.keypoints,
+            "lines": inputJson.lines.map(line => {
+                const fromIndex = inputJson.keypoints.findIndex(
+                    point => point.x === line.from.x && point.y === line.from.y
+                );
+                const toIndex = inputJson.keypoints.findIndex(
+                    point => point.x === line.to.x && point.y === line.to.y
+                );
+
+                return [fromIndex + 1, toIndex + 1];
+            })
+        };
+
+        console.log(outputJson);
+
+
 
     </script>
 </body>

@@ -1000,17 +1000,17 @@
           //--- set the URL of the media to display in the viewer
           //--- markup is defined for images //misun
           NGY2Item.prototype.setMediaURL = function (url, mediaKind) {
+            var index = this.mediaNumber - 1;
             this.src = url;
             this.mediaKind = mediaKind;
             if (mediaKind == 'img') {
               //by.misun 캔버스, 이미지 축소
               this.mediaMarkup = `
-            <canvas id="can"></canvas>
+            <canvas id="zoomcanv`+ index + `"></canvas>
             <img class="nGY2ViewerMedia" src="${url}" alt=" " itemprop="contentURL" draggable="false">
             `;
 
             }
-
           };
 
 
@@ -2372,11 +2372,11 @@
     window.clearRequestTimeout = function (handle) {
       window.cancelAnimationFrame ? window.cancelAnimationFrame(handle.value) :
         window.webkitCancelAnimationFrame ? window.webkitCancelAnimationFrame(handle.value) :
-        window.webkitCancelRequestAnimationFrame ? window.webkitCancelRequestAnimationFrame(handle.value) : /* Support for legacy API */
-        window.mozCancelRequestAnimationFrame ? window.mozCancelRequestAnimationFrame(handle.value) :
-        window.oCancelRequestAnimationFrame ? window.oCancelRequestAnimationFrame(handle.value) :
-        window.msCancelRequestAnimationFrame ? window.msCancelRequestAnimationFrame(handle.value) :
-        clearTimeout(handle);
+          window.webkitCancelRequestAnimationFrame ? window.webkitCancelRequestAnimationFrame(handle.value) : /* Support for legacy API */
+            window.mozCancelRequestAnimationFrame ? window.mozCancelRequestAnimationFrame(handle.value) :
+              window.oCancelRequestAnimationFrame ? window.oCancelRequestAnimationFrame(handle.value) :
+                window.msCancelRequestAnimationFrame ? window.msCancelRequestAnimationFrame(handle.value) :
+                  clearTimeout(handle);
     };
 
 
@@ -2988,7 +2988,7 @@
           return;
         }
 
-        if (G.$E.scrollableParent === null && !topInViewportVert(G.$E.base, 20)) {
+        if (G.$E.scrollableParent === null && !topInViewportVert(G.$E.base, 50)) {
           // $('html, body').animate({scrollTop: G.$E.base.offset().top}, 200);
           G.$E.base.get(0).scrollIntoView();
         }
@@ -4414,7 +4414,7 @@
         GalleryDisplayPart1();
         requestTimeout(function () {
           GalleryDisplayPart2(false)
-        }, 20);
+        }, 50);
       } else {
         // 
         G.galleryResizeEventEnabled = true;
@@ -5363,7 +5363,7 @@
         newTop = curTn.top - G.GOM.clipArea.top;
         var vp = G.GOM.cache.viewport;
         if (G.O.thumbnailDisplayOutsideScreen || (((topOld + curTn.height) >= (vp.t - vp.h) && topOld <= (vp.t + vp.h * 4)) ||
-            ((top + curTn.height) >= (vp.t - vp.h) && top <= (vp.t + vp.h * 4)))) {
+          ((top + curTn.height) >= (vp.t - vp.h) && top <= (vp.t + vp.h * 4)))) {
           // thumbnail positioned in enlarged viewport (viewport + 4 x viewport height) (v1.5: changed from 2 to 4)
           if (curTn.displayed) {
             // thumbnail is displayed
@@ -5863,6 +5863,8 @@
         }
         newElt[newEltIdx++] = '    <div class="nGY2GThumbnailDescription" ' + G.tn.style.getDesc() + '>' + getTumbnailDescription(item) + '</div>';
         newElt[newEltIdx++] = '  </div>';
+
+        drawpointsindex(idx);
       }
 
       // ##### layer for tools
@@ -6678,7 +6680,7 @@
             item.CSSTransformSet(inits[j].element, inits[j].property, inits[j].value);
             item.CSSTransformApply(inits[j].element);
             break;
-            // CSS filter
+          // CSS filter
           case 'blur':
           case 'brightness':
           case 'grayscale':
@@ -6841,7 +6843,6 @@
 
     /** @function DisplayPhoto */
     function DisplayPhoto(imageID, albumID) {
-
       if (G.O.debugMode) {
         console.log('#DisplayPhoto : ' + albumID + '-' + imageID);
       }
@@ -6888,7 +6889,7 @@
         case '':
           AlbumGetMarkupOrApi(fnToCall, fnParam1, fnParam2);
           break;
-          // JSON, Flickr, Picasa, ...
+        // JSON, Flickr, Picasa, ...
         default:
           jQuery.nanogallery2['data_' + G.O.kind](G, 'AlbumGetContent', albumID, fnToCall, fnParam1, fnParam2);
       }
@@ -8134,7 +8135,7 @@
         // MARKUP / API
         case '':
           break;
-          // JSON, Flickr, Picasa, ...
+        // JSON, Flickr, Picasa, ...
         default:
           jQuery.nanogallery2['data_' + G.O.kind](G, 'Init');
       }
@@ -8466,22 +8467,22 @@
               break;
           }
 
-          // case 'overImageOnTop' :
-          // G.tn.style[level]['label'] = 'top:0; position:absolute;';
-          // break;
-          // case 'overImageOnMiddle' :
-          // G.tn.style[level]['label'] = 'top:0; bottom:0;';
-          // G.tn.style[level]['title'] = 'position:absolute; bottom:50%;';
-          // G.tn.style[level]['desc'] = 'position:absolute; top:50%;';
-          // break;
-          // case 'right' :
-          // case 'custom' :
-          // break;
-          // case 'overImageOnBottom' :
-          // default :
-          // G.O.thumbnailLabel.position = 'overImageOnBottom';
-          // G.tn.style[level].label = 'bottom:0; position:absolute;';
-          // break;
+        // case 'overImageOnTop' :
+        // G.tn.style[level]['label'] = 'top:0; position:absolute;';
+        // break;
+        // case 'overImageOnMiddle' :
+        // G.tn.style[level]['label'] = 'top:0; bottom:0;';
+        // G.tn.style[level]['title'] = 'position:absolute; bottom:50%;';
+        // G.tn.style[level]['desc'] = 'position:absolute; top:50%;';
+        // break;
+        // case 'right' :
+        // case 'custom' :
+        // break;
+        // case 'overImageOnBottom' :
+        // default :
+        // G.O.thumbnailLabel.position = 'overImageOnBottom';
+        // G.tn.style[level].label = 'bottom:0; position:absolute;';
+        // break;
       }
 
       // if( G.layout.engine != 'CASCADING' ) {
@@ -8808,7 +8809,7 @@
 
           var aArgs = Array.prototype.slice.call(arguments, 1),
             fToBind = this,
-            fNOP = function () {},
+            fNOP = function () { },
             fBound = function () {
               return fToBind.apply(this instanceof fNOP && oThis ?
                 this :
@@ -9312,10 +9313,10 @@
         case 'picasa':
         case 'google':
         case 'google2':
-          // no more working since Google changed the access to Google Photos in 2017
-          // var sU='https://plus.google.com/photos/'+G.O.userID+'/albums/'+item.albumID+'/'+item.GetID();
-          // window.open(sU,'_blank');
-          // break;
+        // no more working since Google changed the access to Google Photos in 2017
+        // var sU='https://plus.google.com/photos/'+G.O.userID+'/albums/'+item.albumID+'/'+item.GetID();
+        // window.open(sU,'_blank');
+        // break;
         default:
           var sU = item.responsiveURL();
           window.open(sU, '_blank');
@@ -9831,7 +9832,6 @@
     function LightboxGalleryBuild() {
 
       G.VOM.gallery.firstDisplay = true;
-
       if (G.O.viewerGallery != 'none') {
 
         var tw = G.O.viewerGalleryTWidth;
@@ -11157,11 +11157,11 @@
             bottom: ''
           });
           break;
-          // case 'top':
-          // windowsH -= tb_OHt;
-          // G.VOM.$content.css({height: windowsH, width: windowsW, top: tb_OHt  });
-          // G.VOM.$toolbar.css({top: 0});
-          // break;
+        // case 'top':
+        // windowsH -= tb_OHt;
+        // G.VOM.$content.css({height: windowsH, width: windowsW, top: tb_OHt  });
+        // G.VOM.$toolbar.css({top: 0});
+        // break;
         case 'bottom':
         case 'bottomOverImage':
         default:
@@ -11176,12 +11176,12 @@
             bottom: galleryHeight
           });
           break;
-          // case 'bottom':
-          // default:
-          // windowsH -= tb_OHt;
-          // G.VOM.$content.css({ width: windowsW, top: 0, bottom: tb_OHt });
-          // G.VOM.$toolbar.css({bottom: galleryHeight});
-          // break;
+        // case 'bottom':
+        // default:
+        // windowsH -= tb_OHt;
+        // G.VOM.$content.css({ width: windowsW, top: 0, bottom: tb_OHt });
+        // G.VOM.$toolbar.css({bottom: galleryHeight});
+        // break;
       }
 
 
@@ -11964,7 +11964,7 @@
 
 
 
-    function ngEvEmitter() {}
+    function ngEvEmitter() { }
 
     var proto = ngEvEmitter.prototype;
 
@@ -14789,7 +14789,7 @@
        * should handle the inputEvent data and trigger the callback
        * @virtual
        */
-      handler: function () {},
+      handler: function () { },
 
       /**
        * bind the events
@@ -14831,7 +14831,7 @@
       } else {
         Type = TouchMouseInput;
       }
-      return new(Type)(manager, inputHandler);
+      return new (Type)(manager, inputHandler);
     }
 
     /**
@@ -15966,21 +15966,21 @@
        * @param {Object} inputData
        * @returns {Const} STATE
        */
-      process: function (inputData) {}, // jshint ignore:line
+      process: function (inputData) { }, // jshint ignore:line
 
       /**
        * return the preferred touch-action
        * @virtual
        * @returns {Array}
        */
-      getTouchAction: function () {},
+      getTouchAction: function () { },
 
       /**
        * called when the gesture isn't allowed to recognize
        * like when another is being recognized or it is disabled
        * @virtual
        */
-      reset: function () {}
+      reset: function () { }
     };
 
     /**
@@ -16557,23 +16557,23 @@
           enable: false
         }],
         [PinchRecognizer, {
-            enable: false
-          },
+          enable: false
+        },
           ['rotate']
         ],
         [SwipeRecognizer, {
           direction: DIRECTION_HORIZONTAL
         }],
         [PanRecognizer, {
-            direction: DIRECTION_HORIZONTAL
-          },
+          direction: DIRECTION_HORIZONTAL
+        },
           ['swipe']
         ],
         [TapRecognizer],
         [TapRecognizer, {
-            event: 'doubletap',
-            taps: 2
-          },
+          event: 'doubletap',
+          taps: 2
+        },
           ['tap']
         ],
         [PressRecognizer]
@@ -16658,7 +16658,7 @@
       toggleCssProps(this, true);
 
       each(this.options.recognizers, function (item) {
-        var recognizer = this.add(new(item[0])(item[1]));
+        var recognizer = this.add(new (item[0])(item[1]));
         item[2] && recognizer.recognizeWith(item[2]);
         item[3] && recognizer.requireFailure(item[3]);
       }, this);
@@ -16736,8 +16736,8 @@
           // 3.   allow if the recognizer is allowed to run simultaneous with the current recognized recognizer.
           //      this can be setup with the `recognizeWith()` method on the recognizer.
           if (session.stopped !== FORCED_STOP && ( // 1
-              !curRecognizer || recognizer == curRecognizer || // 2
-              recognizer.canRecognizeWith(curRecognizer))) { // 3
+            !curRecognizer || recognizer == curRecognizer || // 2
+            recognizer.canRecognizeWith(curRecognizer))) { // 3
             recognizer.recognize(inputData);
           } else {
             recognizer.reset();
@@ -17215,19 +17215,19 @@
         }
 
         jQuery.getJSON(url, function (data, status, xhr) {
-            clearTimeout(tId);
-            PreloaderDisplay(false);
-            JsonParseData(albumIdx, data);
+          clearTimeout(tId);
+          PreloaderDisplay(false);
+          JsonParseData(albumIdx, data);
 
-            if (data.nano_status == 'ok') {
-              AlbumPostProcess(albumID);
-              if (fnToCall !== null && fnToCall !== undefined) {
-                fnToCall(fnParam1, fnParam2, null);
-              }
-            } else {
-              NanoAlert(G, 'Could not retrieve nanoPhotosProvider2 data. Error: ' + data.nano_status + ' - ' + data.nano_message);
+          if (data.nano_status == 'ok') {
+            AlbumPostProcess(albumID);
+            if (fnToCall !== null && fnToCall !== undefined) {
+              fnToCall(fnParam1, fnParam2, null);
             }
-          })
+          } else {
+            NanoAlert(G, 'Could not retrieve nanoPhotosProvider2 data. Error: ' + data.nano_status + ' - ' + data.nano_message);
+          }
+        })
           .fail(function (jqxhr, textStatus, error) {
             clearTimeout(tId);
             PreloaderDisplay(false);
@@ -17506,21 +17506,21 @@
 
         jQuery.getJSON(url + '&callback=?', function (data) {
 
-            if (data.nano_status == 'error') {
-              clearTimeout(tId);
-              PreloaderDisplay(false);
-              NanoAlert(G, "Could not retrieve Google data. Error: " + data.nano_message);
-              return;
-            }
+          if (data.nano_status == 'error') {
             clearTimeout(tId);
             PreloaderDisplay(false);
-            GoogleParseData(albumIdx, kind, data);
-            AlbumPostProcess(albumID);
-            if (fnToCall !== null && fnToCall !== undefined) {
-              fnToCall(fnParam1, fnParam2, null);
-            }
+            NanoAlert(G, "Could not retrieve Google data. Error: " + data.nano_message);
+            return;
+          }
+          clearTimeout(tId);
+          PreloaderDisplay(false);
+          GoogleParseData(albumIdx, kind, data);
+          AlbumPostProcess(albumID);
+          if (fnToCall !== null && fnToCall !== undefined) {
+            fnToCall(fnParam1, fnParam2, null);
+          }
 
-          })
+        })
           .fail(function (jqxhr, textStatus, error) {
             clearTimeout(tId);
             PreloaderDisplay(false);
@@ -17725,7 +17725,7 @@
 
     // -----------
     // Initialization
-    function Init() {}
+    function Init() { }
 
 
     // shortcuts to NGY2Tools functions (with context)
@@ -17822,14 +17822,14 @@
         // get photos from full photostream
         url = Flickr.url() + "?&method=flickr.people.getPublicPhotos&api_key=" + G.O.flickrAPIKey + "&user_id=" + G.O.userID + "&extras=description,views,tags,url_o,url_sq,url_t,url_q,url_s,url_m,url_z,url_b,url_h,url_k&per_page=500&format=json";
       } else
-      if (G.I[albumIdx].GetID() == 0) {
-        // retrieve the list of albums
-        url = Flickr.url() + "?&method=flickr.photosets.getList&api_key=" + G.O.flickrAPIKey + "&user_id=" + G.O.userID + "&per_page=500&primary_photo_extras=tags,url_o,url_sq,url_t,url_q,url_s,url_m,url_l,url_z,url_b,url_h,url_k&format=json";
-        kind = 'album';
-      } else {
-        // photos from one specific photoset
-        url = Flickr.url() + "?&method=flickr.photosets.getPhotos&api_key=" + G.O.flickrAPIKey + "&photoset_id=" + G.I[albumIdx].GetID() + "&extras=description,views,tags,url_o,url_sq,url_t,url_q,url_s,url_m,url_l,url_z,url_b,url_h,url_k&format=json";
-      }
+        if (G.I[albumIdx].GetID() == 0) {
+          // retrieve the list of albums
+          url = Flickr.url() + "?&method=flickr.photosets.getList&api_key=" + G.O.flickrAPIKey + "&user_id=" + G.O.userID + "&per_page=500&primary_photo_extras=tags,url_o,url_sq,url_t,url_q,url_s,url_m,url_l,url_z,url_b,url_h,url_k&format=json";
+          kind = 'album';
+        } else {
+          // photos from one specific photoset
+          url = Flickr.url() + "?&method=flickr.photosets.getPhotos&api_key=" + G.O.flickrAPIKey + "&photoset_id=" + G.I[albumIdx].GetID() + "&extras=description,views,tags,url_o,url_sq,url_t,url_q,url_s,url_m,url_l,url_z,url_b,url_h,url_k&format=json";
+        }
 
       if (G.O.debugMode) {
         console.log('Flickr URL: ' + url);
@@ -17874,40 +17874,40 @@
       var FlickrGetOnePage = function (url, page) {
         jQuery.getJSON(url + '&page=' + page + '&jsoncallback=?', function (data, status, xhr) {
 
-            var pages = 0;
-            if (kind == 'album') {
+          var pages = 0;
+          if (kind == 'album') {
+            if (data.stat !== undefined && data.stat === 'fail') {
+              NanoAlert(G, "Could not retrieve Flickr album list: " + data.message + " (code: " + data.code + ").");
+              return false;
+            }
+            sourceData = sourceData.concat(data.photosets.photoset);
+            pages = data.photosets.pages;
+          } else {
+            if (G.O.photoset.toUpperCase() == 'NONE' || G.O.album.toUpperCase() == 'NONE') {
+              // content of full photoset
+              sourceData = sourceData.concat(data.photos.photo);
+              pages = data.photos.pages;
+            } else {
+              // content of one album
               if (data.stat !== undefined && data.stat === 'fail') {
-                NanoAlert(G, "Could not retrieve Flickr album list: " + data.message + " (code: " + data.code + ").");
+                NanoAlert(G, "Could not retrieve Flickr album: " + data.message + " (code: " + data.code + ").");
                 return false;
               }
-              sourceData = sourceData.concat(data.photosets.photoset);
-              pages = data.photosets.pages;
-            } else {
-              if (G.O.photoset.toUpperCase() == 'NONE' || G.O.album.toUpperCase() == 'NONE') {
-                // content of full photoset
-                sourceData = sourceData.concat(data.photos.photo);
-                pages = data.photos.pages;
-              } else {
-                // content of one album
-                if (data.stat !== undefined && data.stat === 'fail') {
-                  NanoAlert(G, "Could not retrieve Flickr album: " + data.message + " (code: " + data.code + ").");
-                  return false;
-                }
-                if (G.I[albumIdx].title == '') {
-                  G.I[albumIdx].title = data.photoset.title;
-                }
-                sourceData = sourceData.concat(data.photoset.photo);
-                pages = data.photoset.pages;
+              if (G.I[albumIdx].title == '') {
+                G.I[albumIdx].title = data.photoset.title;
               }
-
+              sourceData = sourceData.concat(data.photoset.photo);
+              pages = data.photoset.pages;
             }
 
-            if (pages > page) {
-              FlickrGetOnePage(url, page + 1);
-            } else {
-              FlickrGetDone();
-            }
-          })
+          }
+
+          if (pages > page) {
+            FlickrGetOnePage(url, page + 1);
+          } else {
+            FlickrGetDone();
+          }
+        })
           .fail(function (jqxhr, textStatus, error) {
             clearTimeout(tId);
             PreloaderDisplay(false);
@@ -18171,25 +18171,25 @@
           tn.width[level][sizes[i]] = one.width;
           tn.height[level][sizes[i]] = one.height;
         } else
-        if (G.tn.settings.height[level][sizes[i]] == 'auto' || G.tn.settings.height[level][sizes[i]] == '') {
-          let sdir = 'width_';
-          let tsize = Math.ceil(G.tn.settings.width[level][sizes[i]] * G.tn.scale * sf * G.tn.settings.mosaic[level + 'Factor']['w'][sizes[i]]);
-          let one = FlickrRetrieveOneImage(sdir, tsize, item);
-          tn.url[level][sizes[i]] = one.url;
-          tn.width[level][sizes[i]] = one.width;
-          tn.height[level][sizes[i]] = one.height;
-        } else {
-          let sdir = 'height_';
-          let tsize = Math.ceil(G.tn.settings.height[level][sizes[i]] * G.tn.scale * sf * G.tn.settings.mosaic[level + 'Factor']['h'][sizes[i]]);
-          if (G.tn.settings.width[level][sizes[i]] > G.tn.settings.height[level][sizes[i]]) {
-            sdir = 'width_';
-            tsize = Math.ceil(G.tn.settings.width[level][sizes[i]] * G.tn.scale * sf * G.tn.settings.mosaic[level + 'Factor']['w'][sizes[i]]);
+          if (G.tn.settings.height[level][sizes[i]] == 'auto' || G.tn.settings.height[level][sizes[i]] == '') {
+            let sdir = 'width_';
+            let tsize = Math.ceil(G.tn.settings.width[level][sizes[i]] * G.tn.scale * sf * G.tn.settings.mosaic[level + 'Factor']['w'][sizes[i]]);
+            let one = FlickrRetrieveOneImage(sdir, tsize, item);
+            tn.url[level][sizes[i]] = one.url;
+            tn.width[level][sizes[i]] = one.width;
+            tn.height[level][sizes[i]] = one.height;
+          } else {
+            let sdir = 'height_';
+            let tsize = Math.ceil(G.tn.settings.height[level][sizes[i]] * G.tn.scale * sf * G.tn.settings.mosaic[level + 'Factor']['h'][sizes[i]]);
+            if (G.tn.settings.width[level][sizes[i]] > G.tn.settings.height[level][sizes[i]]) {
+              sdir = 'width_';
+              tsize = Math.ceil(G.tn.settings.width[level][sizes[i]] * G.tn.scale * sf * G.tn.settings.mosaic[level + 'Factor']['w'][sizes[i]]);
+            }
+            let one = FlickrRetrieveOneImage(sdir, tsize, item);
+            tn.url[level][sizes[i]] = one.url;
+            tn.width[level][sizes[i]] = one.width;
+            tn.height[level][sizes[i]] = one.height;
           }
-          let one = FlickrRetrieveOneImage(sdir, tsize, item);
-          tn.url[level][sizes[i]] = one.url;
-          tn.width[level][sizes[i]] = one.width;
-          tn.height[level][sizes[i]] = one.height;
-        }
       }
       return tn;
     }
