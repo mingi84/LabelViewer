@@ -204,18 +204,19 @@
         var env_path = 'D:\\MgnSData\\Datas\\';
 
         $.ajax({
-            type: 'post', //데이터 전송 타입,
+            type: 'get', //데이터 전송 타입,
             url: _WEBSERVER_ROOT_URL +
-                'Report/DetectionImageView/All?&StorageID=' + stoid + '&PageNum=' + pageCount +
-                '&CountOfPage=50&ErrorType=&SShot=1', //데이터를 주고받을 파일 주소 입력,
+                'MediaList?StorageID=' + stoid + '&PageNum=' + pageCount +
+                '&CountOfPage=50&MediaState=&SortType=1&MediaType=&MediaTitle=&AddDateStart=&AddDateEnd=&ExceptDelete=',
             //data: datasetInfo,
             //보내는 데이터,
             dataType: 'JSON', //문자형식으로 받기 , 
             success: function (result) {
+                console.log(result);
                 imagePath(result, img_folder, label_folder);
-                document.getElementById("totalcount").innerText = result.totalerrorcount.toLocaleString(
+                document.getElementById("totalcount").innerText = result.totalcount.toLocaleString(
                     'ko-KR');
-                document.getElementById("page-total").innerText = parseInt(result.totalerrorcount / 50) + 1;
+                document.getElementById("page-total").innerText = parseInt(result.totalcount / 50) + 1;
             },
             error: function () {
                 alert("error");
@@ -236,7 +237,7 @@
         console.log('imagePath');
         console.log(img_folder);
 
-        var data = result.errorinfo;
+        var data = result.mediainfo;
         console.log(data)
 
         //url 매핑을 위해 url을 만들어준다.
@@ -247,7 +248,7 @@
 
         for (i = 0; i < data.length - 1; i++) {
             //originParam = result.errorinfo[i].thumbnailpath;
-            originParam = img_folder + result.errorinfo[i].mediapath + result.errorinfo[i].mediatitle;
+            originParam = img_folder + data[i].mediapath + data[i].title;
             if (originParam != "") {
 
                 excludeParam = 'D:\\MgnSData\\Datas\\';
@@ -269,7 +270,7 @@
                 object = {
                     src: originParam,
                     srct: originParam,
-                    title: result.errorinfo[i].mediatitle
+                    title: data[i].title
                 }
                 pathArr.push(object);
                 jsonArr.push(jsonParam);
@@ -450,11 +451,10 @@
     const listformatedkeys = [];
 
 
-    async function combinedJsonTemplate(JSONlist) {
-        await waitForCanvas();
+    function combinedJsonTemplate(JSONlist) {
         for (let i = 0; i < JSONlist.length; i++) {   //JSONlist.length
             const key1 = 'labelingInfo';
-            const key1index = 0;
+            const key1index = '0';
             const key2 = 'pose';
             const key3 = 'location';
             const schemaloc = '.labelingInfo[0].pose.location';
@@ -484,72 +484,68 @@
     const lineslink = {
         "lines": [
             [
-                10,
-                15
+            4,
+                12
+            ],
+            [
+            15,
+                10
+            ],
+            [
+            0,
+                5
+            ],
+            [
+            2,
+                16
+            ],
+            [
+            15,
+                9
             ],
             [
                 10,
                 3
             ],
             [
-                10,
-                2
+                3,
+                7
             ],
             [
-                2,
-                16
+                3,
+                14
             ],
             [
-                15,
-                9
+                14,
+                12
             ],
             [
-                2,
-                10
+                3,
+                5
             ],
             [
-                2,
-                10
+                3,
+                17
             ],
             [
-                2,
-                10
+                17,
+                13
             ],
             [
-                2,
-                10
+                0,
+                11
             ],
             [
-                2,
-                10
+                1,
+                8
             ],
             [
-                2,
-                10
+                8,
+                7
             ],
             [
-                2,
-                10
-            ],
-            [
-                2,
-                10
-            ],
-            [
-                2,
-                10
-            ],
-            [
-                2,
-                10
-            ],
-            [
-                2,
-                10
-            ],
-            [
-                2,
-                10
+                13,
+                6
             ]
         ]
     }
@@ -568,10 +564,16 @@
 
         // Draw keypoints
         listformatedkeys[index].keypoints.forEach(point => {
+
+
+            
             ctx.beginPath();
-            ctx.arc(point.x, point.y, 1, 0, 2 * Math.PI);
+            ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI);
             ctx.fillStyle = 'blue';
             ctx.fill();
+            ctx.strokeStyle = "yellow";
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
             ctx.closePath();
 
             zctx.beginPath();
@@ -580,24 +582,18 @@
             zctx.fill();
             zctx.closePath();
 
-
-            // Draw the text with the key value over the point
-            ctx.font = '4px Arial';
-            ctx.fillStyle = 'yellow';
-            ctx.fillText(point.key + 1, point.x, point.y + 4);
-
         });
 
         // Draw lines
         lineslink.lines.forEach(line => {
-            const from = listformatedkeys[index].keypoints[line[0] - 1];
-            const to = listformatedkeys[index].keypoints[line[1] - 1];
+            const from = listformatedkeys[index].keypoints[line[0]];
+            const to = listformatedkeys[index].keypoints[line[1]];
 
             ctx.beginPath();
             ctx.moveTo(from.x, from.y);
             ctx.lineTo(to.x, to.y);
-            ctx.strokeStyle = "red";
-            ctx.lineWidth = 0.5;
+            ctx.strokeStyle = "yellow";
+            ctx.lineWidth = 1;
             ctx.stroke();
             ctx.closePath();
         });

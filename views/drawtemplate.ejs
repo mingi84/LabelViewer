@@ -129,71 +129,67 @@
             "lines": [
             [
             4,
+                12
+            ],
+            [
+            15,
+                10
+            ],
+            [
+            0,
+                5
+            ],
+            [
+            2,
+                16
+            ],
+            [
+            15,
+                9
+            ],
+            [
+                10,
                 3
             ],
             [
-            2,
-                10
+                3,
+                7
             ],
             [
-            2,
-                10
+                3,
+                14
             ],
             [
-            2,
-                10
+                14,
+                12
             ],
             [
-            2,
-                10
+                3,
+                5
             ],
             [
-                2,
-                10
+                3,
+                17
             ],
             [
-                2,
-                10
+                17,
+                13
             ],
             [
-                2,
-                10
+                0,
+                11
             ],
             [
-                2,
-                10
+                1,
+                8
             ],
             [
-                2,
-                10
+                8,
+                7
             ],
             [
-                2,
-                10
-            ],
-            [
-                2,
-                10
-            ],
-            [
-                2,
-                10
-            ],
-            [
-                2,
-                10
-            ],
-            [
-                2,
-                10
-            ],
-            [
-                2,
-                10
-            ],
-            [
-                2,
-                10
+                13,
+                6
             ]
         ]
         };
@@ -203,25 +199,24 @@
             const ctx = canvas.getContext("2d");
 
             // Draw keypoints
-            data.keypoints.forEach(point => {
+            data.keypoints.forEach((point, index)  => {
                 ctx.beginPath();
                 ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI);
                 ctx.fillStyle = "blue";
                 ctx.fill();
                 ctx.closePath();
-
                 // Draw the text with the key value over the point
                 ctx.font = '14px Arial';
                 ctx.fillStyle = 'yellow';
-                console.log(point.key);
+                console.log(point.key + " index= " + index);
                 ctx.fillText(1, point.x, point.y + 4);
             });
 
             // Draw lines
             console.log(data);
             data.lines.forEach(line => {
-                const from = data.keypoints[line[0] - 1];
-                const to = data.keypoints[line[1] - 1];
+                const from = data.keypoints[line[0]];
+                const to = data.keypoints[line[1]];
 
                 ctx.beginPath();
                 ctx.moveTo(from.x, from.y);
