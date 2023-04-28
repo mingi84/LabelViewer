@@ -48,15 +48,15 @@
     </div>
 </body>
 <script>
-    function pageMove(page, datasetID) {
+    function pageMove(page, datasetID, sourceID) {
         var params;
         var url = _PAGE_URL;
         switch (page) {
             case "addfiles":
                 params = "addFiles";
                 break;
-            case "soccer":
-                params = "imagegallery";
+            case "imagegallery":
+                params = "imagegallery?source_list_sto="+ sourceID +"&dataset_id="+ datasetID;
                 break;
             case "edit":
                 params = "addFiles?id=" + datasetID;
@@ -141,13 +141,12 @@
         var cardContainer = document.getElementById("gallerylist");
         var cardText = ``;
 
-        var datasetInfo = dataset;
+        for (var i = 0; i < dataset.length; i++) {
 
-        for (var i = 0; i < datasetInfo.length; i++) {
-
+            console.log(dataset[i].source_list_sto)
 
             cardText += `
-                <div class="col" id="${datasetInfo[i]._id}-card">
+                <div class="col" id="${dataset[i]._id}-card">
                     <div class=" card w-100 dataset" >
                         <div class="" style="position: absolute; margin: 1em; right: 0;">
                             <div class="btn btn-light btn-group dropend" data-bs-toggle="dropdown" aria-expanded="false"
@@ -161,8 +160,8 @@
                             </ul>
                         </div>
                         <img id="${dataset[i]._id}-image" src="${imageSrc}"
-                            class="card-img-top" alt="..."  onclick="pageMove('${imageSrc}');">
-                        <div class="card-body" onclick="pageMove('${imageSrc}');">
+                            class="card-img-top" alt="..."  onclick="pageMove('imagegallery','${dataset[i]._id}','${dataset[i].source_list_sto}');">
+                        <div class="card-body" onclick="pageMove('imagegallery',${dataset[i]._id}');">
                             <div class="gallery-title" id="${dataset[i]._id}-name" style="">${dataset[i].dataset_name}</div>
                             <span class="" style="color: #666666;">Updated</span>
                             <span class="" id="${dataset[i]._id}-updateDate">${dataset[i].dataset_last_update}</span>
