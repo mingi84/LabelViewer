@@ -56,7 +56,7 @@
 <body>
     <%- include('./header') %>
     <div class="container my-4">
-        <form>
+        <form onsubmit="return false;">
             <div class="row" id="gallerylist">
                 <div class="col">
                     <h4>Create Template</h4>
@@ -272,7 +272,7 @@
                         <button type="button" class="btn btn-lg btn-outline-primary"
                             onclick="pageMove('selecttemplate')">Back</button>
                         <button type="submit" class="btn btn-lg btn-primary" id="saveButton"
-                            onclick="infoValidation()">Next</button>
+                            onclick="infoValidation(); return false;">Next</button>
                     </div>
 
                 </div>
@@ -281,6 +281,10 @@
     </div>
 </body>
 <script>
+
+function submmitFunction(event){
+    event.preventDefault();
+}
     function pageMove(page) {
         var params;
         var url = _PAGE_URL;
@@ -320,14 +324,16 @@
     /*
     템플릿 정보를 업데이트한다.
     */
-    function updateTemplate(templateInfo){
+    function updateTemplate(templateInfo) {
+        console.log(JSON.stringify(templateInfo));
         $.ajax({
             type: 'post', //데이터 전송 타입,
-            url: _PAGE_URL + 'apidataset/updatekeyp?keypointId='+ keypointID, //데이터를 주고받을 파일 주소 입력,
+            url: _PAGE_URL + 'apidataset/updatekeyp?keypointId=' + keypointID, //데이터를 주고받을 파일 주소 입력,
             data: JSON.stringify(templateInfo), //보내는 데이터,
             dataType: 'JSON', //문자형식으로 받기 , 
             contentType: "application/json",
             success: function (result) {
+                console.log(result);
                 pageMove("selecttemplate");
             },
             error: function () {
@@ -352,11 +358,11 @@
             return;
         }
 
-        templateInfo(templateName, templateColor);
+        maketemplateInfo(templateName, templateColor);
     }
 
     /*body로 보낼 템플릿 JSON을 만들어준다.*/
-    function templateInfo(templateName, templateColor) {
+    function maketemplateInfo(templateName, templateColor) {
         var keypointName = getPointName();
         var jsonkey = getInputval();
 
@@ -549,6 +555,7 @@
                 connecting = false;
                 selectedKeypoint = null;
             }
+
         } else if (selectedKeypoint) {
             connecting = true;
         } else {
@@ -565,6 +572,8 @@
             keyinfo.push(y);
 
             keypoints.push(newKeypoint);
+            console.log(keyinfo);
+            console.log(keypoints);
         }
 
         draw();
@@ -594,7 +603,6 @@
                 </div>`;
             }
             //console.log(listItem);
-            console.log(divkeylist);
             divkeylist.innerHTML = listItem;
         }
     }
@@ -613,9 +621,10 @@
                 selectedKeypoint = keypoints.find((keypoint) => Math.sqrt(Math.pow(x - keypoint.x, 2) + Math
                     .pow(y - keypoint.y, 2)) <= 5);
             }
+        } else {
+            draw();
         }
 
-        draw();
     });
 
     //저장 버튼
@@ -629,8 +638,10 @@
 
     //클리어 버튼
     clearButton.addEventListener('click', () => {
+        keyinfo = [];
         keypoints = [];
         lines = [];
+        count = 0;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         document.getElementById("keylist").innerHTML = "";
@@ -646,6 +657,7 @@
             ctx.moveTo(line.from.x, line.from.y);
             ctx.lineTo(line.to.x, line.to.y);
             ctx.stroke();
+
         });
 
         keypoints.forEach((keypoint, index) => {
@@ -653,6 +665,11 @@
             ctx.arc(keypoint.x, keypoint.y, 5, 0, 2 * Math.PI);
             ctx.fillStyle = selectedKeypoint === keypoint ? (connecting ? 'green' : 'red') : 'blue';
             ctx.fill();
+
+            // Draw the text with the key value over the point
+            ctx.font = '16px Arial';
+            ctx.fillStyle = 'Black';
+            ctx.fillText(index, keypoint.x, keypoint.y + 24);
         });
     }
 
@@ -746,6 +763,8 @@
             connectingInfo = result.kypt_json.categories[0].skeleton; //초기값을 만들어준다.
             keyinfo = result.kypt_json.annotations[0].keypoints; //초기값을 만들어준다.
 
+            drawpointsindex(result);
+
         } else {
             document.getElementById("btn-keypoint").checked = false;
             $("#type-keypoint").hide();
@@ -771,8 +790,64 @@
                     </div>
                 </div>`;
         }
-        console.log(listItem);
         document.getElementById('keylist').innerHTML = listItem;
+
+    }
+
+    function chunk(data = [], size = 1) {
+        const arr = [];
+
+        for (let i = 0; i < data.length; i += size) {
+            arr.push(data.slice(i, i + size));
+        }
+
+        return arr;
+    }
+
+    async function drawpointsindex(result) {
+
+        const canvas = document.getElementById("poseCanvas");
+        const ctx = canvas.getContext('2d');
+        const {
+            width,
+            height
+        } = canvas.getBoundingClientRect();
+
+        var totalkeynum = result.kypt_json.annotations[0].num_keypoints;
+        var keypointinfo = result.kypt_json.annotations[0].keypoints;
+        var keypointname = result.kypt_json.categories[0].keypoints;
+        var keypointarr = chunk(keypointinfo, 2);
+        var linkInfo = result.kypt_json.categories[0].skeleton;
+
+        // Draw keypoints
+        for (var i = 0; i < totalkeynum; i++) {
+            console.log(keypointarr[i][0], keypointarr[i][1]);
+
+            ctx.beginPath();
+            ctx.arc(keypointarr[i][0], keypointarr[i][1], 5, 0, 2 * Math.PI);
+            ctx.fillStyle = 'blue';
+            ctx.fill();
+            ctx.closePath();
+
+            // Draw the text with the key value over the point
+            ctx.font = '16px Arial';
+            ctx.fillStyle = 'Black';
+            ctx.fillText(keypointname[i], keypointarr[i][0], keypointarr[i][1] + 24);
+        }
+
+        // Draw lines
+        for (var i = 0; i < totalkeynum; i++) {
+            var fromlink = linkInfo[i][0];
+            var tolink = linkInfo[i][1];
+
+            ctx.beginPath();
+            ctx.moveTo(keypointarr[fromlink][0], keypointarr[fromlink][1]);
+            ctx.lineTo(keypointarr[tolink][0], keypointarr[tolink][1]);
+            ctx.strokeStyle = "red";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.closePath();
+        }
 
     }
 </script>
