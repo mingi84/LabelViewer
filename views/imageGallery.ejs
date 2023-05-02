@@ -130,6 +130,9 @@
 <script>
     const toastTrigger = document.getElementById('liveToastBtn')
     const toastLiveExample = document.getElementById('liveToast')
+    const urlParams = new URLSearchParams(window.location.search);
+    const sto_id = urlParams.get('source_list_sto');
+    const dataset_id = urlParams.get('dataset_id');
 
     if (toastTrigger) {
         const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample)
@@ -153,14 +156,11 @@
 
     }
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const sto_id = urlParams.get('source_list_sto');
-    const dataset_id = urlParams.get('dataset_id');
 
     $(document).ready(function () {
-
+        console.log(sto_id);
         if (sto_id) {
-            getDatasetInfo(dataset_id, sto_id);
+            getDatasetInfo(1);
         } else {
             getImage(1, '');
         }
@@ -179,10 +179,12 @@
         ctx.stroke();
     }
 
+    var img_folder = '';
+    var label_folder = '';
 
 
-    async function getDatasetInfo(data_id, sto_id) {
-        var apiUrl = _PAGE_URL + 'apidataset/getdataset?datasetId=' + data_id;
+    async function getDatasetInfo(page) {
+        var apiUrl = _PAGE_URL + 'apidataset/getdataset?datasetId=' + dataset_id;
         try {
             const response = await fetch(apiUrl);
             if (!response.ok) {
@@ -191,8 +193,8 @@
             console.log('getdatasetinfo')
             const datasetInfo = await response.json();
             console.log(datasetInfo);
-            const img_folder = datasetInfo.image_location;
-            const label_folder = datasetInfo.label_location;
+            img_folder = datasetInfo.image_location;
+            label_folder = datasetInfo.label_location;
             console.log(img_folder);
             getImage(1, sto_id, img_folder, label_folder);
         } catch (error) {
@@ -393,7 +395,7 @@
             }
             document.getElementById("page-count").value = Number(pageCnt) + 1;
 
-            getImage(Number(pageCnt) + 1);
+            getDatasetInfo(Number(pageCnt) + 1);
 
         }
         if (attr == "down") {
@@ -403,7 +405,7 @@
 
             document.getElementById("page-count").value = Number(pageCnt) - 1;
 
-            getImage(Number(pageCnt) - 1);
+            getDatasetInfo(Number(pageCnt) - 1);
 
         }
     }
