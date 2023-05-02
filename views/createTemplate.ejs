@@ -269,8 +269,8 @@
                 <button type="button" class="btn btn-success mb-4">Contact Us</button>-->
 
                     <div class="col d-flex justify-content-between">
-                        <button type="button" class="btn btn-lg btn-outline-primary"
-                            onclick="pageMove('selecttemplate')">Back</button>
+                        <button type="button" class="btn btn-lg btn-outline-primary" data-bs-toggle="modal"
+                            data-bs-target="#closemodal" onclick="">Back</button>
                         <button type="submit" class="btn btn-lg btn-primary" id="saveButton"
                             onclick="infoValidation(); return false;">Next</button>
                     </div>
@@ -278,19 +278,42 @@
                 </div>
             </div>
         </form>
+        <div class="modal fade" id="closemodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+            aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog  modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Confirm</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Returns to the previous page without saving your input.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary"
+                            onclick="pageMove('selecttemplate');">Understood</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 <script>
+    function submmitFunction(event) {
+        event.preventDefault();
+    }
 
-function submmitFunction(event){
-    event.preventDefault();
-}
+    const urlParams = new URLSearchParams(window.location.search);
+    const sto_id = urlParams.get('source_list_sto');
+    const dataset_id = urlParams.get('dataset_id');
+
     function pageMove(page) {
         var params;
         var url = _PAGE_URL;
         switch (page) {
             case "selecttemplate":
-                params = "selecttemplate"
+                params = "selecttemplate?source_list_sto=" + sto_id + "&dataset_id=" + dataset_id;
                 break;
         }
         window.location.href = url + params;
@@ -606,6 +629,11 @@ function submmitFunction(event){
             divkeylist.innerHTML = listItem;
         }
     }
+
+    window.addEventListener('resize', () => {
+        canvas.height = window.innerHeight;
+        canvas.width = window.innerWidth;
+    })
 
     //연결상태가 아닐 때의 마우스 이동에 대한 처리
     canvas.addEventListener('mousemove', (e) => {
