@@ -143,7 +143,7 @@
         var url = _PAGE_URL;
         switch (page) {
             case "selecttemplate":
-                params = "selecttemplate"
+                params = "selecttemplate?source_list_sto=" + sto_id + "&dataset_id=" + dataset_id;
                 break;
             case "gallerylist":
                 params = "gallerylist"
@@ -153,10 +153,12 @@
 
     }
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const sto_id = urlParams.get('source_list_sto');
+    const dataset_id = urlParams.get('dataset_id');
+
     $(document).ready(function () {
-        const urlParams = new URLSearchParams(window.location.search);
-        const sto_id = urlParams.get('source_list_sto');
-        const dataset_id = urlParams.get('dataset_id');
+
         if (sto_id) {
             getDatasetInfo(dataset_id, sto_id);
         } else {
@@ -452,7 +454,7 @@
 
 
     function combinedJsonTemplate(JSONlist) {
-        for (let i = 0; i < JSONlist.length; i++) {   //JSONlist.length
+        for (let i = 0; i < JSONlist.length; i++) { //JSONlist.length
             const key1 = 'labelingInfo';
             const key1index = '0';
             const key2 = 'pose';
@@ -470,7 +472,9 @@
                 };
                 listofpoints.push(multipliedValue);
             }
-            var formatedkey = { "keypoints": listofpoints };
+            var formatedkey = {
+                "keypoints": listofpoints
+            };
             listformatedkeys.push(formatedkey);
         }
     }
@@ -484,23 +488,23 @@
     const lineslink = {
         "lines": [
             [
-            4,
+                4,
                 12
             ],
             [
-            15,
+                15,
                 10
             ],
             [
-            0,
+                0,
                 5
             ],
             [
-            2,
+                2,
                 16
             ],
             [
-            15,
+                15,
                 9
             ],
             [
@@ -566,7 +570,7 @@
         listformatedkeys[index].keypoints.forEach(point => {
 
 
-            
+
             ctx.beginPath();
             ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI);
             ctx.fillStyle = 'blue';
@@ -648,7 +652,217 @@
     //---------------------Draw Template---------------------------------
 
 
-    const drawingData = { "keypoints": [{ "x": 219, "y": 160 }, { "x": 243, "y": 146 }, { "x": 264, "y": 162 }, { "x": 284, "y": 145 }, { "x": 306, "y": 162 }, { "x": 265, "y": 223 }, { "x": 326, "y": 226 }, { "x": 205, "y": 229 }, { "x": 245, "y": 375 }, { "x": 297, "y": 375 }, { "x": 245, "y": 439 }, { "x": 301, "y": 436 }, { "x": 241, "y": 496 }, { "x": 303, "y": 497 }, { "x": 349, "y": 301 }, { "x": 184, "y": 301 }, { "x": 164, "y": 368 }, { "x": 381, "y": 372 }], "lines": [{ "from": { "x": 219, "y": 160 }, "to": { "x": 243, "y": 146 } }, { "from": { "x": 243, "y": 146 }, "to": { "x": 264, "y": 162 } }, { "from": { "x": 264, "y": 162 }, "to": { "x": 284, "y": 145 } }, { "from": { "x": 284, "y": 145 }, "to": { "x": 306, "y": 162 } }, { "from": { "x": 264, "y": 162 }, "to": { "x": 265, "y": 223 } }, { "from": { "x": 265, "y": 223 }, "to": { "x": 326, "y": 226 } }, { "from": { "x": 265, "y": 223 }, "to": { "x": 205, "y": 229 } }, { "from": { "x": 265, "y": 223 }, "to": { "x": 245, "y": 375 } }, { "from": { "x": 265, "y": 223 }, "to": { "x": 297, "y": 375 } }, { "from": { "x": 297, "y": 375 }, "to": { "x": 301, "y": 436 } }, { "from": { "x": 245, "y": 375 }, "to": { "x": 245, "y": 439 } }, { "from": { "x": 245, "y": 439 }, "to": { "x": 241, "y": 496 } }, { "from": { "x": 301, "y": 436 }, "to": { "x": 303, "y": 497 } }, { "from": { "x": 326, "y": 226 }, "to": { "x": 349, "y": 301 } }, { "from": { "x": 349, "y": 301 }, "to": { "x": 381, "y": 372 } }, { "from": { "x": 205, "y": 229 }, "to": { "x": 184, "y": 301 } }, { "from": { "x": 184, "y": 301 }, "to": { "x": 164, "y": 368 } }] };
+    const drawingData = {
+        "keypoints": [{
+            "x": 219,
+            "y": 160
+        }, {
+            "x": 243,
+            "y": 146
+        }, {
+            "x": 264,
+            "y": 162
+        }, {
+            "x": 284,
+            "y": 145
+        }, {
+            "x": 306,
+            "y": 162
+        }, {
+            "x": 265,
+            "y": 223
+        }, {
+            "x": 326,
+            "y": 226
+        }, {
+            "x": 205,
+            "y": 229
+        }, {
+            "x": 245,
+            "y": 375
+        }, {
+            "x": 297,
+            "y": 375
+        }, {
+            "x": 245,
+            "y": 439
+        }, {
+            "x": 301,
+            "y": 436
+        }, {
+            "x": 241,
+            "y": 496
+        }, {
+            "x": 303,
+            "y": 497
+        }, {
+            "x": 349,
+            "y": 301
+        }, {
+            "x": 184,
+            "y": 301
+        }, {
+            "x": 164,
+            "y": 368
+        }, {
+            "x": 381,
+            "y": 372
+        }],
+        "lines": [{
+            "from": {
+                "x": 219,
+                "y": 160
+            },
+            "to": {
+                "x": 243,
+                "y": 146
+            }
+        }, {
+            "from": {
+                "x": 243,
+                "y": 146
+            },
+            "to": {
+                "x": 264,
+                "y": 162
+            }
+        }, {
+            "from": {
+                "x": 264,
+                "y": 162
+            },
+            "to": {
+                "x": 284,
+                "y": 145
+            }
+        }, {
+            "from": {
+                "x": 284,
+                "y": 145
+            },
+            "to": {
+                "x": 306,
+                "y": 162
+            }
+        }, {
+            "from": {
+                "x": 264,
+                "y": 162
+            },
+            "to": {
+                "x": 265,
+                "y": 223
+            }
+        }, {
+            "from": {
+                "x": 265,
+                "y": 223
+            },
+            "to": {
+                "x": 326,
+                "y": 226
+            }
+        }, {
+            "from": {
+                "x": 265,
+                "y": 223
+            },
+            "to": {
+                "x": 205,
+                "y": 229
+            }
+        }, {
+            "from": {
+                "x": 265,
+                "y": 223
+            },
+            "to": {
+                "x": 245,
+                "y": 375
+            }
+        }, {
+            "from": {
+                "x": 265,
+                "y": 223
+            },
+            "to": {
+                "x": 297,
+                "y": 375
+            }
+        }, {
+            "from": {
+                "x": 297,
+                "y": 375
+            },
+            "to": {
+                "x": 301,
+                "y": 436
+            }
+        }, {
+            "from": {
+                "x": 245,
+                "y": 375
+            },
+            "to": {
+                "x": 245,
+                "y": 439
+            }
+        }, {
+            "from": {
+                "x": 245,
+                "y": 439
+            },
+            "to": {
+                "x": 241,
+                "y": 496
+            }
+        }, {
+            "from": {
+                "x": 301,
+                "y": 436
+            },
+            "to": {
+                "x": 303,
+                "y": 497
+            }
+        }, {
+            "from": {
+                "x": 326,
+                "y": 226
+            },
+            "to": {
+                "x": 349,
+                "y": 301
+            }
+        }, {
+            "from": {
+                "x": 349,
+                "y": 301
+            },
+            "to": {
+                "x": 381,
+                "y": 372
+            }
+        }, {
+            "from": {
+                "x": 205,
+                "y": 229
+            },
+            "to": {
+                "x": 184,
+                "y": 301
+            }
+        }, {
+            "from": {
+                "x": 184,
+                "y": 301
+            },
+            "to": {
+                "x": 164,
+                "y": 368
+            }
+        }]
+    };
 
     function drawCanvas(data, i) {
         console.log(i);
@@ -681,11 +895,6 @@
             ctx.closePath();
         });
     }
-
-
-
-
-
 </script>
 
 </html>
