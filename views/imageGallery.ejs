@@ -135,6 +135,7 @@
     const urlParams = new URLSearchParams(window.location.search);
     const sto_id = urlParams.get('source_list_sto');
     const dataset_id = urlParams.get('dataset_id');
+    var linecolor = '';
 
     if (toastTrigger) {
         const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample)
@@ -204,8 +205,8 @@
                 getKeyTemplate(datasetInfo.kypt_id);
             } else {
                 const divlabeltemp = document.getElementById('divlabeltemplate');
-            divlabeltemp.innerHTML = '';
-            divlabeltemp.innerHTML = 'Add Template';
+                divlabeltemp.innerHTML = '';
+                divlabeltemp.innerHTML = 'Add Template';
             }
 
             getImage(1, sto_id, img_folder, label_folder);
@@ -231,8 +232,8 @@
             divlabeltemp.innerHTML = '<input type="checkbox" class="btn-check" id="btn-none" name="' + kyptTempInfo.kypt_name +
                 '" autocomplete="off"onclick="clickLabel(this.name); draw();"><label class="btn" for="btn-none" style="background-color: ' + bgcolor +
                 ';">' + kyptTempInfo.kypt_name + '</label>';
-
-
+            linecolor = kyptTempInfo.kypt_json.categories[0].color;
+            console.log(linecolor);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -624,9 +625,9 @@
 
             ctx.beginPath();
             ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI);
-            ctx.fillStyle = 'blue';
+            ctx.fillStyle = linecolor;
             ctx.fill();
-            ctx.strokeStyle = "yellow";
+            ctx.strokeStyle = linecolor;
             ctx.lineWidth = 0.5;
             ctx.stroke();
             ctx.closePath();
@@ -647,7 +648,7 @@
             ctx.beginPath();
             ctx.moveTo(from.x, from.y);
             ctx.lineTo(to.x, to.y);
-            ctx.strokeStyle = "yellow";
+            ctx.strokeStyle = linecolor;
             ctx.lineWidth = 1;
             ctx.stroke();
             ctx.closePath();
