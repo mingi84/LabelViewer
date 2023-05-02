@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 
 
 const keypointSchema = new mongoose.Schema({
+  kypt_id: { type: String, unique: true },
   kypt_name: {
     type: String,
     required: true

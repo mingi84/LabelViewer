@@ -5,6 +5,7 @@ const keypointtb = require("../models/keypointSchema");
 
 // KST Setting
 var moment = require('moment-timezone');
+const { query } = require('express');
 moment.tz.setDefault("Asia/Seoul");
 
 // Controller - 서비스 로직
@@ -194,7 +195,7 @@ exports.keypointwrite = async function (req, res) {
 //Update Keypoint by ID
 exports.keypointUpdate = async function (req, res) {
     console.log("------------!!Update KeypointById!!------------");
-    const keypointId = req.query.keypoint_id; // assuming the route is defined as "/dataset/:dataset_id"
+    const keypointId = req.query.keypointId; // assuming the route is defined as "/dataset/:dataset_id"
     const updatekeyp = {
         kypt_name: req.body.kypt_name,
         kypt_json: req.body.kypt_json,
@@ -202,15 +203,15 @@ exports.keypointUpdate = async function (req, res) {
     };
 
     try {
-        const result = await keypointtb.findOneAndUpdate({ kypt_id: keypointId }, updatekeyp, { new: true });
+        const result = await keypointtb.findByIdAndUpdate( keypointId , updatekeyp, { new: true });
         if (!result) {
-            return res.status(404).json({ message: 'Dataset not found' });
+            return res.status(404).json({ message: 'Keypoint Template not found' });
         }
-        console.log('Dataset updated:', result);
-        res.json({ message: 'Dataset updated successfully', data: result });
+        console.log('Keypoint Template updated:', result);
+        res.json({ message: 'Keypoint Template updated successfully', data: result });
     } catch (err) {
-        console.error('Error during update operation:', err);
-        res.status(500).json({ message: 'Error updating dataset', error: err });
+        console.error('Error during update Keypoint Template operation:', err);
+        res.status(500).json({ message: 'Error updating Keypoint Template', error: err });
     }
 };
 
