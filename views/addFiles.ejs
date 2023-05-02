@@ -142,14 +142,32 @@
                         </div>
                     </div>
                     <div class="col d-flex justify-content-between">
-                        <button type="button" class="btn btn-lg btn-outline-primary"
-                            onclick="pageMove('gallerylist');">Back</button>
+                        <button type="button" class="btn btn-lg btn-outline-primary" data-bs-toggle="modal"
+                            data-bs-target="#closemodal">Back</button>
                         <button type="button" class="btn btn-lg btn-primary" onclick="infoValidation()">Save</button>
                     </div>
                 </div>
             </form>
         </div>
-
+        <!-- Modal -->
+        <div class="modal fade" id="closemodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+            aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog  modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Confirm</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Returns to the previous page without saving your input.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" onclick="pageMove('gallerylist');">Understood</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 <script>
@@ -287,7 +305,6 @@
             dataType: 'JSON', //문자형식으로 받기 , 
             contentType: "application/json",
             success: function (result) {
-                console.log(result);
                 drawExistInfo(result);
             },
             error: function () {
