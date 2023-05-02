@@ -43,7 +43,7 @@
             </div>
         </div>
         <div class="modal" id="delete-popup" tabindex="-1">
-            
+
         </div>
     </div>
 </body>
@@ -56,7 +56,7 @@
                 params = "addFiles";
                 break;
             case "imagegallery":
-                params = "imagegallery?source_list_sto="+ sourceID +"&dataset_id="+ datasetID;
+                params = "imagegallery?source_list_sto=" + sourceID + "&dataset_id=" + datasetID;
                 break;
             case "edit":
                 params = "addFiles?id=" + datasetID;
@@ -91,7 +91,7 @@
         Ajax get
     */
     function loadInfo() {
-        
+
         $.ajax({
             type: 'get', //데이터 전송 타입,
             url: _PAGE_URL + 'apidataset', //데이터를 주고받을 파일 주소 입력,
@@ -99,7 +99,6 @@
             //보내는 데이터,
             dataType: 'JSON', //문자형식으로 받기 , 
             success: function (result) {
-                console.log(result);
                 drawCard(result);
             },
             error: function () {
@@ -112,7 +111,7 @@
         데이터셋을 불러온다.
         Ajax delete
     */
-    function deleteDataset(datasetID){  
+    function deleteDataset(datasetID) {
         $.ajax({
             type: 'get', //데이터 전송 타입,
             url: _PAGE_URL + 'apidataset/deldataset?datasetId=' + datasetID, //데이터를 주고받을 파일 주소 입력,
@@ -128,8 +127,6 @@
         });
     }
 
-    var imageSrc =
-        "http://49.50.160.122:3000/soccer_kick_sample/%2F220802%208%EB%B0%A9%ED%96%A5%EC%B9%B4%EB%A9%94%EB%9D%BC%20%ED%82%A5%201%ED%9A%8C%205%EC%9E%A5%EC%82%AC%EC%A7%84%EC%B6%94%EC%B6%9C%2F1-1%2F175303_661_CH1.jpg"
     /*
     데이터셋 정보를 담은 카드를 그린다.
 
@@ -140,10 +137,11 @@
 
         var cardContainer = document.getElementById("gallerylist");
         var cardText = ``;
+        var imagesource = " ";
 
         for (var i = 0; i < dataset.length; i++) {
 
-            console.log(dataset[i].source_list_sto)
+            imagesource = getImagesrc(dataset[i].source_list_sto, dataset[i].dataset_import_type, dataset[i].image_location);
 
             cardText += `
                 <div class="col" id="${dataset[i]._id}-card">
@@ -159,7 +157,7 @@
                                 >Delete</button></li>
                             </ul>
                         </div>
-                        <img id="${dataset[i]._id}-image" src="${imageSrc}"
+                        <img id="${dataset[i]._id}-image" src="${imagesource}"
                             class="card-img-top" alt="..."  onclick="pageMove('imagegallery','${dataset[i]._id}','${dataset[i].source_list_sto}');">
                         <div class="card-body" onclick="pageMove('imagegallery',${dataset[i]._id}');">
                             <div class="gallery-title" id="${dataset[i]._id}-name" style="">${dataset[i].dataset_name}</div>
@@ -172,6 +170,45 @@
         }
 
         cardContainer.innerHTML += cardText;
+    }
+
+    function loadDIimage(storageID) {
+        var data = "";
+        $.ajax({
+            type: 'get', //데이터 전송 타입,
+            url: _WEBSERVER_ROOT_URL + 'MediaList?StorageID=' + storageID +
+                '&PageNum=1&CountOfPage=20&MediaState=&SortType=1&MediaType=&MediaTitle=&AddDateStart=&AddDateEnd=&ExceptDelete=', //데이터를 주고받을 파일 주소 입력,
+            //data: datasetInfo,
+            //보내는 데이터,
+            async: false, //값을 리턴시 해당코드를 추가하여 동기로 변경
+            dataType: 'JSON', //문자형식으로 받기 , 
+            success: function (result) {
+                data = result;
+            },
+            error: function () {
+                alert("error");
+            }
+        });
+        return data;
+    }
+
+    /*이미지 src*/
+    function getImagesrc(storageID, importtype, imagepath) {
+        var src = "";
+        switch (importtype) {
+            case 1: //D/I
+                var result = loadDIimage(storageID);
+                src = _WEBSERVER_DI_URL + imagepath + result.mediainfo[0].mediapath + result.mediainfo[0].title;
+                return src;
+                break;
+            case 2: //Object storage
+                break;
+            case 3: //Google Drive
+                break
+            default:
+                break;
+        }
+
     }
 
     function showPopupDelete(datasetName, datasetID) {
@@ -201,14 +238,13 @@
     뷰어세팅(데이터셋 정보입력)화면으로 이동하면서,
     파라미터로 데이터셋아이디를 넘겨준다.
     */
-    function editDataset(datasetID){
+    function editDataset(datasetID) {
 
     }
 
-    function closePopup(){
+    function closePopup() {
         $('#delete-popup').modal('toggle');
     }
-
 </script>
 
 </html>
