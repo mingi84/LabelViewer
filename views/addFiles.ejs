@@ -282,30 +282,19 @@
     function getDataset(datasetID) {
         $.ajax({
             type: 'get', //데이터 전송 타입,
-            url: _PAGE_URL + 'apidataset', //데이터를 주고받을 파일 주소 입력,
+            url: _PAGE_URL + 'apidataset/getdataset?datasetId=' + datasetID, //데이터를 주고받을 파일 주소 입력,
             //data: JSON.stringify(datasetInfo), //보내는 데이터,
             dataType: 'JSON', //문자형식으로 받기 , 
             contentType: "application/json",
             success: function (result) {
-                compareID(result, datasetID);
+                console.log(result);
+                drawExistInfo(result);
             },
             error: function () {
                 alert("error");
             }
         });
 
-    }
-
-    /*
-    파라미터 아이디와 스토리지 아이디를 비교한 후, 필요한 정보만 만들어주는 함수
-    */
-    function compareID(result, datasetID) {
-        for (var i = 0; i < result.length; i++) {
-            if (result[i]._id == datasetID) {
-                drawExistInfo(result[i]);
-                return;
-            }
-        }
     }
 
     /*
