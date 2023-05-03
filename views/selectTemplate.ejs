@@ -224,16 +224,16 @@
     $(document).ready(function () {
         loadTemplateList();
         getDataset();
-        var width = document.getElementById("image-plus").getBoundingClientRect().width;
-        var height = document.getElementById("image-plus").getBoundingClientRect().height;
-        canvas.width = width;
-        canvas.height = height;
     });
 
     // after resources (css, images)
     window.addEventListener("load", (event) => {
         loadDIimage();
-        selectedTemplate();
+        var width = document.getElementById("image-plus").getBoundingClientRect().width;
+        var height = document.getElementById("image-plus").getBoundingClientRect().height;
+        canvas.width = width;
+        canvas.height = height;
+        selectDraw();
     });
 
     /*
@@ -337,10 +337,7 @@
     //처음에 선택값 불러와서 그려주는 코드
     function loadSelectedTemplate(result) {
         var selectKey = result.kypt_id;
-        console.log(selectKey.length > 0 && selectKey[0] == '');
-
         if (selectKey.length > 0 && selectKey[0] !== '') {
-            console.log(selectKey);
             selectKey.forEach(function (item) {
                 document.getElementById("template-" + item).checked = true;
             });
@@ -393,7 +390,6 @@
             dataType: 'JSON', //문자형식으로 받기 , 
             contentType: "application/json",
             success: function (result) {
-                console.log(result)
                 keypointList = result;
                 drawTemplate(result);
 
@@ -457,7 +453,6 @@
 
         for (var i = 0; i < t_template.length; i++) {
             if (t_template[i]._id == id) {
-                console.log(t_template[i]._id(kypt_name));
                 $(".template-name").html(t_template[i]._id(kypt_name));
 
             }
@@ -523,9 +518,7 @@
     function compareID(templateID) {
         for (var i = 0; i < keypointList.length; i++) {
             if (keypointList[i]._id == templateID) {
-                console.log(templateID);
                 drawExistInfo(keypointList[i]);
-                return;
             }
         }
     }
@@ -543,6 +536,7 @@
     var keypointList = ''; //템플릿 리스트
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext('2d');
+    
 
     function drawExistInfo(selectTemplate) {
         connectingInfo = selectTemplate.kypt_json.categories[0].skeleton; //초기값을 만들어준다.
