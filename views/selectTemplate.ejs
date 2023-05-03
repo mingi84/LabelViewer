@@ -223,17 +223,16 @@
     const dataset_id = urlParams.get('dataset_id');
     $(document).ready(function () {
         loadTemplateList();
-        getDataset();
     });
 
     // after resources (css, images)
     window.addEventListener("load", (event) => {
+        getDataset();
         loadDIimage();
         var width = document.getElementById("image-plus").getBoundingClientRect().width;
         var height = document.getElementById("image-plus").getBoundingClientRect().height;
         canvas.width = width;
         canvas.height = height;
-        selectDraw();
     });
 
     /*
@@ -341,6 +340,8 @@
             selectKey.forEach(function (item) {
                 document.getElementById("template-" + item).checked = true;
             });
+
+            selectDraw();
         }
     }
 
@@ -390,6 +391,7 @@
             dataType: 'JSON', //문자형식으로 받기 , 
             contentType: "application/json",
             success: function (result) {
+                console.log(result)
                 keypointList = result;
                 drawTemplate(result);
 
@@ -453,6 +455,7 @@
 
         for (var i = 0; i < t_template.length; i++) {
             if (t_template[i]._id == id) {
+                console.log(t_template[i]._id(kypt_name));
                 $(".template-name").html(t_template[i]._id(kypt_name));
 
             }
@@ -508,6 +511,7 @@
         });
 
         chkArray.forEach(function (item) {
+            console.log(item);
             compareID(item);
         })
     }
@@ -518,6 +522,7 @@
     function compareID(templateID) {
         for (var i = 0; i < keypointList.length; i++) {
             if (keypointList[i]._id == templateID) {
+                console.log(templateID);
                 drawExistInfo(keypointList[i]);
             }
         }
