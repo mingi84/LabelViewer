@@ -612,14 +612,12 @@
 
         for (let i = 0; i < JSONlist.length; i++) { //JSONlist.length
             const listofpoints = [];
-            console.log(JSONlist[i]);
             for (let j = 0; j < xylocationlist.length; j++) {
                 const pathx = xylocationlist[j][0];
                 const pathy = xylocationlist[j][1];
                 const Xparts = pathx.split(">>");
                 const Yparts = pathy.split(">>");
                 const valueBeforeText = valuesBeforeText(Xparts, 'index');
-                console.log(valueBeforeText == ""); // Output: "keypoints"
                 if (valueBeforeText == "") {
                     const valuex = getObjectReference(pathx, JSONlist[i]);
                     const valuey = getObjectReference(pathy, JSONlist[i]);
@@ -639,8 +637,6 @@
                         console.log(k);
                         var XKvalue = getObjectReferenceIndex(xvaluesBefore, k, xvaluesAfter, JSONlist[i])
                         var YKvalue = getObjectReferenceIndex(yvaluesBefore, k, yvaluesAfter, JSONlist[i])
-                        console.log(XKvalue)
-                        console.log(YKvalue)
                         const multipliedValue = {
                             x: XKvalue * 0.1555,
                             y: YKvalue * 0.14,
@@ -714,76 +710,6 @@
 
 
 
-
-    const lineslink = {
-        "lines": [
-            [
-                4,
-                12
-            ],
-            [
-                15,
-                10
-            ],
-            [
-                0,
-                5
-            ],
-            [
-                2,
-                16
-            ],
-            [
-                15,
-                9
-            ],
-            [
-                10,
-                3
-            ],
-            [
-                3,
-                7
-            ],
-            [
-                3,
-                14
-            ],
-            [
-                14,
-                12
-            ],
-            [
-                3,
-                5
-            ],
-            [
-                3,
-                17
-            ],
-            [
-                17,
-                13
-            ],
-            [
-                0,
-                11
-            ],
-            [
-                1,
-                8
-            ],
-            [
-                8,
-                7
-            ],
-            [
-                13,
-                6
-            ]
-        ]
-    }
-
     async function drawpointsindex(idx) {
         await waitForCanvas();
         const index = idx - 1;
@@ -819,8 +745,6 @@
         });
 
         // Draw lines
-        console.log('draw lines');
-        console.log(linklines);
         linklines.lines.forEach(line => {
             const from = listformatedkeys[index].keypoints[line[0]];
             const to = listformatedkeys[index].keypoints[line[1]];
@@ -883,220 +807,8 @@
 
     //---------------------Draw Template---------------------------------
 
-
-    const drawingData = {
-        "keypoints": [{
-            "x": 219,
-            "y": 160
-        }, {
-            "x": 243,
-            "y": 146
-        }, {
-            "x": 264,
-            "y": 162
-        }, {
-            "x": 284,
-            "y": 145
-        }, {
-            "x": 306,
-            "y": 162
-        }, {
-            "x": 265,
-            "y": 223
-        }, {
-            "x": 326,
-            "y": 226
-        }, {
-            "x": 205,
-            "y": 229
-        }, {
-            "x": 245,
-            "y": 375
-        }, {
-            "x": 297,
-            "y": 375
-        }, {
-            "x": 245,
-            "y": 439
-        }, {
-            "x": 301,
-            "y": 436
-        }, {
-            "x": 241,
-            "y": 496
-        }, {
-            "x": 303,
-            "y": 497
-        }, {
-            "x": 349,
-            "y": 301
-        }, {
-            "x": 184,
-            "y": 301
-        }, {
-            "x": 164,
-            "y": 368
-        }, {
-            "x": 381,
-            "y": 372
-        }],
-        "lines": [{
-            "from": {
-                "x": 219,
-                "y": 160
-            },
-            "to": {
-                "x": 243,
-                "y": 146
-            }
-        }, {
-            "from": {
-                "x": 243,
-                "y": 146
-            },
-            "to": {
-                "x": 264,
-                "y": 162
-            }
-        }, {
-            "from": {
-                "x": 264,
-                "y": 162
-            },
-            "to": {
-                "x": 284,
-                "y": 145
-            }
-        }, {
-            "from": {
-                "x": 284,
-                "y": 145
-            },
-            "to": {
-                "x": 306,
-                "y": 162
-            }
-        }, {
-            "from": {
-                "x": 264,
-                "y": 162
-            },
-            "to": {
-                "x": 265,
-                "y": 223
-            }
-        }, {
-            "from": {
-                "x": 265,
-                "y": 223
-            },
-            "to": {
-                "x": 326,
-                "y": 226
-            }
-        }, {
-            "from": {
-                "x": 265,
-                "y": 223
-            },
-            "to": {
-                "x": 205,
-                "y": 229
-            }
-        }, {
-            "from": {
-                "x": 265,
-                "y": 223
-            },
-            "to": {
-                "x": 245,
-                "y": 375
-            }
-        }, {
-            "from": {
-                "x": 265,
-                "y": 223
-            },
-            "to": {
-                "x": 297,
-                "y": 375
-            }
-        }, {
-            "from": {
-                "x": 297,
-                "y": 375
-            },
-            "to": {
-                "x": 301,
-                "y": 436
-            }
-        }, {
-            "from": {
-                "x": 245,
-                "y": 375
-            },
-            "to": {
-                "x": 245,
-                "y": 439
-            }
-        }, {
-            "from": {
-                "x": 245,
-                "y": 439
-            },
-            "to": {
-                "x": 241,
-                "y": 496
-            }
-        }, {
-            "from": {
-                "x": 301,
-                "y": 436
-            },
-            "to": {
-                "x": 303,
-                "y": 497
-            }
-        }, {
-            "from": {
-                "x": 326,
-                "y": 226
-            },
-            "to": {
-                "x": 349,
-                "y": 301
-            }
-        }, {
-            "from": {
-                "x": 349,
-                "y": 301
-            },
-            "to": {
-                "x": 381,
-                "y": 372
-            }
-        }, {
-            "from": {
-                "x": 205,
-                "y": 229
-            },
-            "to": {
-                "x": 184,
-                "y": 301
-            }
-        }, {
-            "from": {
-                "x": 184,
-                "y": 301
-            },
-            "to": {
-                "x": 164,
-                "y": 368
-            }
-        }]
-    };
-
     function drawCanvas(data, i) {
+        console.log(data);
         console.log(i);
         const canvasindex = "canvas" + i;
         const canvas = document.getElementById(canvasindex);
