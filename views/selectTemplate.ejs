@@ -118,11 +118,15 @@
                     <div class="col">
                         <div class="card w-100" style="width: 18rem;">
                             <div class="card-body d-flex gap-2">
-                                <div class="w-100 border border-1" id="image-plus" style="height: 360px;">
-                                    <img class="img-thumbnail" id="image-zoom-in" onclick="" src="" alt="">
+                                <div class="w-100 " id="image-plus" style="height: 360px; background-size:cover;">
+                                    <canvas id="canvas" class="" style=""></canvas>
                                 </div>
                                 <div class="w-100  row row-cols-3" id="list-thumbnail">
                                     <div class="thumbnail align-self-center" style="object-fit: contain;">
+                                        <img class="img-thumbnail" id="image-0" onclick="clickThumbnail(this.src)"
+                                            src="" alt="">
+                                    </div>
+                                    <div class=" thumbnail align-self-center" style="object-fit: contain;">
                                         <img class="img-thumbnail" id="image-1" onclick="clickThumbnail(this.src)"
                                             src="" alt="">
                                     </div>
@@ -154,10 +158,6 @@
                                         <img class="img-thumbnail" id="image-8" onclick="clickThumbnail(this.src)"
                                             src="" alt="">
                                     </div>
-                                    <div class=" thumbnail align-self-center" style="object-fit: contain;">
-                                        <img class="img-thumbnail" id="image-9" onclick="clickThumbnail(this.src)"
-                                            src="" alt="">
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -165,13 +165,32 @@
                 </div>
 
                 <div class="col d-flex justify-content-between">
-                    <button type="button" class="btn btn-lg btn-outline-primary"
-                        onclick="pageMove('imagegallery')">Back</button>
+                    <button type="button" class="btn btn-lg btn-outline-primary" data-bs-toggle="modal"
+                        data-bs-target="#closemodal" onclick="">Back</button>
                     <button type="button" class="btn btn-lg btn-primary" onclick="updateTemplate();">Save</button>
                 </div>
             </div>
             <div class="modal" id="delete-popup" tabindex="-1">
 
+            </div>
+            <div class="modal fade" id="closemodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog  modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="staticBackdropLabel">Confirm</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Returns to the previous page without saving your input.
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary"
+                                onclick="pageMove('imagegallery');">Understood</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -186,13 +205,13 @@
                 params = "imagegallery?source_list_sto=" + sto_id + "&dataset_id=" + dataset_id;
                 break;
             case "createtemplate":
-                params = "createtemplate"
+                params = "createtemplate?source_list_sto=" + sto_id + "&dataset_id=" + dataset_id;
                 break;
             case "gallerylist":
                 params = "gallerylist"
                 break;
             case "edit":
-                params = "createtemplate?id=" + id
+                params = "createtemplate?source_list_sto=" + sto_id + "&dataset_id=" + dataset_id;
                 break;
         }
         window.location.href = url + params;
@@ -203,18 +222,28 @@
     const sto_id = urlParams.get('source_list_sto');
     const dataset_id = urlParams.get('dataset_id');
     $(document).ready(function () {
-        loadTemplate();
+        loadTemplateList();
         getDataset();
+        var width = document.getElementById("image-plus").getBoundingClientRect().width;
+        var height = document.getElementById("image-plus").getBoundingClientRect().height;
+        canvas.width = width;
+        canvas.height = height;
+    });
+
+    // after resources (css, images)
+    window.addEventListener("load", (event) => {
         loadDIimage();
+        selectedTemplate();
     });
 
     /*
     Data Injector image를 가져온다.
     */
-    function loadDIimage(){
+    function loadDIimage() {
         $.ajax({
             type: 'get', //데이터 전송 타입,
-            url: _WEBSERVER_ROOT_URL + 'MediaList?StorageID='+sto_id+'&PageNum=1&CountOfPage=20&MediaState=&SortType=1&MediaType=&MediaTitle=&AddDateStart=&AddDateEnd=&ExceptDelete=', //데이터를 주고받을 파일 주소 입력,
+            url: _WEBSERVER_ROOT_URL + 'MediaList?StorageID=' + sto_id +
+                '&PageNum=1&CountOfPage=20&MediaState=&SortType=1&MediaType=&MediaTitle=&AddDateStart=&AddDateEnd=&ExceptDelete=', //데이터를 주고받을 파일 주소 입력,
             //data: datasetInfo,
             //보내는 데이터,
             dataType: 'JSON', //문자형식으로 받기 , 
@@ -227,17 +256,19 @@
         });
     }
 
-    function loadImage(result){
+    function loadImage(result) {
         console.log(result);
 
         //zoom-in Image 1
-        document.getElementById("image-zoom-in").src = _WEBSERVER_DI_URL + DATASET_INFO.image_location + result.mediainfo[0].mediapath + result.mediainfo[0].title
+        document.getElementById("image-plus").style.backgroundImage = `url('${_WEBSERVER_DI_URL + DATASET_INFO.image_location + result
+            .mediainfo[0].mediapath + result.mediainfo[0].title}')`
 
         //thumnnail Image 9
-        for(i=1; i <=9; i++){
-            document.getElementById("image-"+i).src = _WEBSERVER_DI_URL + DATASET_INFO.image_location + result.mediainfo[i].mediapath + result.mediainfo[i].title;
+        for (i = 0; i < 9; i++) {
+            document.getElementById("image-" + i).src = _WEBSERVER_DI_URL + DATASET_INFO.image_location + result
+                .mediainfo[i].mediapath + result.mediainfo[i].title;
         }
-        
+
     }
 
     /*
@@ -273,14 +304,14 @@
     }
 
     function selectedTemplate() {
-        /*
+
         var selectedArray = [];
-        $('input:radio[name=tag-label]:checked').each(function () {
+        $('input:checked[name=tag-label]:checked').each(function () {
             var templateID = $(this).val();
             selectedArray.push(templateID);
-        });*/
-        var selectele = $('input:radio[name=tag-label]:checked').val();
-        return selectele;
+        });
+
+        return selectedArray;
     }
 
     var DATASET_INFO = {}
@@ -302,10 +333,17 @@
         });
     }
 
+
+    //처음에 선택값 불러와서 그려주는 코드
     function loadSelectedTemplate(result) {
         var selectKey = result.kypt_id;
-        if (selectKey !== "" || document.getElementById("template-" + selectKey) !== null) {
-            document.getElementById("template-" + selectKey).checked = true;
+        console.log(selectKey.length > 0 && selectKey[0] == '');
+
+        if (selectKey.length > 0 && selectKey[0] !== '') {
+            console.log(selectKey);
+            selectKey.forEach(function (item) {
+                document.getElementById("template-" + item).checked = true;
+            });
         }
     }
 
@@ -317,10 +355,11 @@
     */
     function clickLabel(buttonName) {
         if (buttonName == "none") {
-            $("input:radio[name='tag-label']").prop("checked", false);
+            $("input:checkbox[name='tag-label']").prop("checked", false);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
         if (buttonName == "tag-label") {
-            $("input:radio[name='none']").prop("checked", false);
+            $("input:checkbox[name='none']").prop("checked", false);
         }
     }
 
@@ -346,8 +385,7 @@
     /*
     기존 템플릿 정보 불러오기
     */
-    function loadTemplate() {
-
+    function loadTemplateList() {
         $.ajax({
             type: 'get', //데이터 전송 타입,
             url: _PAGE_URL + 'apidataset/keyp', //데이터를 주고받을 파일 주소 입력,
@@ -356,6 +394,7 @@
             contentType: "application/json",
             success: function (result) {
                 console.log(result)
+                keypointList = result;
                 drawTemplate(result);
 
             },
@@ -370,8 +409,6 @@
     Ajax 템플릿 정보 삭제
     */
     function deleteTemplate(templateID) {
-        console.log(templateID);
-
         $.ajax({
             type: 'get', //데이터 전송 타입,
             url: _PAGE_URL + 'apidataset/delkeyp?keypointId=' + templateID, //데이터를 주고받을 파일 주소 입력,
@@ -398,8 +435,8 @@
         t_template = JSON.stringify(templateInfo)
         for (var i = 0; i < templateInfo.length; i++) {
             template.innerHTML += `
-                                <input type="radio" class="btn-check" name="tag-label" id="template-${templateInfo[i]._id}" value ="${templateInfo[i]._id}"
-                                onclick="clickLabel(this.name); showInfo('${templateInfo[i]._id}');" autocomplete="off">
+                                <input type="checkbox" class="btn-check" name="tag-label" id="template-${templateInfo[i]._id}" value ="${templateInfo[i]._id}"
+                                onclick="clickLabel(this.name); showInfo('${templateInfo[i]._id}'); selectDraw();" autocomplete="off">
                                 <label class="btn tag-label" for="template-${templateInfo[i]._id}"
                                     style="background-color: ${templateInfo[i].kypt_json.categories[0].color};">
                                     <div class="d-flex">
@@ -460,7 +497,94 @@
     */
     function clickThumbnail(clickSrc) {
         //console.log(clickSrc)
-        document.getElementById("image-zoom-in").src = clickSrc;
+        document.getElementById("image-plus").style.backgroundImage = `url('${clickSrc}')`
+    }
+
+
+    //**********Keypoint Draw**********
+
+    function selectDraw() {
+        var chkArray = new Array();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        $("input[name=tag-label]:checked").each(function () {
+            var tmpVal = $(this).val();
+            chkArray.push(tmpVal);
+        });
+
+        chkArray.forEach(function (item) {
+            compareID(item);
+        })
+    }
+
+    /*
+    파라미터 아이디와 키포인트 아이디를 비교한 후, 필요한 정보만 만들어주는 함수
+    */
+    function compareID(templateID) {
+        for (var i = 0; i < keypointList.length; i++) {
+            if (keypointList[i]._id == templateID) {
+                console.log(templateID);
+                drawExistInfo(keypointList[i]);
+                return;
+            }
+        }
+    }
+
+    function chunk(data = [], size = 1) {
+        const arr = [];
+
+        for (let i = 0; i < data.length; i += size) {
+            arr.push(data.slice(i, i + size));
+        }
+
+        return arr;
+    }
+
+    var keypointList = ''; //템플릿 리스트
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext('2d');
+
+    function drawExistInfo(selectTemplate) {
+        connectingInfo = selectTemplate.kypt_json.categories[0].skeleton; //초기값을 만들어준다.
+        keyinfo = selectTemplate.kypt_json.annotations[0].keypoints; //초기값을 만들어준다.
+
+        //console.log(width, height);
+
+        var totalkeynum = selectTemplate.kypt_json.annotations[0].num_keypoints;
+        var keypointinfo = selectTemplate.kypt_json.annotations[0].keypoints;
+        var keypointname = selectTemplate.kypt_json.categories[0].keypoints;
+        var keypointarr = chunk(keypointinfo, 2);
+        var linkInfo = selectTemplate.kypt_json.categories[0].skeleton;
+
+        // Draw keypoints
+        for (var i = 0; i < totalkeynum; i++) {
+            ctx.beginPath();
+            ctx.arc(keypointarr[i][0], keypointarr[i][1], 5, 0, 2 * Math.PI);
+            ctx.fillStyle = 'blue';
+            ctx.fill();
+            ctx.closePath();
+
+            // Draw the text with the key value over the point
+            ctx.font = '16px Arial';
+            ctx.fillStyle = 'Black';
+            ctx.fillText(keypointname[i], keypointarr[i][0], keypointarr[i][1] + 24);
+        }
+
+        // Draw lines
+        console.log(linkInfo);
+        for (var i = 0; i < linkInfo.length; i++) {
+            var fromlink = linkInfo[i][0];
+            var tolink = linkInfo[i][1];
+
+            ctx.beginPath();
+            ctx.moveTo(keypointarr[fromlink][0], keypointarr[fromlink][1]);
+            ctx.lineTo(keypointarr[tolink][0], keypointarr[tolink][1]);
+            ctx.strokeStyle = "red";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.closePath();
+        }
+
     }
 </script>
 
