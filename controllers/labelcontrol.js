@@ -95,7 +95,8 @@ exports.getDatasetById = async function (req, res) {
 //Update Dataset by ID
 exports.datasetUpdate = async function (req, res) {
     console.log("------------!!Update DatasetById!!------------");
-    const datasetId = req.query.dataset_id; // assuming the route is defined as "/dataset/:dataset_id"
+    const datasetId = req.query.datasetId; // assuming the route is defined as "/dataset/:dataset_id"
+    console.log(req.query.datasetId);
     const updateData = {
         dataset_name: req.body.dataset_name,
         user_id: req.body.user_id,
@@ -108,7 +109,7 @@ exports.datasetUpdate = async function (req, res) {
     };
 
     try {
-        const result = await datasettb.findOneAndUpdate({ dataset_id: datasetId }, updateData, { new: true });
+        const result = await datasettb.findByIdAndUpdate(datasetId , updateData, { new: true });
         if (!result) {
             return res.status(404).json({ message: 'Dataset not found' });
         }
