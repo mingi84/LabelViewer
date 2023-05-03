@@ -258,10 +258,11 @@
     function loadImage(result) {
         console.log(result);
 
+        /*
         //zoom-in Image 1
         document.getElementById("image-plus").style.backgroundImage = `url('${_WEBSERVER_DI_URL + DATASET_INFO.image_location + result
             .mediainfo[0].mediapath + result.mediainfo[0].title}')`
-
+            */
         //thumnnail Image 9
         for (i = 0; i < 9; i++) {
             document.getElementById("image-" + i).src = _WEBSERVER_DI_URL + DATASET_INFO.image_location + result
@@ -495,6 +496,7 @@
     */
     function clickThumbnail(clickSrc) {
         //console.log(clickSrc)
+        return;
         document.getElementById("image-plus").style.backgroundImage = `url('${clickSrc}')`
     }
 
