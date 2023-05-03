@@ -103,7 +103,7 @@ exports.datasetUpdate = async function (req, res) {
         source_list_sto: req.body.source_list_sto,
         image_location: req.body.image_location,
         label_location: req.body.label_location,
-        kypt_id: req.body.kypt_id,
+        kypt_id: [req.body.kypt_id],
         dataset_last_update: moment().format("YYYY-MM-DD HH:mm:ss")
     };
 
