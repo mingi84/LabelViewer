@@ -29,7 +29,7 @@ const datasetSchema = new mongoose.Schema({
     required: true
   },
   kypt_id: {
-    type: String,
+    type: Array,
     required: false
   },
   dataset_createDate: {
