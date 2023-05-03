@@ -5848,7 +5848,7 @@
       newElt[newEltIdx++] = '</div>';
 
       // ##### layer for user customization purposes by.misun
-      newElt[newEltIdx++] = '<div class="nGY2GThumbnailCustomLayer"><canvas id="canvas' + idx + '" style="width:100%; height:100%"></canvas></div>';
+      newElt[newEltIdx++] = '<div class="nGY2GThumbnailCustomLayer"><canvas class="labelcanvasgallery" id="canvas' + idx + '" style="width:100%; height:100%"></canvas></div>';
 
       // ##### layer for labels (title + description and their icons)
       if (G.O.thumbnailLabel.get('display') == true) {

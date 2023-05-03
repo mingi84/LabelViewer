@@ -44,6 +44,10 @@
         background: rgba(33, 122, 244, .1);
         /*스크롤바 뒷 배경 색상*/
     }
+
+    .labelcanvasgallery {
+        display: block;
+    }
 </style>
 <!--
 
@@ -132,12 +136,12 @@
 <script>
 
 
-/* 
-labelingInfo[0].pose.location.흉골.x
-
-var { labelingInfo: [{ pose: { location: { 흉골: { x } } } }] } = obj;
-
-*/
+    /* 
+    labelingInfo[0].pose.location.흉골.x
+    
+    var { labelingInfo: [{ pose: { location: { 흉골: { x } } } }] } = obj;
+    
+    */
 
 
     const toastTrigger = document.getElementById('liveToastBtn')
@@ -213,8 +217,8 @@ var { labelingInfo: [{ pose: { location: { 흉골: { x } } } }] } = obj;
             divgalleryname.innerHTML = datasetInfo.dataset_name;
             img_folder = datasetInfo.image_location;
             label_folder = datasetInfo.label_location;
-            if (datasetInfo.kypt_id) {
-                getKeyTemplate(datasetInfo.kypt_id);
+            if (datasetInfo.kypt_id[0]) {
+                getKeyTemplate(datasetInfo.kypt_id[0]);
             } else {
                 const divlabeltemp = document.getElementById('divlabeltemplate');
                 divlabeltemp.innerHTML = '';
@@ -242,8 +246,8 @@ var { labelingInfo: [{ pose: { location: { 흉골: { x } } } }] } = obj;
             const divlabeltemp = document.getElementById('divlabeltemplate');
             divlabeltemp.innerHTML = '';
             divlabeltemp.innerHTML = '<input type="checkbox" class="btn-check" id="btn-none" name="' + kyptTempInfo.kypt_name +
-                '" autocomplete="off"onclick="clickLabel(this.name); draw();"><label class="btn" for="btn-none" style="background-color: ' + bgcolor +
-                ';">' + kyptTempInfo.kypt_name + '</label>';
+                '" autocomplete="off" onclick=\'clickLabel(this.name); toggleCanvasVisibility("labelcanvasgallery","' + kyptTempInfo.kypt_name + '");\'><label class="btn" for="btn-none" style="background-color: ' + bgcolor +
+                ';"><div id="eye-icon"><i class="fas fa-eye"></i> ' + kyptTempInfo.kypt_name + '</div></label>';
             linecolor = kyptTempInfo.kypt_json.categories[0].color;
             xylocationlist = kyptTempInfo.kypt_json.annotations[0].keypoints_json;
             console.log(kyptTempInfo.kypt_json.categories[0].skeleton);
@@ -252,6 +256,26 @@ var { labelingInfo: [{ pose: { location: { 흉골: { x } } } }] } = obj;
             console.error('Error fetching data:', error);
         }
     };
+
+    //class = labelcanvasgallery
+    function toggleCanvasVisibility(className, kypt_name) {
+        const canvases = document.querySelectorAll(`canvas.${className}`);
+        const eyeIcon = document.getElementById('eye-icon');
+        const checkTemp = document.getElementById('btn-none');
+        console.log(eyeIcon);
+        canvases.forEach(canvas => {
+            canvas.style.display = canvas.style.display === 'none' ? 'block' : 'none';
+        });
+
+        if(checkTemp.checked) {
+            eyeIcon.innerHTML = '<i class="fas fa-eye-slash"></i> ' + kypt_name ;
+        } else {
+            eyeIcon.innerHTML = '<i class="fas fa-eye"></i> ' + kypt_name ;
+        }
+
+
+    }
+
 
     function hexToRGBA(hex, alpha = 1) {
         const r = parseInt(hex.slice(1, 3), 16);
@@ -429,7 +453,7 @@ var { labelingInfo: [{ pose: { location: { 흉골: { x } } } }] } = obj;
             // ### gallery settings ###
             thumbnailHeight: 300,
             thumbnailWidth: "auto",
-            itemsBaseURL: 'http://49.50.160.122:3000/',
+            itemsBaseURL: _WEBSERVER_DI_URL,
             thumbnailBorderVertical: 0,
             thumbnailBorderHorizontal: 0,
             colorScheme: {
@@ -771,6 +795,8 @@ var { labelingInfo: [{ pose: { location: { 흉골: { x } } } }] } = obj;
         const zoomcanv = document.getElementById(zoomcanvindex)
         const zctx = zoomcanv.getContext('2d');
 
+
+        
 
         // Draw keypoints
         listformatedkeys[index].keypoints.forEach(point => {
