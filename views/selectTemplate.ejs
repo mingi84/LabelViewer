@@ -546,6 +546,7 @@
     
 
     function drawExistInfo(selectTemplate) {
+        templateColor = selectTemplate.kypt_json.categories[0].color;
         connectingInfo = selectTemplate.kypt_json.categories[0].skeleton; //초기값을 만들어준다.
         keyinfo = selectTemplate.kypt_json.annotations[0].keypoints; //초기값을 만들어준다.
 
@@ -557,20 +558,6 @@
         var keypointarr = chunk(keypointinfo, 2);
         var linkInfo = selectTemplate.kypt_json.categories[0].skeleton;
 
-        // Draw keypoints
-        for (var i = 0; i < totalkeynum; i++) {
-            ctx.beginPath();
-            ctx.arc(keypointarr[i][0], keypointarr[i][1], 5, 0, 2 * Math.PI);
-            ctx.fillStyle = 'blue';
-            ctx.fill();
-            ctx.closePath();
-
-            // Draw the text with the key value over the point
-            ctx.font = '16px Arial';
-            ctx.fillStyle = 'Black';
-            ctx.fillText(keypointname[i], keypointarr[i][0], keypointarr[i][1] + 24);
-        }
-
         // Draw lines
         console.log(linkInfo);
         for (var i = 0; i < linkInfo.length; i++) {
@@ -580,11 +567,27 @@
             ctx.beginPath();
             ctx.moveTo(keypointarr[fromlink][0], keypointarr[fromlink][1]);
             ctx.lineTo(keypointarr[tolink][0], keypointarr[tolink][1]);
-            ctx.strokeStyle = "red";
+            ctx.strokeStyle = templateColor;
             ctx.lineWidth = 2;
             ctx.stroke();
             ctx.closePath();
         }
+
+
+        // Draw keypoints
+        for (var i = 0; i < totalkeynum; i++) {
+            ctx.beginPath();
+            ctx.arc(keypointarr[i][0], keypointarr[i][1], 5, 0, 2 * Math.PI);
+            ctx.fillStyle = templateColor;
+            ctx.fill();
+            ctx.closePath();
+
+            // Draw the text with the key value over the point
+            ctx.font = '16px Arial';
+            ctx.fillStyle = 'Black';
+            ctx.fillText(keypointname[i], keypointarr[i][0], keypointarr[i][1] + 24);
+        }
+
 
     }
 </script>
