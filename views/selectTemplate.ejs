@@ -341,8 +341,10 @@
             selectKey.forEach(function (item) {
                 document.getElementById("template-" + item).checked = true;
             });
-
             selectDraw();
+        }
+        else{
+            document.getElementById("btn-none").checked = true;
         }
     }
 
