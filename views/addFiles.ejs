@@ -163,7 +163,8 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" onclick="pageMove('gallerylist');">Understood</button>
+                        <button type="button" class="btn btn-primary"
+                            onclick="pageMove('gallerylist');">Understood</button>
                     </div>
                 </div>
             </div>
@@ -192,7 +193,9 @@
 
     $(document).ready(function () {
         getDIStorage();
+    });
 
+    window.addEventListener("load", (event) => {
         if (datasetID !== null) {
             getDataset(datasetID)
         }
@@ -210,11 +213,6 @@
             dataType: 'JSON', //문자형식으로 받기 , 
             success: function (result) {
                 addSourcelist(result);
-
-                //데이터인젝터 스토리지 목록을 그린 후에 기존 선택 값을 넣어준다.
-                if (datasetID !== null) {
-                    $("#sourcelist").val("40").prop("selected", true);
-                }
             },
             error: function () {
                 alert("error");
@@ -347,6 +345,12 @@
 
         document.getElementById("location-image").value = result.image_location;
         inputLabel.value = result.image_location;
+
+        //데이터인젝터 스토리지 목록을 그린 후에 기존 선택 값을 넣어준다.
+        if (datasetID !== null) {
+            console.log(result.source_list_sto)
+            $("#sourcelist").val(result.source_list_sto).prop("selected", true);
+        }
 
     }
 
