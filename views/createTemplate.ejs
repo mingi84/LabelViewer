@@ -728,6 +728,7 @@
     function drawExistInfo(result) {
         console.log(result)
         document.getElementById("template-name").value = result.kypt_name;
+        document.getElementById("template-color").value = result.kypt_json.categories[0].color;
 
         //바운딩박스 선택했을 때
         if (result.kypt_json.annotations[0].bbox_type !== 0) {
