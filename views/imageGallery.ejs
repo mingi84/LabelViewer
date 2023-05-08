@@ -149,9 +149,9 @@
     const urlParams = new URLSearchParams(window.location.search);
     const sto_id = urlParams.get('source_list_sto');
     const dataset_id = urlParams.get('dataset_id');
-    var linecolor = '';
-    var xylocationlist = '';
-    var linklines = '';
+    var linecolor = [];
+    var xylocationlist = [];
+    var linklines = [];
     var listformatedkeys = [];
 
     if (toastTrigger) {
@@ -220,8 +220,14 @@
             divgalleryname.innerHTML = datasetInfo.dataset_name;
             img_folder = datasetInfo.image_location;
             label_folder = datasetInfo.label_location;
-            if (datasetInfo.kypt_id[0]) {
-                getKeyTemplate(datasetInfo.kypt_id[0]);
+            console.log(datasetInfo.kypt_id.length)
+            if (datasetInfo.kypt_id.length >= 0) {
+                keytemplates = datasetInfo.kypt_id
+                const divlabeltemp = document.getElementById('divlabeltemplate');
+                divlabeltemp.innerHTML = '';
+                keytemplates.forEach(function (keytemplate) {
+                    getKeyTemplate(keytemplate);
+                })
             } else {
                 const divlabeltemp = document.getElementById('divlabeltemplate');
                 divlabeltemp.innerHTML = '';
@@ -247,14 +253,14 @@
             console.log(kyptTempInfo);
             const bgcolor = colorWithTransparency(kyptTempInfo.kypt_json.categories[0].color, 0.4)
             const divlabeltemp = document.getElementById('divlabeltemplate');
-            divlabeltemp.innerHTML = '';
-            divlabeltemp.innerHTML = '<input type="checkbox" class="btn-check" id="btn-none" name="' + kyptTempInfo.kypt_name +
+            divlabeltemp.innerHTML += '<input type="checkbox" class="btn-check" id="btn-none" name="' + kyptTempInfo.kypt_name +
                 '" autocomplete="off" onclick=\'clickLabel(this.name); toggleCanvasVisibility("labelcanvasgallery","' + kyptTempInfo.kypt_name + '");\'><label class="btn" for="btn-none" style="background-color: ' + bgcolor +
                 ';"><div id="eye-icon"><i class="fas fa-eye"></i> ' + kyptTempInfo.kypt_name + '</div></label>';
-            linecolor = kyptTempInfo.kypt_json.categories[0].color;
-            xylocationlist = kyptTempInfo.kypt_json.annotations[0].keypoints_json;
-            console.log(kyptTempInfo.kypt_json.categories[0].skeleton);
-            linklines = { lines: kyptTempInfo.kypt_json.categories[0].skeleton };
+            linecolor.push(kyptTempInfo.kypt_json.categories[0].color);
+            const xylocListPush = { keyjsonpt: kyptTempInfo.kypt_json.annotations[0].keypoints_json, keyjsoncolor: kyptTempInfo.kypt_json.categories[0].color }
+            xylocationlist.push(xylocListPush);
+            console.log(xylocationlist);
+            linklines.push({ lines: kyptTempInfo.kypt_json.categories[0].skeleton, linescolor: kyptTempInfo.kypt_json.categories[0].color });
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -263,6 +269,11 @@
     //class = labelcanvasgallery
     function toggleCanvasVisibility(className, kypt_name) {
         const canvases = document.querySelectorAll(`canvas.${className}`);
+        console.log(canvases);
+        canvases.forEach(function (canvas) {
+            const name = canvas.getAttribute('name');
+            console.log(name);
+        });
         const eyeIcon = document.getElementById('eye-icon');
         const checkTemp = document.getElementById('btn-none');
         console.log(eyeIcon);
@@ -270,10 +281,10 @@
             canvas.style.display = canvas.style.display === 'none' ? 'block' : 'none';
         });
 
-        if(checkTemp.checked) {
-            eyeIcon.innerHTML = '<i class="fas fa-eye-slash"></i> ' + kypt_name ;
+        if (checkTemp.checked) {
+            eyeIcon.innerHTML = '<i class="fas fa-eye-slash"></i> ' + kypt_name;
         } else {
-            eyeIcon.innerHTML = '<i class="fas fa-eye"></i> ' + kypt_name ;
+            eyeIcon.innerHTML = '<i class="fas fa-eye"></i> ' + kypt_name;
         }
 
 
@@ -611,50 +622,34 @@
 
 
     function combinedJsonTemplate(JSONlist) {
-
+        console.log(xylocationlist);
         for (let i = 0; i < JSONlist.length; i++) { //JSONlist.length
             const listofpoints = [];
             for (let j = 0; j < xylocationlist.length; j++) {
-                const pathx = xylocationlist[j][0];
-                const pathy = xylocationlist[j][1];
-                const Xparts = pathx.split(">>");
-                const Yparts = pathy.split(">>");
-                const valueBeforeText = valuesBeforeText(Xparts, 'index');
-                if (valueBeforeText == "") {
-                    const valuex = getObjectReference(pathx, JSONlist[i]);
-                    const valuey = getObjectReference(pathy, JSONlist[i]);
-                    const multipliedValue = {
-                        x: valuex * 0.1555,
-                        y: valuey * 0.14,
-                        key: "single"
-                    };
-                    listofpoints.push(multipliedValue);
-                } else {
-                    var objindex = getObjectBeforeIndex(valueBeforeText, JSONlist[i]);
-                    const { xvaluesBefore, xvaluesAfter } = XvaluesBeforeAndAfterText(Xparts, 'index');
-                    const { yvaluesBefore, yvaluesAfter } = YvaluesBeforeAndAfterText(Yparts, 'index');
-                    console.log(xvaluesBefore); // Output: []
-                    console.log(xvaluesAfter);  // Output: []
-                    for (k = 0; k < objindex.length; k++) {
-                        console.log(k);
-                        var XKvalue = getObjectReferenceIndex(xvaluesBefore, k, xvaluesAfter, JSONlist[i])
-                        var YKvalue = getObjectReferenceIndex(yvaluesBefore, k, yvaluesAfter, JSONlist[i])
+                for (let k = 0; k < xylocationlist[j].keyjsonpt.length; k++) {
+                    const pathx = xylocationlist[j].keyjsonpt[k][0];
+                    const pathy = xylocationlist[j].keyjsonpt[k][1];
+                    const Xparts = pathx.split(">>");
+                    const Yparts = pathy.split(">>");
+                    const valueBeforeText = valuesBeforeText(Xparts, 'index');
+                    if (valueBeforeText == "") {
+                        const valuex = getObjectReference(pathx, JSONlist[i]);
+                        const valuey = getObjectReference(pathy, JSONlist[i]);
                         const multipliedValue = {
-                            x: XKvalue * 0.1555,
-                            y: YKvalue * 0.14,
-                            key: k
+                            x: valuex * 0.1555,
+                            y: valuey * 0.14,
+                            key: xylocationlist[j].keyjsoncolor
                         };
                         listofpoints.push(multipliedValue);
                     }
+
                 }
-
-
             }
             var formatedkey = {
                 "keypoints": listofpoints
             };
             listformatedkeys.push(formatedkey);
-            console.log(listformatedkeys);
+            console.log(listformatedkeys)
         }
     }
 
@@ -714,6 +709,8 @@
 
 
     async function drawpointsindex(idx) {
+
+
         await waitForCanvas();
         const index = idx - 1;
         const canvasindex = "canvas" + (index + 1);
@@ -725,88 +722,62 @@
         const zctx = zoomcanv.getContext('2d');
 
 
-        
+
 
         // Draw keypoints
+        console.log(listformatedkeys);
         listformatedkeys[index].keypoints.forEach(point => {
-
+            var pointcolor = point.key;
             ctx.beginPath();
             ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI);
-            ctx.fillStyle = linecolor;
+            ctx.fillStyle = pointcolor;
             ctx.fill();
-            ctx.strokeStyle = linecolor;
+            ctx.strokeStyle = pointcolor;
             ctx.lineWidth = 0.5;
             ctx.stroke();
             ctx.closePath();
 
-            zctx.beginPath();
-            zctx.arc(point.x, point.y, 1, 0, 2 * Math.PI);
-            zctx.fillStyle = linecolor;
-            zctx.fill();
-            zctx.closePath();
-
         });
 
         // Draw lines
-        linklines.lines.forEach(line => {
-            const from = listformatedkeys[index].keypoints[line[0]];
-            const to = listformatedkeys[index].keypoints[line[1]];
+        console.log(linklines);
 
-            ctx.beginPath();
-            ctx.moveTo(from.x, from.y);
-            ctx.lineTo(to.x, to.y);
-            ctx.strokeStyle = linecolor;
-            ctx.lineWidth = 1;
-            ctx.stroke();
-            ctx.closePath();
-        });
+        if (linklines.length == 0) {
+            linklines.lines.forEach(line => {
+                const from = listformatedkeys[index].keypoints[line[0]];
+                const to = listformatedkeys[index].keypoints[line[1]];
+
+                ctx.beginPath();
+                ctx.moveTo(from.x, from.y);
+                ctx.lineTo(to.x, to.y);
+                ctx.strokeStyle = linecolor;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.closePath();
+            });
+        }
+        else {
+            for (i = 0; i < linklines.length; i++) {
+                linklines[i].lines.forEach(line => {
+                    var linecolor = linklines[i].linescolor;
+                    const from = listformatedkeys[index].keypoints[line[0]];
+                    const to = listformatedkeys[index].keypoints[line[1]];
+
+                    ctx.beginPath();
+                    ctx.moveTo(from.x, from.y);
+                    ctx.lineTo(to.x, to.y);
+                    ctx.strokeStyle = linecolor;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                    ctx.closePath();
+                });
+
+            }
+        }
 
 
     }
 
-    async function drawzoomcanv(index) {
-        await waitForCanvas();
-        console.log('ZOOM draw points idx')
-        const zindex = index - 1;
-        const zoomcanvindex = "zoomcanv" + (index + 1);
-
-        const zoomcanv = document.getElementById(zoomcanvindex)
-        const zctx = zoomcanv.getContext('2d');
-
-
-        // Draw keypoints
-        listformatedkeys[index].keypoints.forEach(point => {
-
-            zctx.beginPath();
-            zctx.arc(point.x, point.y, 1, 0, 2 * Math.PI);
-            zctx.fillStyle = 'blue';
-            zctx.fill();
-            zctx.closePath();
-
-
-            // Draw the text with the key value over the point
-            zctx.font = '4px Arial';
-            zctx.fillStyle = 'yellow';
-            zctx.fillText(point.key + 1, point.x, point.y + 4);
-
-        });
-
-        // Draw lines
-        lineslink.lines.forEach(line => {
-            const from = listformatedkeys[index].keypoints[line[0] - 1];
-            const to = listformatedkeys[index].keypoints[line[1] - 1];
-
-            zctx.beginPath();
-            zctx.moveTo(from.x, from.y);
-            zctx.lineTo(to.x, to.y);
-            zctx.strokeStyle = "red";
-            zctx.lineWidth = 0.5;
-            zctx.stroke();
-            zctx.closePath();
-        });
-
-
-    }
 
     //---------------------Draw Template---------------------------------
 
