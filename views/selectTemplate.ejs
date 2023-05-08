@@ -26,6 +26,14 @@
     .type-template {
         cursor: pointer;
     }
+
+    .btn-edit:hover{
+        opacity:0.6;
+    }
+
+    .closebtn:hover{
+        opacity:0.7;
+    }
 </style>
 <!--
 
@@ -211,7 +219,8 @@
                 params = "gallerylist"
                 break;
             case "edit":
-                params = "createtemplate?source_list_sto=" + sto_id + "&dataset_id=" + dataset_id + "&ketpoint_id=" + id;
+                params = "createtemplate?source_list_sto=" + sto_id + "&dataset_id=" + dataset_id + "&ketpoint_id=" +
+                id;
                 break;
         }
         window.location.href = url + params;
@@ -342,8 +351,7 @@
                 document.getElementById("template-" + item).checked = true;
             });
             selectDraw();
-        }
-        else{
+        } else {
             document.getElementById("btn-none").checked = true;
         }
     }
@@ -436,19 +444,33 @@
         t_template = JSON.stringify(templateInfo)
         for (var i = 0; i < templateInfo.length; i++) {
             template.innerHTML += `
-                                <input type="checkbox" class="btn-check" name="tag-label" id="template-${templateInfo[i]._id}" value ="${templateInfo[i]._id}"
-                                onclick="clickLabel(this.name); showInfo('${templateInfo[i]._id}'); selectDraw();" autocomplete="off">
-                                <label class="btn tag-label" for="template-${templateInfo[i]._id}"
-                                    style="background-color: ${templateInfo[i].kypt_json.categories[0].color};">
-                                    <div class="d-flex">
-                                        <div id="template-name">${templateInfo[i].kypt_name}</div>
-                                        <i class="fa-solid fa-xmark btn-close ms-2" onclick="deletePopup('${templateInfo[i].kypt_name}','${templateInfo[i]._id}'); return false;"></i>
-                                        
-                <i class="fa-solid fa-pen m-1" style="color: #202020;" onclick="pageMove('edit','${templateInfo[i]._id}'); return false;"></i>
-                </div>
-                                </label>`
+                <input type="checkbox" class="btn-check" name="tag-label" id="template-${templateInfo[i]._id}" value ="${templateInfo[i]._id}"
+                onclick="clickLabel(this.name); showInfo('${templateInfo[i]._id}'); selectDraw();" autocomplete="off">
+                    <label class="btn tag-label" for="template-${templateInfo[i]._id}"
+                    style="background-color: ${templateInfo[i].kypt_json.categories[0].color};">
+                        <div class="d-flex" style="color:${getTextColor(templateInfo[i].kypt_json.categories[0].color)};">
+                            <div id="template-name">${templateInfo[i].kypt_name}</div>
+                            <i class="fa-solid align-self-center fa-xmark mx-1 closebtn" style="font-size: 20px; color:${getTextColor(templateInfo[i].kypt_json.categories[0].color)};" onclick="deletePopup('${templateInfo[i].kypt_name}','${templateInfo[i]._id}'); return false;"></i>
+                            <i class="fa-solid fa-pen m-1 btn-edit" style="color:${getTextColor(templateInfo[i].kypt_json.categories[0].color)};" onclick="pageMove('edit','${templateInfo[i]._id}'); return false;"></i>
+                        </div>
+                    </label>`
         }
 
+    }
+
+    /*
+    버튼 명도에 맞춰 font-color를 black/white로 바꾼다.
+    */
+    function getTextColor(hexColor) {
+        const c = hexColor.substring(1) // 색상 앞의 # 제거
+        const rgb = parseInt(c, 16) // rrggbb를 10진수로 변환
+        const r = (rgb >> 16) & 0xff // red 추출
+        const g = (rgb >> 8) & 0xff // green 추출
+        const b = (rgb >> 0) & 0xff // blue 추출
+        const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b // per ITU-R BT.709
+        // 색상 선택
+
+        return luma < 127.5 ? "white" : "black" // 글자색이
     }
 
     /*
@@ -545,7 +567,7 @@
     var keypointList = ''; //템플릿 리스트
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext('2d');
-    
+
 
     function drawExistInfo(selectTemplate) {
         templateColor = selectTemplate.kypt_json.categories[0].color;
