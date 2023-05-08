@@ -27,12 +27,12 @@
         cursor: pointer;
     }
 
-    .btn-edit:hover{
-        opacity:0.6;
+    .btn-edit:hover {
+        opacity: 0.6;
     }
 
-    .closebtn:hover{
-        opacity:0.7;
+    .closebtn:hover {
+        opacity: 0.7;
     }
 </style>
 <!--
@@ -52,9 +52,8 @@
                     <div class="col">
                         <div class="card" style="height: 280px;" id="type-api">
                             <div class="card-body" id="template-list">
-                                <button type="button" class="btn btn-primary" onclick="pageMove('createtemplate')">+
-                                    add</button>
-
+                                <button type="button" class="btn btn-primary"
+                                    onclick="pageMove('createtemplate')">+add</button>
                                 <input type="checkbox" class="btn-check" id="btn-none" name="none" autocomplete="off"
                                     onclick="clickLabel(this.name);">
                                 <label class="btn" for="btn-none" style="background-color: #f4f4f4;">none</label>
@@ -114,6 +113,12 @@
                                 </div>
 
 
+                                            <div class="" style="color: #666666;">Key Point</div>
+                                            <div id="keypoint-count" class="mb-2">-</div>
+                                            <button type="button" class="btn btn-outline-primary"
+                                                onclick="pageMove('createtemplate')">Edit Template</button>
+                                        </div>
+                                        <div class="border border-1 rounded" style="width: 240px;"></div>
                             </div>
                         </div>
                     </div>-->
@@ -131,39 +136,39 @@
                                 </div>
                                 <div class="w-100  row row-cols-3" id="list-thumbnail">
                                     <div class="thumbnail align-self-center" style="object-fit: contain;">
-                                        <img class="img-thumbnail" id="image-0" onclick="clickThumbnail(this.src)"
+                                        <img class="img-thumbnail" id="image-0" onclick="clickThumbnail(this.src); drawpointsindex(1)"
                                             src="" alt="">
                                     </div>
                                     <div class=" thumbnail align-self-center" style="object-fit: contain;">
-                                        <img class="img-thumbnail" id="image-1" onclick="clickThumbnail(this.src)"
+                                        <img class="img-thumbnail" id="image-1" onclick="clickThumbnail(this.src); drawpointsindex(2)"
                                             src="" alt="">
                                     </div>
                                     <div class=" thumbnail align-self-center" style="object-fit: contain;">
-                                        <img class="img-thumbnail" id="image-2" onclick="clickThumbnail(this.src)"
+                                        <img class="img-thumbnail" id="image-2" onclick="clickThumbnail(this.src); drawpointsindex(3)"
                                             src="" alt="">
                                     </div>
                                     <div class=" thumbnail align-self-center" style="object-fit: contain;">
-                                        <img class="img-thumbnail" id="image-3" onclick="clickThumbnail(this.src)"
+                                        <img class="img-thumbnail" id="image-3" onclick="clickThumbnail(this.src); drawpointsindex(4)"
                                             src="" alt="">
                                     </div>
                                     <div class=" thumbnail align-self-center" style="object-fit: contain;">
-                                        <img class="img-thumbnail" id="image-4" onclick="clickThumbnail(this.src)"
+                                        <img class="img-thumbnail" id="image-4" onclick="clickThumbnail(this.src); drawpointsindex(5)"
                                             src="" alt="">
                                     </div>
                                     <div class=" thumbnail align-self-center" style="object-fit: contain;">
-                                        <img class="img-thumbnail" id="image-5" onclick="clickThumbnail(this.src)"
+                                        <img class="img-thumbnail" id="image-5" onclick="clickThumbnail(this.src); drawpointsindex(6)"
                                             src="" alt="">
                                     </div>
                                     <div class=" thumbnail align-self-center" style="object-fit: contain;">
-                                        <img class="img-thumbnail" id="image-6" onclick="clickThumbnail(this.src)"
+                                        <img class="img-thumbnail" id="image-6" onclick="clickThumbnail(this.src); drawpointsindex(7)"
                                             src="" alt="">
                                     </div>
                                     <div class=" thumbnail align-self-center" style="object-fit: contain;">
-                                        <img class="img-thumbnail" id="image-7" onclick="clickThumbnail(this.src)"
+                                        <img class="img-thumbnail" id="image-7" onclick="clickThumbnail(this.src); drawpointsindex(8)"
                                             src="" alt="">
                                     </div>
                                     <div class=" thumbnail align-self-center" style="object-fit: contain;">
-                                        <img class="img-thumbnail" id="image-8" onclick="clickThumbnail(this.src)"
+                                        <img class="img-thumbnail" id="image-8" onclick="clickThumbnail(this.src); drawpointsindex(9)"
                                             src="" alt="">
                                     </div>
                                 </div>
@@ -220,7 +225,7 @@
                 break;
             case "edit":
                 params = "createtemplate?source_list_sto=" + sto_id + "&dataset_id=" + dataset_id + "&ketpoint_id=" +
-                id;
+                    id;
                 break;
         }
         window.location.href = url + params;
@@ -257,6 +262,8 @@
             dataType: 'JSON', //문자형식으로 받기 , 
             success: function (result) {
                 loadImage(result);
+                jsonPath(result, img_folder, label_folder);
+
             },
             error: function () {
                 alert("error");
@@ -264,14 +271,260 @@
         });
     }
 
-    function loadImage(result) {
-        console.log(result);
+    /*
+    D/I의 JSON path를 만들어준다. 
+    result information: 
+    api : http://49.50.160.122:9070/OpenAPI/Report/DetectionImageView/All
+    
+    imagepath와 같은 이름의 json path 목록을 만들어준다.
+    jsonParam = Kids_Sample/D023(굴러가는 공을…운다)/D023_JSON/D023_GMS_1_1_anonymized_001171.json
+    */
+    function jsonPath(result, img_folder, label_folder) {
+        var data = result.mediainfo;
+        //url 매핑을 위해 url을 만들어준다.
 
-        /*
+        var originParam, jsonParam;
+        var pathArr = [];
+        var jsonArr = [];
+
+        for (i = 0; i < data.length - 1; i++) {
+            //originParam = result.errorinfo[i].thumbnailpath;
+            originParam = img_folder + data[i].mediapath + data[i].title;
+            if (originParam != "") {
+                originParam = originParam.replace(/\\/ig, "/");
+                //originParam = originParam.replace(/\\/ig, "/");
+                jsonParam = originParam.replace(/JPG|\.jpg/g, (match) => {
+                    if (match === "JPG") {
+                        return "JSON";
+                    } else if (match === ".jpg") {
+                        return ".json";
+                    }
+                });
+
+                jsonArr.push(jsonParam);
+            }
+        }
+        transfUrlJson(jsonArr);
+    }
+    /*
+    JSON 불러올 때 쓸 수 있는 URL로 변환
+    http://49.50.160.122:3000/Kids_Sample/D023(굴러가는 공을…운다)/D023_JSON/D023_GMS_1_1_anonymized_001171.json
+    */
+    function transfUrlJson(jsonArr) {
+        var jsonlistgallery = [];
+        jsonArr.forEach((json) => {
+            var jsonUrlLoc = _WEBSERVER_DI_URL + json;
+            jsonlistgallery.push(jsonUrlLoc);
+        });
+        console.log(jsonlistgallery);
+        fetchAndCombineJson(jsonlistgallery);
+    }
+
+    var JsonTemplate;
+    async function fetchAndCombineJson(urlList) {
+        const jsonPromises = urlList.map(async (url) => {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        });
+
+        try {
+            console.log(jsonPromises);
+            const combinedJsonArray = await Promise.all(jsonPromises);
+
+            selectedID = selectedTemplate();
+            console.log(selectedID);
+            for (var i = 0; i < keypointList.length; i++) {
+                if (keypointList[i]._id == selectedID[0]) {
+                    SELECT_KEYPOINTLIST = keypointList[i];
+                }
+                selectedID.forEach(index => {
+                    
+                });
+            }
+
+            combinedJsonTemplate(combinedJsonArray);
+        } catch (error) {
+            //console.error('Error fetching JSON data:', error);
+        }
+    }
+
+    var SELECT_KEYPOINTLIST = '';
+    var listformatedkeys = [];
+    var linklines = '';
+    
+    function combinedJsonTemplate(JSONlist) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        color = SELECT_KEYPOINTLIST.kypt_json.categories[0].color;
+        xylocationlist = SELECT_KEYPOINTLIST.kypt_json.annotations[0].keypoints_json;
+        linklines = { lines: SELECT_KEYPOINTLIST.kypt_json.categories[0].skeleton };
+        for (let i = 0; i < JSONlist.length; i++) { //JSONlist.length
+            const listofpoints = [];
+            for (let j = 0; j < xylocationlist.length; j++) {
+                const pathx = xylocationlist[j][0];
+                const pathy = xylocationlist[j][1];
+                const Xparts = pathx.split(">>");
+                const Yparts = pathy.split(">>");
+                const valueBeforeText = valuesBeforeText(Xparts, 'index');
+                if (valueBeforeText == "") {
+                    const valuex = getObjectReference(pathx, JSONlist[i]);
+                    const valuey = getObjectReference(pathy, JSONlist[i]);
+                    const multipliedValue = {
+                        x: valuex * 0.333,
+                        y: valuey * 0.335,
+                        key: "single"
+                    };
+                    listofpoints.push(multipliedValue);
+                } else {
+                    var objindex = getObjectBeforeIndex(valueBeforeText, s[i]);
+                    const {
+                        xvaluesBefore,
+                        xvaluesAfter
+                    } = XvaluesBeforeAndAfterText(Xparts, 'index');
+                    const {
+                        yvaluesBefore,
+                        yvaluesAfter
+                    } = YvaluesBeforeAndAfterText(Yparts, 'index');
+                    console.log(xvaluesBefore); // Output: []
+                    console.log(xvaluesAfter); // Output: []
+                    for (k = 0; k < objindex.length; k++) {
+                        console.log(k);
+                        var XKvalue = getObjectReferenceIndex(xvaluesBefore, k, xvaluesAfter, JSONlist[i])
+                        var YKvalue = getObjectReferenceIndex(yvaluesBefore, k, yvaluesAfter, JSONlist[i])
+                        const multipliedValue = {
+                            x: XKvalue * 0.3555,
+                            y: YKvalue * 0.34,
+                            key: k
+                        };
+                        listofpoints.push(multipliedValue);
+                    }
+                }
+
+
+            }
+            var formatedkey = {
+                "keypoints": listofpoints
+            };
+            listformatedkeys.push(formatedkey);
+        }
+        //drawExistInfo(selectTemplate)
+        drawpointsindex(1, color);
+
+    }
+
+
+    function drawpointsindex(idx, color) {
+
+        const index = idx - 1;
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        console.log(listformatedkeys[index].keypoints)
+        // Draw keypoints
+        listformatedkeys[index].keypoints.forEach(point => {
+
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI);
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.closePath();
+
+        });
+        console.log(linklines);
+        // Draw lines
+        linklines.lines.forEach(line => {
+            const from = listformatedkeys[index].keypoints[line[0]];
+            const to = listformatedkeys[index].keypoints[line[1]];
+            console.log(from);
+            console.log(to);
+
+            ctx.beginPath();
+            ctx.moveTo(from.x, from.y);
+            ctx.lineTo(to.x, to.y);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.closePath();
+        });
+
+
+    }
+
+    function getObjectBeforeIndex(path, obj) {
+        const parts = path;
+
+        let currentObj = obj;
+
+
+
+        for (const part of parts) {
+            currentObj = currentObj[part];
+            if (currentObj === undefined) {
+                return undefined;
+            }
+        }
+        return currentObj;
+    }
+
+
+    function getObjectReference(path, obj) {
+        const parts = path.split(">>");
+        let currentObj = obj;
+
+        for (const part of parts) {
+            currentObj = currentObj[part];
+            if (currentObj === undefined) {
+                return undefined;
+            }
+        }
+        return currentObj;
+    }
+
+    function getObjectReferenceIndex(valuesBefore, index, valuesAfter, obj) {
+        const partsBefore = valuesBefore;
+        const partsAfter = valuesAfter;
+        const parts = [...partsBefore, index, ...partsAfter];
+
+        let currentObj = obj;
+
+        for (const part of parts) {
+            currentObj = currentObj[part];
+            if (currentObj === undefined) {
+                return undefined;
+            }
+        }
+
+        return currentObj;
+    }
+
+
+    function valuesBeforeText(arr, text) {
+        const result = [];
+        let found = false;
+
+        for (let i = 0; i < arr.length; i++) {
+            if (arr[i] === text) {
+                found = true;
+                break;
+            }
+            result.push(arr[i]);
+        }
+
+        return found ? result : [];
+    }
+
+
+    function loadImage(result) {
         //zoom-in Image 1
         document.getElementById("image-plus").style.backgroundImage = `url('${_WEBSERVER_DI_URL + DATASET_INFO.image_location + result
             .mediainfo[0].mediapath + result.mediainfo[0].title}')`
-            */
+            
         //thumnnail Image 9
         for (i = 0; i < 9; i++) {
             document.getElementById("image-" + i).src = _WEBSERVER_DI_URL + DATASET_INFO.image_location + result
@@ -324,6 +577,9 @@
     }
 
     var DATASET_INFO = {}
+    var img_folder = '';
+    var label_folder = '';
+
     //데이터셋 정보 가져오기
     function getDataset() {
         $.ajax({
@@ -334,7 +590,9 @@
             contentType: "application/json",
             success: function (result) {
                 loadSelectedTemplate(result);
-                DATASET_INFO = result
+                DATASET_INFO = result;
+                img_folder = DATASET_INFO.image_location;
+                label_folder = DATASET_INFO.label_location;
             },
             error: function () {
                 alert("error");
@@ -350,7 +608,7 @@
             selectKey.forEach(function (item) {
                 document.getElementById("template-" + item).checked = true;
             });
-            selectDraw();
+            //selectDraw();
         } else {
             document.getElementById("btn-none").checked = true;
         }
@@ -520,7 +778,6 @@
     */
     function clickThumbnail(clickSrc) {
         //console.log(clickSrc)
-        return;
         document.getElementById("image-plus").style.backgroundImage = `url('${clickSrc}')`
     }
 
