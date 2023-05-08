@@ -388,6 +388,10 @@
     function maketemplateInfo(templateName, templateColor) {
         var keypointName = getPointName();
         var jsonkey = getInputval();
+        var bbox_type = $('input[name="b-box-type"]:checked').val();
+        if (document.getElementById("btn-boundingbox").checked == false) {
+            bbox_type = 0;
+        }
 
         templateJson = {
             "kypt_name": templateName,
@@ -399,7 +403,7 @@
                     "skeleton": connectingInfo
                 }],
                 "annotations": [{
-                    "bbox_type": $('input[name="b-box-type"]:checked').val(),
+                    "bbox_type": bbox_type,
                     "bbox": [
                         document.getElementById("bbox-x").value,
                         document.getElementById("bbox-y").value,
@@ -550,6 +554,7 @@
     let count = 0;
     let connectingInfo = []; //line info 전송할 때
     let keyinfo = []; //keypoints 정보 전송할 때
+    var inputXY = []; //input x,y 정보
 
     canvas.addEventListener('mousedown', (e) => {
         if (selectedKeypoint) {
@@ -603,33 +608,6 @@
         listkeypoints();
     });
 
-
-    /*
-    키포인트의 json 정보를 입력할 수 있는 input 칸을 만들어준다.
-    */
-    function listkeypoints() {
-        listItem = "";
-        if (keypoints.length > 0) {
-            for (i = 0; i < keypoints.length; i++) {
-                // listItem += '<div>index = ' + i + ' x= ' + keypoints[i].x + ' y = ' + keypoints[i].y + '</div>';
-
-                listItem += `<div class="row row-cols-3  my-2">
-                    <div class="col col-2 d-flex align-items-center">
-                        <div id="point-name${i}">${i}</div>
-                    </div>
-                    <div class="col col-5">
-                        <input type="text" id="x${i}" class="form-control form-control-sm"aria-describedby="addon-wrapping">
-                    </div>
-                    <div class="col col-5">
-                        <input type="text" id="y${i}" class="form-control form-control-sm" aria-describedby="addon-wrapping">
-                    </div>
-                </div>`;
-            }
-            //console.log(listItem);
-            divkeylist.innerHTML = listItem;
-        }
-    }
-
     window.addEventListener('resize', () => {
         canvas.height = window.innerHeight;
         canvas.width = window.innerWidth;
@@ -669,6 +647,7 @@
         keyinfo = [];
         keypoints = [];
         lines = [];
+        inputXY = [];
         count = 0;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -704,7 +683,7 @@
 
     let query = window.location.search;
     let param = new URLSearchParams(query);
-    let keypointID = param.get('id');
+    let keypointID = param.get('ketpoint_id');
 
     $(document).ready(function () {
         if (keypointID !== null) {
@@ -751,7 +730,7 @@
         document.getElementById("template-name").value = result.kypt_name;
 
         //바운딩박스 선택했을 때
-        if (result.kypt_json.annotations[0].bbox.length > 0) {
+        if (result.kypt_json.annotations[0].bbox_type !== 0) {
             document.getElementById("btn-boundingbox").checked = true;
             typeClick("boundingbox");
 
@@ -786,7 +765,6 @@
         if (result.kypt_json.annotations[0].num_keypoints > 0) {
             document.getElementById("btn-keypoint").checked = true;
             typeClick("keypoint");
-            inputKeypointinfo(result, result.kypt_json.annotations[0].num_keypoints);
 
             connectingInfo = result.kypt_json.categories[0].skeleton; //초기값을 만들어준다.
             keyinfo = result.kypt_json.annotations[0].keypoints; //초기값을 만들어준다.
@@ -799,27 +777,56 @@
         }
     }
 
-
-    //키포인트 input - json을 만들어준다.
-    function inputKeypointinfo(result, keypointTotal) {
+    /*
+    키포인트의 json 정보를 입력할 수 있는 input 칸을 만들어준다.
+    */
+    function listkeypoints() {
         listItem = "";
-        var jsoninfo = result.kypt_json.annotations[0].keypoints_json;
 
-        for (i = 0; i < keypointTotal; i++) {
-            listItem += `<div class="row row-cols-3  my-2">
+        console.log(keypoints);
+        if (keypoints.length > 0) {
+            for (i = 0; i < keypoints.length; i++) {
+                // listItem += '<div>index = ' + i + ' x= ' + keypoints[i].x + ' y = ' + keypoints[i].y + '</div>';
+
+                listItem += `<div class="row row-cols-3  my-2">
                     <div class="col col-2 d-flex align-items-center">
                         <div id="point-name${i}">${i}</div>
                     </div>
                     <div class="col col-5">
-                        <input type="text" id="x${i}" class="form-control form-control-sm"aria-describedby="addon-wrapping" value="${jsoninfo[i][0]}">
+                        <input type="text" id="x${i}" class="form-control form-control-sm"aria-describedby="addon-wrapping" value="${noneInputCheck(inputXY[i],"x")}"> 
                     </div>
                     <div class="col col-5">
-                        <input type="text" id="y${i}" class="form-control form-control-sm" aria-describedby="addon-wrapping" value="${jsoninfo[i][1]}">
+                        <input type="text" id="y${i}" class="form-control form-control-sm" aria-describedby="addon-wrapping" value="${noneInputCheck(inputXY[i],"y")}">
                     </div>
                 </div>`;
+            }
+            //console.log(listItem);
+            divkeylist.innerHTML = listItem;
         }
-        document.getElementById('keylist').innerHTML = listItem;
+    }
 
+    function noneInputCheck(obj, num){
+        if( typeof obj == "undefined"){
+            return "";
+        }
+        else{
+            if(num == "x"){return obj.x; }
+            if(num == "y"){return obj.y; }
+        }
+    }
+
+    //키포인트 input - json을 만들어준다.
+    function inputKeypointinfo(result, keypointTotal) {
+        var jsoninfo = result.kypt_json.annotations[0].keypoints_json;
+
+        for (i = 0; i < keypointTotal; i++) {
+            inputXY.push({
+                x: jsoninfo[i][0],
+                y: jsoninfo[i][1]
+            })
+        }
+
+        listkeypoints();
     }
 
     function chunk(data = [], size = 1) {
@@ -851,6 +858,14 @@
         for (var i = 0; i < totalkeynum; i++) {
             console.log(keypointarr[i][0], keypointarr[i][1]);
 
+            newKeypoint = {
+                count: i,
+                x: keypointarr[i][0],
+                y: keypointarr[i][1]
+            };
+            count++;
+            keypoints.push(newKeypoint);
+
             ctx.beginPath();
             ctx.arc(keypointarr[i][0], keypointarr[i][1], 5, 0, 2 * Math.PI);
             ctx.fillStyle = 'blue';
@@ -862,11 +877,23 @@
             ctx.fillStyle = 'Black';
             ctx.fillText(keypointname[i], keypointarr[i][0], keypointarr[i][1] + 24);
         }
+        console.log(keypoints);
 
         // Draw lines
-        for (var i = 0; i < totalkeynum; i++) {
+        for (var i = 0; i < linkInfo.length; i++) {
             var fromlink = linkInfo[i][0];
             var tolink = linkInfo[i][1];
+
+            lines.push({
+                from: {
+                    x: keypointarr[fromlink][0],
+                    y: keypointarr[fromlink][1]
+                },
+                to: {
+                    x: keypointarr[tolink][0],
+                    y: keypointarr[tolink][1]
+                }
+            });
 
             ctx.beginPath();
             ctx.moveTo(keypointarr[fromlink][0], keypointarr[fromlink][1]);
@@ -876,6 +903,8 @@
             ctx.stroke();
             ctx.closePath();
         }
+        
+        inputKeypointinfo(result, result.kypt_json.annotations[0].num_keypoints);
 
     }
 </script>
