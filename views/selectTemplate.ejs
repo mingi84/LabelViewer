@@ -123,7 +123,6 @@
                         </div>
                     </div>-->
                 </div>
-
                 <h5>Preview</h5>
                 <div class="" style="color: #666666;">Randomly select an image and apply the selected label.</div>
 
@@ -132,6 +131,15 @@
                         <div class="card w-100" style="width: 18rem;">
                             <div class="card-body d-flex gap-2">
                                 <div class="w-100 " id="image-plus" style="height: 360px; background-size:cover;">
+                                    <div class="toast position-absolute top-50 start-50 translate-middle" id="" role="alert" aria-live="assertive" aria-atomic="true"  data-bs-delay='2000'>
+                                        <div class="toast-header">
+                                            <strong class="me-auto">Template Error</strong>
+                                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                                        </div>
+                                        <div class="toast-body">
+                                            Template &lt;<span style="font-size: 600; color: #0D6EFD;" id="toast-templateName"></span>&gt;is not available.                                 
+                                        </div>
+                                    </div>
                                     <canvas id="canvas" class="" style=""></canvas>
                                 </div>
                                 <div class="w-100  row row-cols-3" id="list-thumbnail">
@@ -206,7 +214,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 </body>
 <script>
@@ -342,8 +349,8 @@
 
     //템플릿을 선택한다.
     function selectTemplate(num) {
-        
-        if(typeof num == "undefined"){
+
+        if (typeof num == "undefined") {
             num = CLICKIMAGENUM;
         }
 
@@ -428,9 +435,13 @@
 
     function drawpointsindex(num, color) {
         const index = num - 1;
+        // Draw keypoints
+
         try {
-            // Draw keypoints
             listformatedkeys[index].keypoints.forEach(point => {
+                if (isNaN(point.x) == true || isNaN(point.y) == true) {
+                    throw new Error(listformatedkeys[index].keypoint_id);
+                }
 
                 ctx.beginPath();
                 ctx.arc(point.x, point.y, 3, 0, 2 * Math.PI);
@@ -456,9 +467,20 @@
                 ctx.stroke();
                 ctx.closePath();
             });
-        } catch (err){
-            return;
+        } catch (err) {            
+            var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+            var toastList = toastElList.map(function (toastEl) {
+                return new bootstrap.Toast(toastEl)
+            })
+            toastList.forEach(toast => toast.show());
+
+            document.getElementById("toast-templateName").innerHTML = document.getElementById("template-name-"+ listformatedkeys[index].keypoint_id).innerText;
+
+            document.getElementById("template-"+ listformatedkeys[index].keypoint_id).checked = false;
+
         }
+
+
 
     }
 
@@ -713,7 +735,7 @@
                     <label class="btn tag-label" for="template-${templateInfo[i]._id}"
                     style="background-color: ${templateInfo[i].kypt_json.categories[0].color};">
                         <div class="d-flex" style="color:${getTextColor(templateInfo[i].kypt_json.categories[0].color)};">
-                            <div id="template-name">${templateInfo[i].kypt_name}</div>
+                            <div id="template-name-${templateInfo[i]._id}">${templateInfo[i].kypt_name}</div>
                             <i class="fa-solid align-self-center fa-xmark mx-1 closebtn" style="font-size: 20px; color:${getTextColor(templateInfo[i].kypt_json.categories[0].color)};" onclick="deletePopup('${templateInfo[i].kypt_name}','${templateInfo[i]._id}'); return false;"></i>
                             <i class="fa-solid fa-pen m-1 btn-edit" style="color:${getTextColor(templateInfo[i].kypt_json.categories[0].color)};" onclick="pageMove('edit','${templateInfo[i]._id}'); return false;"></i>
                         </div>
