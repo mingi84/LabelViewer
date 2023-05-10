@@ -13,7 +13,6 @@
     <link rel="stylesheet" type="text/css" href="css/fontawesome.all.css">
     <link rel="stylesheet" type="text/css" href="css/main.css">
     <script language="javascript" type="text/javascript" src="js/globalconst.js"></script>
-
 </head>
 <style>
     .card {
@@ -31,21 +30,21 @@
 
 <body>
     <%- include('./header') %>
-    <div class="container my-4">
-        <div class="row row-cols-4 g-4" id="gallerylist">
-            <div class="col" id="add-dataset">
-                <div class="card w-100 dataset" style="border: 2px dashed #D9D9D9;">
-                    <div class="card-body d-flex justify-content-center align-items-center"
-                        onclick="pageMove('addfiles');">
-                        <p class="card-text">+ Add Dataset</p>
+        <div class="container my-4">
+            <div class="row row-cols-4 g-4" id="gallerylist">
+                <div class="col" id="add-dataset">
+                    <div class="card w-100 dataset" style="border: 2px dashed #D9D9D9;">
+                        <div class="card-body d-flex justify-content-center align-items-center"
+                            onclick="pageMove('addfiles');">
+                            <p class="card-text">+ Add Dataset</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="modal" id="delete-popup" tabindex="-1">
+            <div class="modal" id="delete-popup" tabindex="-1">
 
+            </div>
         </div>
-    </div>
 </body>
 <script>
     function pageMove(page, datasetID, sourceID) {
@@ -71,15 +70,15 @@
 
 
     var dataset = [{
-            "datasetID": 0,
-            "name": "축구1",
-            "updateDate": "2023-04-17"
-        },
-        {
-            "datasetID": 1,
-            "name": "축구2",
-            "updateDate": "2023-04-21"
-        }
+        "datasetID": 0,
+        "name": "축구1",
+        "updateDate": "2023-04-17"
+    },
+    {
+        "datasetID": 1,
+        "name": "축구2",
+        "updateDate": "2023-04-21"
+    }
     ]
 
     $(document).ready(function () {
@@ -141,6 +140,12 @@
 
         for (var i = 0; i < dataset.length; i++) {
 
+
+            //Format UTC Time to Asia/Seoul Timezone
+            const date = new Date(dataset[i].dataset_last_update);
+            const timezone = 'Asia/Seoul'; // Replace with your desired timezone
+            const formattedDate = date.toLocaleString('ko-KR', { timeZone: timezone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).replace(',', 'T');
+
             imagesource = getImagesrc(dataset[i].source_list_sto, dataset[i].dataset_import_type, dataset[i].image_location);
 
             cardText += `
@@ -162,7 +167,7 @@
                         <div class="card-body" onclick="pageMove('imagegallery','${dataset[i]._id}','${dataset[i].source_list_sto}');">
                             <div class="gallery-title" id="${dataset[i]._id}-name" style="">${dataset[i].dataset_name}</div>
                             <span class="" style="color: #666666;">Updated</span>
-                            <span class="" id="${dataset[i]._id}-updateDate">${dataset[i].dataset_last_update}</span>
+                            <span class="" id="${dataset[i]._id}-updateDate">` + formattedDate + `</span>
                         </div>
                     </div>
                 </div>
