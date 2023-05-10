@@ -16,7 +16,7 @@
 </head>
 <style>
     .card {
-        height: 280px;
+        height: 300px;
         cursor: pointer;
     }
 
@@ -177,7 +177,7 @@
             }
 
             //Format UTC Time to Asia/Seoul Timezone
-            const date = new Date(dataset[i].dataset_last_update);
+            const date = new Date(dataset[i].dataset_createDate);
             const timezone = 'Asia/Seoul'; // Replace with your desired timezone
             const formattedDate = date.toLocaleString('ko-KR', { timeZone: timezone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).replace(',', 'T');
 
@@ -197,12 +197,16 @@
                                 >Delete</button></li>
                             </ul>
                         </div>
-                        <img id="${dataset[i]._id}-image" src="${imagesource}"
+                        <img id="${dataset[i]._id}-image" src="${imagesource.src_img}"
                             class="card-img-top" alt="..."  onclick="pageMove('imagegallery','${dataset[i]._id}','${dataset[i].source_list_sto}');">
                         <div class="card-body" onclick="pageMove('imagegallery','${dataset[i]._id}','${dataset[i].source_list_sto}');">
-                            <div class="gallery-title" id="${dataset[i]._id}-name" style="">${dataset[i].dataset_name}</div>
-                            <span class="" style="color: #666666;">Updated</span>
+                            <div class="gallery-title" id="${dataset[i]._id}-name" style="">
+                                <span class="" style="color: #666666;">Dataset: </span>
+                                ${dataset[i].dataset_name}</div>
+                            <span class="" style="color: #666666;">Created: </span>
                             <span class="" id="${dataset[i]._id}-updateDate">` + formattedDate + `</span>
+                            <span style="color: #666666;">Contains: </span>
+                            <span>` + imagesource.img_count + ` Files</span>
                             <div>` + kypttemps + `</div>
                         </div>
                     </div>
@@ -253,7 +257,7 @@
         switch (importtype) {
             case 1: //D/I
                 var result = loadDIimage(storageID);
-                src = _WEBSERVER_DI_URL + imagepath + result.mediainfo[0].mediapath + result.mediainfo[0].title;
+                src = {src_img: _WEBSERVER_DI_URL + imagepath + result.mediainfo[0].mediapath + result.mediainfo[0].title, img_count:result.totalcount} 
                 return src;
                 break;
             case 2: //Object storage
