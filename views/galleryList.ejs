@@ -47,6 +47,8 @@
         </div>
 </body>
 <script>
+
+
     function pageMove(page, datasetID, sourceID) {
         var params;
         var url = _PAGE_URL;
@@ -89,21 +91,47 @@
         데이터셋을 불러온다.
         Ajax get
     */
+
+    var keyptTempNameList = new Array;
+
     function loadInfo() {
 
         $.ajax({
-            type: 'get', //데이터 전송 타입,
-            url: _PAGE_URL + 'apidataset', //데이터를 주고받을 파일 주소 입력,
+            type: 'get',
+            url: _PAGE_URL + 'apidataset/keyp',
             //data: datasetInfo,
             //보내는 데이터,
             dataType: 'JSON', //문자형식으로 받기 , 
             success: function (result) {
-                drawCard(result);
+                if (result.length) {
+                    for (i = 0; i < result.length; i++) {
+                        var kyptnamelist = { kypt_id: result[i]._id, kypt_name: result[i].kypt_name, kypt_color: result[i].kypt_json.categories[0].color };
+                        keyptTempNameList.push(kyptnamelist);
+                    }
+                }
+                $.ajax({
+                    type: 'get', //데이터 전송 타입,
+                    url: _PAGE_URL + 'apidataset', //데이터를 주고받을 파일 주소 입력,
+                    //data: datasetInfo,
+                    //보내는 데이터,
+                    dataType: 'JSON', //문자형식으로 받기 , 
+                    success: function (result) {
+
+                        drawCard(result);
+                    },
+                    error: function () {
+                        alert("error");
+                    }
+                });
+
             },
             error: function () {
-                alert("error");
+                console.log(error);
             }
         });
+
+
+
     }
 
     /* 
@@ -137,9 +165,16 @@
         var cardContainer = document.getElementById("gallerylist");
         var cardText = ``;
         var imagesource = " ";
-
         for (var i = 0; i < dataset.length; i++) {
-
+            var kypttemps = ``
+            if (dataset[i].kypt_id[0] != null) {
+                for (j = 0; j < dataset[i].kypt_id.length; j++) {
+                    const foundTemplate = keyptTempNameList.find(obj => obj.kypt_id === dataset[i].kypt_id[j]);
+                    bgcolor = colorWithTransparency(foundTemplate.kypt_color, 0.4)
+                    kypttemps += `<span class="badge" style="margin-right: 5px;color:black; background-color:${bgcolor};">
+                        ${foundTemplate.kypt_name}</span>`
+                }
+            }
 
             //Format UTC Time to Asia/Seoul Timezone
             const date = new Date(dataset[i].dataset_last_update);
@@ -168,6 +203,7 @@
                             <div class="gallery-title" id="${dataset[i]._id}-name" style="">${dataset[i].dataset_name}</div>
                             <span class="" style="color: #666666;">Updated</span>
                             <span class="" id="${dataset[i]._id}-updateDate">` + formattedDate + `</span>
+                            <div>` + kypttemps + `</div>
                         </div>
                     </div>
                 </div>
@@ -176,6 +212,20 @@
 
         cardContainer.innerHTML += cardText;
     }
+
+    function hexToRGBA(hex, alpha = 1) {
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    };
+
+    function colorWithTransparency(hex, transparency) {
+        return hexToRGBA(hex, transparency);
+    };
+
+
 
     function loadDIimage(storageID) {
         var data = "";
