@@ -131,11 +131,11 @@
                 </div>
             </div>
         </div>
+
+        <input type="text" value="" id="copyinput" style="display: none;">
     </div>
 </body>
 <script>
-
-
     /* 
     labelingInfo[0].pose.location.흉골.x
     
@@ -178,7 +178,7 @@
 
 
     $(document).ready(function () {
-        console.log(sto_id);
+        //console.log(sto_id);
         if (sto_id) {
             getDatasetInfo(1);
         } else {
@@ -212,15 +212,15 @@
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            console.log('getdatasetinfo')
+            //console.log('getdatasetinfo')
             const datasetInfo = await response.json();
-            console.log(datasetInfo);
+            //console.log(datasetInfo);
             const divgalleryname = document.getElementById('galleryname');
             divgalleryname.innerHTML = '';
             divgalleryname.innerHTML = datasetInfo.dataset_name;
             img_folder = datasetInfo.image_location;
             label_folder = datasetInfo.label_location;
-            console.log(datasetInfo.kypt_id.length)
+            //console.log(datasetInfo.kypt_id.length)
             if (datasetInfo.kypt_id.length >= 0) {
                 keytemplates = datasetInfo.kypt_id
                 const divlabeltemp = document.getElementById('divlabeltemplate');
@@ -236,7 +236,7 @@
 
             getImage(page, sto_id, img_folder, label_folder);
         } catch (error) {
-            console.error('Error fetching data:', error);
+            //console.error('Error fetching data:', error);
         }
     }
 
@@ -248,35 +248,41 @@
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            console.log('getGetKeypointInfo');
+            //console.log('getGetKeypointInfo');
             const kyptTempInfo = await response.json();
-            console.log(kyptTempInfo);
+            //console.log(kyptTempInfo);
             const bgcolor = colorWithTransparency(kyptTempInfo.kypt_json.categories[0].color, 0.4)
             const divlabeltemp = document.getElementById('divlabeltemplate');
-            divlabeltemp.innerHTML += '<input type="checkbox" class="btn-check" id="btn-none" name="' + kyptTempInfo.kypt_name +
-                '" autocomplete="off" onclick=\'clickLabel(this.name); toggleCanvasVisibility("labelcanvasgallery","' + kyptTempInfo.kypt_name + '");\'><label class="btn" for="btn-none" style="background-color: ' + bgcolor +
-                ';"><div id="eye-icon"><i class="fas fa-eye"></i> ' + kyptTempInfo.kypt_name + '</div></label>';
+            divlabeltemp.innerHTML += '<input type="checkbox" class="btn-check" id="'+ kyptTempInfo.kypt_name +'" name="' + kyptTempInfo.kypt_name +
+                '" autocomplete="off" value="'+kypt_id+'" onclick=\'clickLabel(this.value); toggleCanvasVisibility("labelcanvasgallery","' +
+                kyptTempInfo.kypt_name + '");\'><label class="btn mx-1" for="'+kyptTempInfo.kypt_name+'" style="background-color: ' +
+                bgcolor + ';"><div id="eye-icon'+kyptTempInfo.kypt_name+'"><i class="fas fa-eye"></i> ' + kyptTempInfo.kypt_name + '</div></label>';
             linecolor.push(kyptTempInfo.kypt_json.categories[0].color);
-            const xylocListPush = { keyjsonpt: kyptTempInfo.kypt_json.annotations[0].keypoints_json, keyjsoncolor: kyptTempInfo.kypt_json.categories[0].color }
+            const xylocListPush = {
+                keyjsonpt: kyptTempInfo.kypt_json.annotations[0].keypoints_json,
+                keyjsoncolor: kyptTempInfo.kypt_json.categories[0].color
+            }
             xylocationlist.push(xylocListPush);
-            console.log(xylocationlist);
-            linklines.push({ lines: kyptTempInfo.kypt_json.categories[0].skeleton, linescolor: kyptTempInfo.kypt_json.categories[0].color });
+            //console.log(xylocationlist);
+            linklines.push({
+                lines: kyptTempInfo.kypt_json.categories[0].skeleton,
+                linescolor: kyptTempInfo.kypt_json.categories[0].color
+            });
         } catch (error) {
-            console.error('Error fetching data:', error);
+            //console.error('Error fetching data:', error);
         }
     };
 
     //class = labelcanvasgallery
     function toggleCanvasVisibility(className, kypt_name) {
         const canvases = document.querySelectorAll(`canvas.${className}`);
-        console.log(canvases);
+        //console.log(canvases);
         canvases.forEach(function (canvas) {
             const name = canvas.getAttribute('name');
-            console.log(name);
         });
-        const eyeIcon = document.getElementById('eye-icon');
-        const checkTemp = document.getElementById('btn-none');
-        console.log(eyeIcon);
+        const eyeIcon = document.getElementById('eye-icon' + kypt_name);
+        const checkTemp = document.getElementById(kypt_name);
+        //console.log(eyeIcon);
         canvases.forEach(canvas => {
             canvas.style.display = canvas.style.display === 'none' ? 'block' : 'none';
         });
@@ -371,7 +377,7 @@
 
 
     function getImage(pageCount, stoid, img_folder, label_folder) {
-        console.log(pageCount);
+        //console.log(pageCount);
         var env_path = 'D:\\MgnSData\\Datas\\';
 
         $.ajax({
@@ -383,7 +389,7 @@
             //보내는 데이터,
             dataType: 'JSON', //문자형식으로 받기 , 
             success: function (result) {
-                console.log(result);
+                //console.log(result);
                 imagePath(result, img_folder, label_folder);
                 document.getElementById("totalcount").innerText = result.totalcount.toLocaleString(
                     'ko-KR');
@@ -405,11 +411,11 @@
     Imagepath: http://49.50.160.122:3000/errorimages/2022/7/22/9/24863/24863_0_0x80000000_0.jpg
     */
     function imagePath(result, img_folder, label_folder) {
-        console.log('imagePath');
-        console.log(img_folder);
+        //console.log('imagePath');
+        //console.log(img_folder);
 
         var data = result.mediainfo;
-        console.log(data)
+        //console.log(data)
 
         //url 매핑을 위해 url을 만들어준다.
 
@@ -447,7 +453,7 @@
                 jsonArr.push(jsonParam);
             }
         }
-
+        console.log(pathArr);
         makeGallery(pathArr);
         transfUrlJson(jsonArr);
     }
@@ -494,16 +500,14 @@
             },
             viewerTools: {
                 topLeft: 'label',
-                topRight: 'custom1,playPauseButton, zoomButton, fullscreenButton, viewerShoppingcart, closeButton '
+                topRight: 'labelButton, copyButton, playPauseButton, zoomButton, fullscreenButton, viewerShoppingcart, closeButton '
             },
-            icons: {
-                viewerCustomTool1: '<i class="fa-regular fa-copy" id="btn-copy"  data-clipboard-target="#test1"></i>'
-            },
+            icons: {},
             fnImgToolbarCustClick: myToolbarCustClick,
             // ### gallery content ###
             items: pathArr
         });
-        console.log('makegallery')
+        //console.log('makegallery')
     }
 
 
@@ -612,7 +616,7 @@
     function waitForCanvas(i) {
         return new Promise((resolve) => {
             setTimeout(() => {
-                console.log('Function wait 1s is finished');
+                //console.log('Function wait 1s is finished');
                 resolve();
             }, 300);
         });
@@ -622,7 +626,7 @@
 
 
     function combinedJsonTemplate(JSONlist) {
-        console.log(xylocationlist);
+        //console.log(xylocationlist);
         for (let i = 0; i < JSONlist.length; i++) { //JSONlist.length
             const listofpoints = [];
             for (let j = 0; j < xylocationlist.length; j++) {
@@ -649,7 +653,7 @@
                 "keypoints": listofpoints
             };
             listformatedkeys.push(formatedkey);
-            console.log(listformatedkeys)
+            //console.log(listformatedkeys)
         }
     }
 
@@ -678,9 +682,15 @@
         }
 
         if (!indexFound) {
-            return { xvaluesBefore: [], xvaluesAfter: [] };
+            return {
+                xvaluesBefore: [],
+                xvaluesAfter: []
+            };
         }
-        return { xvaluesBefore, xvaluesAfter };
+        return {
+            xvaluesBefore,
+            xvaluesAfter
+        };
     }
 
     function YvaluesBeforeAndAfterText(arr, text) {
@@ -701,9 +711,15 @@
         }
 
         if (!indexFound) {
-            return { yvaluesBefore: [], yvaluesAfter: [] };
+            return {
+                yvaluesBefore: [],
+                yvaluesAfter: []
+            };
         }
-        return { yvaluesBefore, yvaluesAfter };
+        return {
+            yvaluesBefore,
+            yvaluesAfter
+        };
     }
 
 
@@ -725,7 +741,7 @@
 
 
         // Draw keypoints
-        console.log(listformatedkeys);
+        //console.log(listformatedkeys);
         listformatedkeys[index].keypoints.forEach(point => {
             var pointcolor = point.key;
             ctx.beginPath();
@@ -740,7 +756,7 @@
         });
 
         // Draw lines
-        console.log(linklines);
+        //console.log(linklines);
 
         if (linklines.length == 0) {
             linklines.lines.forEach(line => {
@@ -755,8 +771,7 @@
                 ctx.stroke();
                 ctx.closePath();
             });
-        }
-        else {
+        } else {
             for (i = 0; i < linklines.length; i++) {
                 linklines[i].lines.forEach(line => {
                     var linecolor = linklines[i].linescolor;
@@ -782,8 +797,8 @@
     //---------------------Draw Template---------------------------------
 
     function drawCanvas(data, i) {
-        console.log(data);
-        console.log(i);
+        //console.log(data);
+        //console.log(i);
         const canvasindex = "canvas" + i;
         const canvas = document.getElementById(canvasindex);
         const ctx = canvas.getContext('2d');
@@ -812,6 +827,76 @@
             ctx.stroke();
             ctx.closePath();
         });
+    }
+
+    //Light box
+    function lightboxDrawTemplate() {
+        let url = document.location.href;
+        var sectionId = url.split("#");
+        var canvasId = sectionId[1].split("/");
+        var canvasIndex = canvasId[3] % 49;
+
+        const canvas = document.getElementById("zoomcanv" + canvasIndex);
+        const ctx = canvas.getContext('2d');
+        $("#zoomcanv" + canvasIndex).toggleClass('onlabel');
+
+        if ($("#zoomcanv" + canvasIndex).hasClass("onlabel") === true) {
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            width = canvas.clientWidth;
+            height = canvas.clientHeight;
+
+            ctx.width = width;
+            ctx.height = height;
+
+            listformatedkeys[canvasIndex - 1].keypoints.forEach(point => {
+                var pointcolor = point.key;
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI);
+                ctx.fillStyle = pointcolor;
+                ctx.fill();
+                ctx.strokeStyle = pointcolor;
+                ctx.lineWidth = 0.5;
+                ctx.stroke();
+                ctx.closePath();
+            });
+
+            // Draw lines        
+            for (i = 0; i < linklines.length; i++) {
+
+                linklines[i].lines.forEach(line => {
+                    const from = listformatedkeys[canvasIndex - 1].keypoints[line[0]];
+                    const to = listformatedkeys[canvasIndex - 1].keypoints[line[1]];
+
+                    ctx.beginPath();
+                    ctx.moveTo(from.x, from.y);
+                    ctx.lineTo(to.x, to.y);
+                    ctx.strokeStyle = linklines[i].linescolor;;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                    ctx.closePath();
+                });
+            }
+
+        } else {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    }
+
+    function getPath() {
+        var path = jQuery('.nGY2ViewerMedia').attr("src");
+        var copyText = document.getElementById("copyinput");
+        copyText.value = path;
+
+        // Select the text field
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); // For mobile devices
+
+        // Copy the text inside the text field
+        navigator.clipboard.writeText(copyText.value);
+
+        // Alert the copied text
+        alert("Copy Image URL : " + copyText.value);
     }
 </script>
 
