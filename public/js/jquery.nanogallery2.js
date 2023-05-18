@@ -5866,6 +5866,7 @@
         newElt[newEltIdx++] = '    <div class="nGY2GThumbnailDescription" ' + G.tn.style.getDesc() + '>' + getTumbnailDescription(item) + '</div>';
         newElt[newEltIdx++] = '  </div>';
 
+        //Draw Keypoint custom function
         drawpointsindex(idx);
       }
 

@@ -186,19 +186,6 @@
         }
     });
 
-    function draw() {
-
-        var canvas = document.getElementById('canvas1');
-        var ctx = canvas.getContext('2d');
-        ctx.beginPath();
-        ctx.rect(100, 100, 200, 100);
-        ctx.fillStyle = 'yellow';
-        ctx.fill();
-        ctx.lineWidth = 5;
-        ctx.strokeStyle = 'black';
-        ctx.stroke();
-    }
-
     var img_folder = '';
     var label_folder = '';
 
@@ -253,18 +240,22 @@
             //console.log(kyptTempInfo);
             const bgcolor = colorWithTransparency(kyptTempInfo.kypt_json.categories[0].color, 0.4)
             const divlabeltemp = document.getElementById('divlabeltemplate');
-            divlabeltemp.innerHTML += '<input type="checkbox" class="btn-check" id="'+ kyptTempInfo.kypt_name +'" name="' + kyptTempInfo.kypt_name +
-                '" autocomplete="off" value="'+kypt_id+'" onclick=\'clickLabel(this.value); toggleCanvasVisibility("labelcanvasgallery","' +
-                kyptTempInfo.kypt_name + '");\'><label class="btn mx-1" for="'+kyptTempInfo.kypt_name+'" style="background-color: ' +
-                bgcolor + ';"><div id="eye-icon'+kyptTempInfo.kypt_name+'"><i class="fas fa-eye"></i> ' + kyptTempInfo.kypt_name + '</div></label>';
+            divlabeltemp.innerHTML += `
+            <input type="checkbox" class="btn-check" id="${kyptTempInfo.kypt_name}" name="btn-template" autocomplete="off" 
+            value="${kypt_id}" onclick="toggleCanvasVisibility('labelcanvasgallery','${kyptTempInfo.kypt_name}'); drawSelectTemplate();" checked>
+            <label class="btn mx-1" for="${kyptTempInfo.kypt_name}" style="background-color: ${bgcolor};">
+                    <div id="eye-icon${kyptTempInfo.kypt_name}"><i class="fas fa-eye"></i>${kyptTempInfo.kypt_name}</div>
+            </label>`;
             linecolor.push(kyptTempInfo.kypt_json.categories[0].color);
             const xylocListPush = {
+                keypoint_id: kypt_id,
                 keyjsonpt: kyptTempInfo.kypt_json.annotations[0].keypoints_json,
                 keyjsoncolor: kyptTempInfo.kypt_json.categories[0].color
             }
             xylocationlist.push(xylocListPush);
             //console.log(xylocationlist);
             linklines.push({
+                keypoint_id: kypt_id,
                 lines: kyptTempInfo.kypt_json.categories[0].skeleton,
                 linescolor: kyptTempInfo.kypt_json.categories[0].color
             });
@@ -275,6 +266,7 @@
 
     //class = labelcanvasgallery
     function toggleCanvasVisibility(className, kypt_name) {
+        return;
         const canvases = document.querySelectorAll(`canvas.${className}`);
         //console.log(canvases);
         canvases.forEach(function (canvas) {
@@ -282,15 +274,17 @@
         });
         const eyeIcon = document.getElementById('eye-icon' + kypt_name);
         const checkTemp = document.getElementById(kypt_name);
-        //console.log(eyeIcon);
+
         canvases.forEach(canvas => {
             canvas.style.display = canvas.style.display === 'none' ? 'block' : 'none';
         });
 
         if (checkTemp.checked) {
-            eyeIcon.innerHTML = '<i class="fas fa-eye-slash"></i> ' + kypt_name;
-        } else {
             eyeIcon.innerHTML = '<i class="fas fa-eye"></i> ' + kypt_name;
+
+        } else {
+            eyeIcon.innerHTML = '<i class="fas fa-eye-slash"></i> ' + kypt_name;
+
         }
 
 
@@ -453,7 +447,6 @@
                 jsonArr.push(jsonParam);
             }
         }
-        console.log(pathArr);
         makeGallery(pathArr);
         transfUrlJson(jsonArr);
     }
@@ -557,6 +550,8 @@
     pagecount : id = page-count
     */
     function countPage(attr) {
+        xylocationlist = [];
+        linklines = [];
         var pageCnt = document.getElementById("page-count").value;
         var pageMax = Number(document.getElementById("page-total").innerText);
 
@@ -597,7 +592,10 @@
 
         try {
             const combinedJsonArray = await Promise.all(jsonPromises);
-            combinedJsonTemplate(combinedJsonArray);
+            LABEL_KEYPOINT = combinedJsonArray;
+            selectTemplate();
+
+            //combinedJsonTemplate(combinedJsonArray);
         } catch (error) {
             console.error('Error fetching JSON data:', error);
         }
@@ -610,6 +608,37 @@
             jsonlistgalery.push(jsonUrlLoc);
         });
         fetchAndCombineJson(jsonlistgalery);
+    }
+
+    var LABEL_KEYPOINT;
+    var TEMPLATE_LIST;
+    var TEMPLATE_KEY_MATCH = [];
+
+    //템플릿을 선택한다.
+    function selectTemplate() {
+
+        var selectedID = new Array();
+        $("input[name='btn-template']").each(function () {
+            var tmpVal = $(this).val();
+            selectedID.push(tmpVal);
+        });
+
+        TEMPLATE_KEY_MATCH = [];
+        
+        TEMPLATE_LIST = xylocationlist;
+        for (var i = 0; i < selectedID.length; i++) {
+            $.each(TEMPLATE_LIST, function (index, row) {
+                if (TEMPLATE_LIST[index].keypoint_id == selectedID[i]) {
+                    var list = combinedJsonTemplate(LABEL_KEYPOINT, TEMPLATE_LIST[index]);
+                    var formatedkey = {
+                        "keypoint_id": selectedID[i],
+                        "keypoint_list": list
+                    };
+                    TEMPLATE_KEY_MATCH.push(formatedkey);
+                }
+            });
+        }
+
     }
 
 
@@ -625,38 +654,36 @@
 
 
 
-    function combinedJsonTemplate(JSONlist) {
-        //console.log(xylocationlist);
+    function combinedJsonTemplate(JSONlist, templateList) {
+        listformatedkeys = [];
         for (let i = 0; i < JSONlist.length; i++) { //JSONlist.length
             const listofpoints = [];
-            for (let j = 0; j < xylocationlist.length; j++) {
-                for (let k = 0; k < xylocationlist[j].keyjsonpt.length; k++) {
-                    const pathx = xylocationlist[j].keyjsonpt[k][0];
-                    const pathy = xylocationlist[j].keyjsonpt[k][1];
-                    const Xparts = pathx.split(">>");
-                    const Yparts = pathy.split(">>");
-                    const valueBeforeText = valuesBeforeText(Xparts, 'index');
-                    if (valueBeforeText == "") {
-                        const valuex = getObjectReference(pathx, JSONlist[i]);
-                        const valuey = getObjectReference(pathy, JSONlist[i]);
-                        const multipliedValue = {
-                            x: valuex * 0.1555,
-                            y: valuey * 0.14,
-                            key: xylocationlist[j].keyjsoncolor
-                        };
-                        listofpoints.push(multipliedValue);
-                    }
-
+            for (let k = 0; k < templateList.keyjsonpt.length; k++) {
+                const pathx = templateList.keyjsonpt[k][0];
+                const pathy = templateList.keyjsonpt[k][1];
+                const Xparts = pathx.split(">>");
+                const Yparts = pathy.split(">>");
+                const valueBeforeText = valuesBeforeText(Xparts, 'index');
+                if (valueBeforeText == "") {
+                    const valuex = getObjectReference(pathx, JSONlist[i]);
+                    const valuey = getObjectReference(pathy, JSONlist[i]);
+                    const multipliedValue = {
+                        x: valuex * 0.1555,
+                        y: valuey * 0.14,
+                        key: templateList.keyjsoncolor
+                    };
+                    listofpoints.push(multipliedValue);
                 }
+
+
             }
             var formatedkey = {
                 "keypoints": listofpoints
             };
             listformatedkeys.push(formatedkey);
-            //console.log(listformatedkeys)
         }
+        return listformatedkeys;
     }
-
     /*
         x: value.x * 0.1555,
                         y: value.y * 0.14,
@@ -722,11 +749,7 @@
         };
     }
 
-
-
     async function drawpointsindex(idx) {
-
-
         await waitForCanvas();
         const index = idx - 1;
         const canvasindex = "canvas" + (index + 1);
@@ -734,26 +757,31 @@
 
         const canvas = document.getElementById(canvasindex);
         const ctx = canvas.getContext('2d');
-        const zoomcanv = document.getElementById(zoomcanvindex)
-        const zctx = zoomcanv.getContext('2d');
+        //const zoomcanv = document.getElementById(zoomcanvindex)
+        //const zctx = zoomcanv.getContext('2d');
 
-
-
-
-        // Draw keypoints
-        //console.log(listformatedkeys);
-        listformatedkeys[index].keypoints.forEach(point => {
-            var pointcolor = point.key;
-            ctx.beginPath();
-            ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI);
-            ctx.fillStyle = pointcolor;
-            ctx.fill();
-            ctx.strokeStyle = pointcolor;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-            ctx.closePath();
-
+        var selectedID = [];
+        $("input[name='btn-template']:checked").each(function () {
+            var tmpVal = $(this).val();
+            selectedID.push(tmpVal);
         });
+        /*선택한 템플릿에 맞는 키포인트를 그린다.*/
+
+        //console.log(TEMPLATE_KEY_MATCH); // 6
+        TEMPLATE_KEY_MATCH.forEach((list, ind) => {
+                list.keypoint_list[index].keypoints.forEach(point => {
+                    var pointcolor = point.key;
+                    ctx.beginPath();
+                    ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI);
+                    ctx.fillStyle = pointcolor;
+                    ctx.fill();
+                    ctx.strokeStyle = pointcolor;
+                    ctx.lineWidth = 0.5;
+                    ctx.stroke();
+                    ctx.closePath();
+                });
+        })
+
 
         // Draw lines
         //console.log(linklines);
@@ -772,19 +800,22 @@
                 ctx.closePath();
             });
         } else {
-            for (i = 0; i < linklines.length; i++) {
-                linklines[i].lines.forEach(line => {
-                    var linecolor = linklines[i].linescolor;
-                    const from = listformatedkeys[index].keypoints[line[0]];
-                    const to = listformatedkeys[index].keypoints[line[1]];
 
-                    ctx.beginPath();
-                    ctx.moveTo(from.x, from.y);
-                    ctx.lineTo(to.x, to.y);
-                    ctx.strokeStyle = linecolor;
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-                    ctx.closePath();
+
+            //console.log(linklines);
+            for (i = 0; i < linklines.length; i++) {
+                linklines[i].lines.forEach((line, ind) => {
+                        var linecolor = linklines[i].linescolor;
+                        const from = TEMPLATE_KEY_MATCH[i].keypoint_list[index].keypoints[line[0]];
+                        const to = TEMPLATE_KEY_MATCH[i].keypoint_list[index].keypoints[line[1]];
+
+                        ctx.beginPath();
+                        ctx.moveTo(from.x, from.y);
+                        ctx.lineTo(to.x, to.y);
+                        ctx.strokeStyle = linecolor;
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                        ctx.closePath();
                 });
 
             }
@@ -793,6 +824,79 @@
 
     }
 
+    //-------------------------------------------------------------------
+    //select template
+
+    function drawSelectTemplate() {
+
+        try {
+            for (index = 0; index < 49; index++) {
+                const canvasindex = "canvas" + (index + 1);
+
+                const canvas = document.getElementById(canvasindex);
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+
+                var selectedID = [];
+                $("input[name='btn-template']:checked").each(function () {
+                    var tmpVal = $(this).val();
+                    selectedID.push(tmpVal);
+                })
+
+
+                /*선택한 템플릿에 맞는 키포인트를 그린다.*/
+                TEMPLATE_KEY_MATCH.forEach((list, ind) => {
+                    selectedID.forEach((selected) => {
+                        if (list.keypoint_id == selected) {
+                            list.keypoint_list[index].keypoints.forEach(point => {
+                                pointcolor = point.key;
+                                ctx.beginPath();
+                                ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI);
+                                ctx.fillStyle = pointcolor;
+                                ctx.fill();
+                                ctx.strokeStyle = pointcolor;
+                                ctx.lineWidth = 0.5;
+                                ctx.stroke();
+                                ctx.closePath();
+                            });
+                        }
+                    });
+
+
+
+                })
+
+
+                // Draw lines
+
+                //console.log(linklines);
+                for (i = 0; i < linklines.length; i++) {
+                    linklines[i].lines.forEach((line, ind) => {
+                        selectedID.forEach((selected) => {
+                            if (linklines[i].keypoint_id == selected) {
+                                var linecolor = linklines[i].linescolor;
+                                const from = TEMPLATE_KEY_MATCH[i].keypoint_list[index].keypoints[line[0]];
+                                const to = TEMPLATE_KEY_MATCH[i].keypoint_list[index].keypoints[line[1]];
+
+                                ctx.beginPath();
+                                ctx.moveTo(from.x, from.y);
+                                ctx.lineTo(to.x, to.y);
+                                ctx.strokeStyle = linecolor;
+                                ctx.lineWidth = 1;
+                                ctx.stroke();
+                                ctx.closePath();
+                            }
+                        });
+                    });
+
+                }
+            }
+        } catch (err) {
+            return;
+        }
+
+    }
 
     //---------------------Draw Template---------------------------------
 
@@ -883,6 +987,7 @@
         }
     }
 
+    //lightbox copy button
     function getPath() {
         var path = jQuery('.nGY2ViewerMedia').attr("src");
         var copyText = document.getElementById("copyinput");
