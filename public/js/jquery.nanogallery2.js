@@ -1738,7 +1738,7 @@
       sharePinterest: '<i style="color:#cb2027;" class="nGY2Icon-pinterest-squared"></i>',
       shareVK: '<i style="color:#3b5998;" class="nGY2Icon-vkontakte"></i>',
       shareMail: '<i style="color:#555;" class="nGY2Icon-mail-alt"></i>',
-      labelButton: `<i class="fa-solid fa-draw-polygon nGY2Icon mx-2" onclick="lightboxDrawTemplate();"></i>`,
+      labelButton: ``,
       copyButton: `<i class="fa-solid fa-clone nGY2Icon mx-2" onclick="getPath();"></i>`,
       viewerCustomTool1: 'T1',
       viewerCustomTool2: 'T2',
@@ -10458,7 +10458,7 @@
           r += 'closeButton nGEvent" data-ngy2action="shoppingcart">' + G.O.icons.viewerShoppingcart + '</div>';
           break;
         case 'labelButton':
-          r += ' nGvent" data-ngy2action="label">' + G.O.icons.labelButton + '</div>';
+          r += ' nGvent labelButtons" id="lightbox-template" data-ngy2action="label">' + G.O.icons.labelButton + '</div>';
           break;
         case 'copyButton':
           r += ' nGvent" data-ngy2action="copy">' + G.O.icons.copyButton + '</div>';
