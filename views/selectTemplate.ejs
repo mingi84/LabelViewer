@@ -339,7 +339,7 @@
             const combinedJsonArray = await Promise.all(jsonPromises);
 
 
-            LABEL_KEYPOINT = combinedJsonArray;
+            labelKeypoint = combinedJsonArray;
             selectTemplate(1);
             //combinedJsonTemplate(combinedJsonArray);
         } catch (error) {
@@ -351,7 +351,7 @@
     function selectTemplate(num) {
 
         if (typeof num == "undefined") {
-            num = CLICKIMAGENUM;
+            num = clickNum;
         }
 
         clearCanvas();
@@ -360,19 +360,19 @@
         for (var i = 0; i < selectedID.length; i++) {
             $.each(keypointList, function (index, row) {
                 if (keypointList[index]._id == selectedID[i]) {
-                    combinedJsonTemplate(LABEL_KEYPOINT, keypointList[index], selectedID[i], num);
+                    combinedJsonTemplate(labelKeypoint, keypointList[index], selectedID[i], num);
                 }
             });
         }
     }
 
-    var CLICKIMAGENUM = 1; //선택한 이미지 number
+    var clickNum = 1; //선택한 이미지 number
     var keypointList = ''; //템플릿 리스트
-    var LABEL_KEYPOINT = ''; //이미지- 라벨의 키포인트
+    var labelKeypoint = ''; //이미지- 라벨의 키포인트
     var listformatedkeys = []; //key-value 매칭 키포인트
     var linklines = ''; //그릴 line 정보
 
-    function combinedJsonTemplate(JSONlist, templateJson, ID, num) { //LABEL_KEYPOINT == JSONlist
+    function combinedJsonTemplate(JSONlist, templateJson, ID, num) { //labelKeypoint == JSONlist
         listformatedkeys = []; //그릴 때 초기화
         var select_keypoint = templateJson;
         color = select_keypoint.kypt_json.categories[0].color;
@@ -428,6 +428,7 @@
             listformatedkeys.push(formatedkey);
         }
         //drawExistInfo(selected_item)
+        console.log(listformatedkeys);
         drawpointsindex(num, color);
 
     }
@@ -805,7 +806,7 @@
     썸네일을 클릭하면 선택한 이미지와 왼쪽의 확대 이미지에 템플릿을 적용하여 보여준다.
     */
     function clickThumbnail(clickSrc, num) {
-        CLICKIMAGENUM = num;
+        clickNum = num;
         document.getElementById("image-plus").style.backgroundImage = `url('${clickSrc}')`
     }
 
