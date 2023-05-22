@@ -72,18 +72,6 @@
             <div class="col-8">
                 <div style="color: #666666;">Label Show</div>
                 <div id="divlabeltemplate">
-                    <input type="checkbox" class="btn-check" id="btn-none" name="none" autocomplete="off"
-                        onclick="clickLabel(this.name); draw();">
-                    <label class="btn" for="btn-none" style="background-color: #f4f4f4;">none</label>
-
-                    <input type="checkbox" class="btn-check" name="tag-label" id="B-box-soccer"
-                        onclick="clickLabel(this.name);" autocomplete="off">
-                    <label class="btn tag-label" for="B-box-soccer"
-                        style="background-color: #FFB9B9;">B-box-soccer</label>
-
-                    <input type="checkbox" class="btn-check " name="tag-label" id="B-box-s"
-                        onclick="clickLabel(this.name);" autocomplete="off">
-                    <label class="btn tag-label" for="B-box-s" style="background-color: #D9D9D9;">B-box-s</label>
                 </div>
             </div>
             <div class="col-2 d-flex align-items-end justify-content-end">
@@ -153,7 +141,7 @@
     var xylocationlist = [];
     var linklines = [];
     var listformatedkeys = [];
-    var labelKeypoint; 
+    var labelKeypoint;
     var templateList;
     var templateKeyMatch = [];
 
@@ -252,6 +240,7 @@
             linecolor.push(kyptTempInfo.kypt_json.categories[0].color);
             const xylocListPush = {
                 keypoint_id: kypt_id,
+                keypoint_name: kyptTempInfo.kypt_name,
                 keyjsonpt: kyptTempInfo.kypt_json.annotations[0].keypoints_json,
                 keyjsoncolor: kyptTempInfo.kypt_json.categories[0].color
             }
@@ -269,18 +258,8 @@
 
     //class = labelcanvasgallery
     function toggleCanvasVisibility(className, kypt_name) {
-        return;
-        const canvases = document.querySelectorAll(`canvas.${className}`);
-        //console.log(canvases);
-        canvases.forEach(function (canvas) {
-            const name = canvas.getAttribute('name');
-        });
         const eyeIcon = document.getElementById('eye-icon' + kypt_name);
         const checkTemp = document.getElementById(kypt_name);
-
-        canvases.forEach(canvas => {
-            canvas.style.display = canvas.style.display === 'none' ? 'block' : 'none';
-        });
 
         if (checkTemp.checked) {
             eyeIcon.innerHTML = '<i class="fas fa-eye"></i> ' + kypt_name;
@@ -496,33 +475,34 @@
             },
             viewerTools: {
                 topLeft: 'label',
-                topRight: 'labelButton, copyButton, playPauseButton, zoomButton, fullscreenButton, viewerShoppingcart, closeButton '
+                topRight: 'custom2 ,labelButton, copyButton, playPauseButton, zoomButton, fullscreenButton, viewerShoppingcart, closeButton '
             },
-            icons: {},
-            fnImgToolbarCustClick: myToolbarCustClick,
+            icons: {
+                viewerCustomTool2: ''
+            },
+            fnImgToolbarCustDisplay: myToolbarCustDisplay,
             // ### gallery content ###
             items: pathArr
         });
         //console.log('makegallery')
     }
 
+    // Callback on display of a new media in the lightbox
+    function myToolbarCustDisplay($customToolbarElements, item) {
 
-
-
-    // Click event on custom lightbox toolbar element
-    function myToolbarCustClick(customElementName, $customIcon, item) {
-        // Display the title of the current displayed image
-        if (customElementName == 'custom1') {
-            //alert('Image path: ' + item.src);
-            var tempElement = document.createElement("textarea");
-            document.body.appendChild(tempElement);
-            tempElement.value = item.src;
-            tempElement.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempElement);
+        const template = document.getElementById("lightbox-template");
+        template.innerHTML = "";
+        t_template = JSON.stringify(templateList);
+        for (var i = 0; i < templateList.length; i++) {
+            template.innerHTML += `
+                <input type="checkbox" class="btn-check" name="tag-label-lightbox" id="lightbox-${templateList[i].keypoint_id}" value ="${templateList[i].keypoint_id}"
+                onclick="clickLabel(this.name); lightboxDrawTemplate();" autocomplete="off" checked>
+                    <label class="btn tag-label" for="lightbox-${templateList[i].keypoint_id}"
+                    style="background-color: ${templateList[i].keyjsoncolor}; color:#fff;">${templateList[i].keypoint_name}
+                    </label>`
         }
+        lightboxDrawTemplate();
     }
-
 
     /*
     템플릿을 선택하지 않는 경우에 대한 행동 처리
@@ -623,7 +603,7 @@
         });
 
         templateKeyMatch = [];
-        
+
         templateList = xylocationlist;
         for (var i = 0; i < selectedID.length; i++) {
             $.each(templateList, function (index, row) {
@@ -768,17 +748,17 @@
 
         //console.log(templateKeyMatch); // 6
         templateKeyMatch.forEach((list, ind) => {
-                list.keypoint_list[index].keypoints.forEach(point => {
-                    var pointcolor = point.key;
-                    ctx.beginPath();
-                    ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI);
-                    ctx.fillStyle = pointcolor;
-                    ctx.fill();
-                    ctx.strokeStyle = pointcolor;
-                    ctx.lineWidth = 0.5;
-                    ctx.stroke();
-                    ctx.closePath();
-                });
+            list.keypoint_list[index].keypoints.forEach(point => {
+                var pointcolor = point.key;
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI);
+                ctx.fillStyle = pointcolor;
+                ctx.fill();
+                ctx.strokeStyle = pointcolor;
+                ctx.lineWidth = 0.5;
+                ctx.stroke();
+                ctx.closePath();
+            });
         })
 
 
@@ -804,17 +784,17 @@
             //console.log(linklines);
             for (i = 0; i < linklines.length; i++) {
                 linklines[i].lines.forEach((line, ind) => {
-                        var linecolor = linklines[i].linescolor;
-                        const from = templateKeyMatch[i].keypoint_list[index].keypoints[line[0]];
-                        const to = templateKeyMatch[i].keypoint_list[index].keypoints[line[1]];
+                    var linecolor = linklines[i].linescolor;
+                    const from = templateKeyMatch[i].keypoint_list[index].keypoints[line[0]];
+                    const to = templateKeyMatch[i].keypoint_list[index].keypoints[line[1]];
 
-                        ctx.beginPath();
-                        ctx.moveTo(from.x, from.y);
-                        ctx.lineTo(to.x, to.y);
-                        ctx.strokeStyle = linecolor;
-                        ctx.lineWidth = 1;
-                        ctx.stroke();
-                        ctx.closePath();
+                    ctx.beginPath();
+                    ctx.moveTo(from.x, from.y);
+                    ctx.lineTo(to.x, to.y);
+                    ctx.strokeStyle = linecolor;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                    ctx.closePath();
                 });
 
             }
@@ -875,7 +855,8 @@
                         selectedID.forEach((selected) => {
                             if (linklines[i].keypoint_id == selected) {
                                 var linecolor = linklines[i].linescolor;
-                                const from = templateKeyMatch[i].keypoint_list[index].keypoints[line[0]];
+                                const from = templateKeyMatch[i].keypoint_list[index].keypoints[line[
+                                    0]];
                                 const to = templateKeyMatch[i].keypoint_list[index].keypoints[line[1]];
 
                                 ctx.beginPath();
@@ -941,9 +922,12 @@
 
         const canvas = document.getElementById("zoomcanv" + canvasIndex);
         const ctx = canvas.getContext('2d');
-        $("#zoomcanv" + canvasIndex).toggleClass('onlabel');
 
-        if ($("#zoomcanv" + canvasIndex).hasClass("onlabel") === true) {
+        var selectedID = [];
+        $("input[name='tag-label-lightbox']:checked").each(function () {
+            var tmpVal = $(this).val();
+            selectedID.push(tmpVal);
+        });
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             width = canvas.clientWidth;
@@ -952,38 +936,54 @@
             ctx.width = width;
             ctx.height = height;
 
-            listformatedkeys[canvasIndex - 1].keypoints.forEach(point => {
-                var pointcolor = point.key;
-                ctx.beginPath();
-                ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI);
-                ctx.fillStyle = pointcolor;
-                ctx.fill();
-                ctx.strokeStyle = pointcolor;
-                ctx.lineWidth = 0.5;
-                ctx.stroke();
-                ctx.closePath();
-            });
-
-            // Draw lines        
-            for (i = 0; i < linklines.length; i++) {
-
-                linklines[i].lines.forEach(line => {
-                    const from = listformatedkeys[canvasIndex - 1].keypoints[line[0]];
-                    const to = listformatedkeys[canvasIndex - 1].keypoints[line[1]];
-
-                    ctx.beginPath();
-                    ctx.moveTo(from.x, from.y);
-                    ctx.lineTo(to.x, to.y);
-                    ctx.strokeStyle = linklines[i].linescolor;;
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-                    ctx.closePath();
+            /*선택한 템플릿에 맞는 키포인트를 그린다.*/
+            templateKeyMatch.forEach((list, ind) => {
+                selectedID.forEach((selected) => {
+                    if (list.keypoint_id == selected) {
+                        list.keypoint_list[canvasIndex-1].keypoints.forEach(point => {
+                            pointcolor = point.key;
+                            ctx.beginPath();
+                            ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI);
+                            ctx.fillStyle = pointcolor;
+                            ctx.fill();
+                            ctx.strokeStyle = pointcolor;
+                            ctx.lineWidth = 0.5;
+                            ctx.stroke();
+                            ctx.closePath();
+                        });
+                    }
                 });
-            }
 
-        } else {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
+
+
+            })
+
+
+            // Draw lines
+
+            //console.log(linklines);
+            for (i = 0; i < linklines.length; i++) {
+                linklines[i].lines.forEach((line, ind) => {
+                    selectedID.forEach((selected) => {
+                        if (linklines[i].keypoint_id == selected) {
+                            var linecolor = linklines[i].linescolor;
+                            const from = templateKeyMatch[i].keypoint_list[canvasIndex-1].keypoints[line[
+                                0]];
+                            const to = templateKeyMatch[i].keypoint_list[canvasIndex-1].keypoints[line[1]];
+
+                            ctx.beginPath();
+                            ctx.moveTo(from.x, from.y);
+                            ctx.lineTo(to.x, to.y);
+                            ctx.strokeStyle = linecolor;
+                            ctx.lineWidth = 1;
+                            ctx.stroke();
+                            ctx.closePath();
+                        }
+                    });
+                });
+
+
+            }
     }
 
     //lightbox copy button
