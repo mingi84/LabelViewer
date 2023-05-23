@@ -11742,11 +11742,23 @@
         }
         return;
       }
+      console.log(G);
+      console.log(G.baseEltID);
 
-      var newLocationHash = '#' + 'nanogallery/' + G.baseEltID + '/' + albumID;
-      if (imageID != '') {
-        newLocationHash += '/' + imageID;
+
+      //var newLocationHash = '#' + 'nanogallery/' + G.baseEltID + '/' + albumID; //원본 <-- by.misun url 페이지+이미지 번호
+      var page = document.getElementById("page-count").value;
+      var imageNum = imageID % 49;
+      if(imageNum == 0){
+        imageNum = 49;
       }
+
+      var newLocationHash = '#' + 'nanogallery/' + G.baseEltID + '/' + page;
+      if (imageID != '') {
+        newLocationHash += '/' + imageNum;
+      }
+
+      //여기까지 커스텀 -->
 
       var lH = location.hash;
       if (G.O.debugMode) {

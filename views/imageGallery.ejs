@@ -951,10 +951,8 @@
         let url = document.location.href;
         var sectionId = url.split("#");
         var canvasId = sectionId[1].split("/");
-        var canvasIndex = canvasId[3] % 49;
-        if (canvasIndex == 0) {
-            canvasIndex = 49;
-        }
+        var canvasIndex = canvasId[3];
+
 
         const canvas = document.getElementById("zoomcanv" + canvasIndex);
         const ctx = canvas.getContext('2d');
