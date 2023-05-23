@@ -52,11 +52,11 @@
                     <div class="col">
                         <div class="card" style="height: 280px;" id="type-api">
                             <div class="card-body" id="template-list">
-                                <button type="button" class="btn btn-primary"
+                                <button type="button" class="btn btn-primary m-1"
                                     onclick="pageMove('createtemplate')">+add</button>
                                 <input type="checkbox" class="btn-check" id="btn-none" name="none" autocomplete="off"
                                     onclick="clickLabel(this.name);">
-                                <label class="btn" for="btn-none" style="background-color: #f4f4f4;">none</label>
+                                <label class="btn m-1" for="btn-none" style="background-color: #f4f4f4;">none</label>
 
                             </div>
                         </div>
@@ -428,7 +428,7 @@
             listformatedkeys.push(formatedkey);
         }
         //drawExistInfo(selected_item)
-        console.log(listformatedkeys);
+        //console.log(listformatedkeys);
         drawpointsindex(num, color);
 
     }
@@ -633,7 +633,7 @@
     //처음에 선택값 불러와서 그려주는 코드
     function loadSelectedTemplate(result) {
         var selectKey = result.kypt_id;
-        if (selectKey.length > 0 && selectKey[0] !== '') {
+        if (selectKey.length > 0 && selectKey[0] !== '' && selectKey[0] !== null) {
             selectKey.forEach(function (item) {
                 document.getElementById("template-" + item).checked = true;
             });
@@ -733,7 +733,7 @@
             template.innerHTML += `
                 <input type="checkbox" class="btn-check" name="tag-label" id="template-${templateInfo[i]._id}" value ="${templateInfo[i]._id}"
                 onclick="clickLabel(this.name); showInfo('${templateInfo[i]._id}'); selectTemplate();" autocomplete="off">
-                    <label class="btn tag-label" for="template-${templateInfo[i]._id}"
+                    <label class="btn tag-label m-1" for="template-${templateInfo[i]._id}"
                     style="background-color: ${templateInfo[i].kypt_json.categories[0].color};">
                         <div class="d-flex" style="color:${getTextColor(templateInfo[i].kypt_json.categories[0].color)};">
                             <div id="template-name-${templateInfo[i]._id}">${templateInfo[i].kypt_name}</div>
