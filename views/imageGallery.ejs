@@ -780,8 +780,8 @@
                 const to = listformatedkeys[index].keypoints[line[1]];
 
                 ctx.beginPath();
-                ctx.moveTo(from.x * zthumb_width, from.y* zthumb_height);
-                ctx.lineTo(to.x * zthumb_width, to.y* zthumb_height);
+                ctx.moveTo(from.x * zthumb_width, from.y * zthumb_height);
+                ctx.lineTo(to.x * zthumb_width, to.y * zthumb_height);
                 ctx.strokeStyle = linecolor;
                 ctx.lineWidth = 1;
                 ctx.stroke();
@@ -798,8 +798,8 @@
                     const to = templateKeyMatch[i].keypoint_list[index].keypoints[line[1]];
 
                     ctx.beginPath();
-                    ctx.moveTo(from.x * zthumb_width, from.y* zthumb_height);
-                    ctx.lineTo(to.x * zthumb_width, to.y* zthumb_height);
+                    ctx.moveTo(from.x * zthumb_width, from.y * zthumb_height);
+                    ctx.lineTo(to.x * zthumb_width, to.y * zthumb_height);
                     ctx.strokeStyle = linecolor;
                     ctx.lineWidth = 3;
                     ctx.stroke();
@@ -842,7 +842,8 @@
                             list.keypoint_list[index].keypoints.forEach(point => {
                                 pointcolor = point.key;
                                 ctx.beginPath();
-                                ctx.arc(point.x * zthumb_width, point.y * zthumb_height,4, 0, 2 * Math.PI);
+                                ctx.arc(point.x * zthumb_width, point.y * zthumb_height, 4, 0,
+                                    2 * Math.PI);
                                 ctx.fillStyle = pointcolor;
                                 ctx.fill();
                                 ctx.strokeStyle = pointcolor;
@@ -871,8 +872,8 @@
                                 const to = templateKeyMatch[i].keypoint_list[index].keypoints[line[1]];
 
                                 ctx.beginPath();
-                                ctx.moveTo(from.x *zthumb_width, from.y *zthumb_height);
-                                ctx.lineTo(to.x *zthumb_width, to.y *zthumb_height);
+                                ctx.moveTo(from.x * zthumb_width, from.y * zthumb_height);
+                                ctx.lineTo(to.x * zthumb_width, to.y * zthumb_height);
                                 ctx.strokeStyle = linecolor;
                                 ctx.lineWidth = 3;
                                 ctx.stroke();
@@ -943,26 +944,29 @@
     }
 
     //Light box
-    var z_width = ""; //* zoom_width
-    var z_height = "";
+    var originwidth = "";
+    var originheight = "";
 
     function lightboxDrawTemplate() {
         let url = document.location.href;
         var sectionId = url.split("#");
         var canvasId = sectionId[1].split("/");
         var canvasIndex = canvasId[3] % 49;
-
-        console.log(canvasIndex);
+        if (canvasIndex == 0) {
+            canvasIndex = 49;
+        }
 
         const canvas = document.getElementById("zoomcanv" + canvasIndex);
         const ctx = canvas.getContext('2d');
 
-        if(z_width == "" && z_height == ""){
-            z_width = ($(".nGY2ViewerMedia").width() / canvas.width); //배율 구하기 x
-            z_height = ($(".nGY2ViewerMedia").height() / canvas.height); // 배율 구하기 y
+        if(originwidth == "" && originheight == ""){
+            originwidth = canvas.width;
+            originheight = canvas.height;  
         }
-
+  
         resizeCanvasToDisplaySize(canvas);
+            z_width = ( canvas.width/originwidth) ; //배율 구하기 x
+            z_height = ( canvas.height/originheight); // 배율 구하기 y
 
         var selectedID = [];
         $("input[name='tag-label-lightbox']:checked").each(function () {
@@ -971,42 +975,31 @@
         });
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        width = canvas.clientWidth;
-        height = canvas.clientHeight;
 
-        ctx.width = width;
-        ctx.height = height;
-
-        /*선택한 템플릿에 맞는 키포인트를 그린다.*/
-        templateKeyMatch.forEach((list, ind) => {
-            selectedID.forEach((selected) => {
-                if (list.keypoint_id == selected) {
+        for (var j = 0; j < selectedID.length; j++) {
+            /*선택한 템플릿에 맞는 키포인트를 그린다.*/
+            templateKeyMatch.forEach((list, ind) => {
+                if (list.keypoint_id == selectedID[j]) {
                     list.keypoint_list[canvasIndex - 1].keypoints.forEach(point => {
                         pointcolor = point.key;
                         ctx.beginPath();
-                        ctx.arc(point.x * z_width, point.y * z_height, 7, 0, 2 * Math.PI);
+                        ctx.arc(point.x * z_width, point.y * z_height, 1*z_width, 0, 2 * Math.PI);
                         ctx.fillStyle = pointcolor;
                         ctx.fill();
                         ctx.strokeStyle = pointcolor;
-                        ctx.lineWidth = 0.5;
+                        ctx.lineWidth = 0.5*z_width;
                         ctx.stroke();
                         ctx.closePath();
                     });
                 }
+
             });
 
-
-
-        })
-
-
-        // Draw lines
-
-        //console.log(linklines);
-        for (i = 0; i < linklines.length; i++) {
-            linklines[i].lines.forEach((line, ind) => {
-                selectedID.forEach((selected) => {
-                    if (linklines[i].keypoint_id == selected) {
+            // Draw lines
+            //console.log(linklines);
+            for (i = 0; i < linklines.length; i++) {
+                linklines[i].lines.forEach((line, ind) => {
+                    if (linklines[i].keypoint_id == selectedID[j]) {
                         var linecolor = linklines[i].linescolor;
                         const from = templateKeyMatch[i].keypoint_list[canvasIndex - 1].keypoints[line[
                             0]];
@@ -1017,14 +1010,12 @@
                         ctx.moveTo(from.x * z_width, from.y * z_height);
                         ctx.lineTo(to.x * z_width, to.y * z_height);
                         ctx.strokeStyle = linecolor;
-                        ctx.lineWidth = 5;
+                        ctx.lineWidth = 1*z_width;
                         ctx.stroke();
                         ctx.closePath();
                     }
                 });
-            });
-
-
+            }
         }
     }
 
