@@ -11742,8 +11742,8 @@
         }
         return;
       }
-      console.log(G);
-      console.log(G.baseEltID);
+      //console.log(G);
+      //console.log(G.baseEltID);
 
 
       //var newLocationHash = '#' + 'nanogallery/' + G.baseEltID + '/' + albumID; //원본 <-- by.misun url 페이지+이미지 번호
