@@ -80,7 +80,7 @@
             </div>
         </div>
 
-        <div style="overflow-y: scroll; height:75vh;">
+        <div style="overflow-y: scroll; height:80vh;">
             <div ID="imageGallery"></div>
         </div>
 
@@ -353,7 +353,6 @@
 
 
     function getImage(pageCount, stoid, img_folder, label_folder) {
-        //console.log(pageCount);
         var env_path = 'D:\\MgnSData\\Datas\\';
 
         $.ajax({
@@ -399,7 +398,7 @@
         var pathArr = [];
         var jsonArr = [];
 
-        for (i = 0; i < data.length - 1; i++) {
+        for (i = 0; i < data.length; i++) {
             //originParam = result.errorinfo[i].thumbnailpath;
             originParam = img_folder + data[i].mediapath + data[i].title;
             if (originParam != "") {
@@ -547,7 +546,7 @@
             getDatasetInfo(Number(pageCnt) + 1);
 
         }
-        if (attr == "down") {
+        else if (attr == "down") {
             if (pageCnt <= 1) {
                 return;
             }
@@ -555,6 +554,17 @@
             document.getElementById("page-count").value = Number(pageCnt) - 1;
 
             getDatasetInfo(Number(pageCnt) - 1);
+
+        }
+        else{
+            if (attr < 1) {
+                return;
+            }
+            if (attr > pageMax) {
+                return;
+            }
+            document.getElementById("page-count").value = attr;
+            getDatasetInfo(Number(attr));
 
         }
     }
@@ -647,8 +657,8 @@
                     const valuex = getObjectReference(pathx, JSONlist[i]);
                     const valuey = getObjectReference(pathy, JSONlist[i]);
                     const multipliedValue = {
-                        x: valuex * 0.1555,
-                        y: valuey * 0.14,
+                        x: valuex * 0.157,
+                        y: valuey * 0.136,
                         key: templateList.keyjsoncolor
                     };
                     listofpoints.push(multipliedValue);
@@ -812,7 +822,8 @@
     function drawSelectTemplate() {
 
         try {
-            for (index = 0; index < 49; index++) {
+            for (index = 0; index < 50; index++) {
+                
                 const canvasindex = "canvas" + (index + 1);
 
                 const canvas = document.getElementById(canvasindex);

@@ -11748,9 +11748,9 @@
 
       //var newLocationHash = '#' + 'nanogallery/' + G.baseEltID + '/' + albumID; //원본 <-- by.misun url 페이지+이미지 번호
       var page = document.getElementById("page-count").value;
-      var imageNum = imageID % 49;
+      var imageNum = imageID % 50;
       if(imageNum == 0){
-        imageNum = 49;
+        imageNum = 50;
       }
 
       var newLocationHash = '#' + 'nanogallery/' + G.baseEltID + '/' + page;
