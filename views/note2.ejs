@@ -1,115 +1,115 @@
-<!DOCTYPE html>
-<html lang="en">
+<script>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Human Pose Estimation</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
+    function convertInput(input) {
+        // Parse the input as a JSON object
+        const obj = JSON.parse(input);
 
-        canvas {
-            border: 1px solid black;
-            display: inline-block;
-            cursor: crosshair;
-        }
-    </style>
-</head>
-
-<body>
-    <h1>Human Pose Estimation</h1>
-    <canvas id="poseCanvas" width="800" height="600"></canvas>
-    <button id="saveButton">Save</button>
-    <button id="cleanButton">Clean template</button>
-    <script>
-        const canvas = document.getElementById('poseCanvas');
-        const ctx = canvas.getContext('2d');
-        const saveButton = document.getElementById('saveButton');
-        const keypoints = [];
-        const lines = [];
-        let selectedKeypoint = null;
-        let connecting = false;
-        let dragging = false;
-
-        canvas.addEventListener('mousedown', (e) => {
-            if (selectedKeypoint) {
-                dragging = true;
+        // Define a function to recursively search for the key
+        function findKey(obj, key) {
+            // If obj is null or undefined, return null
+            if (!obj) {
+                return null;
             }
-        });
 
-        canvas.addEventListener('mouseup', (e) => {
-            dragging = false;
-        });
-
-        canvas.addEventListener('click', (e) => {
-            if (selectedKeypoint && connecting) {
-                const rect = canvas.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                const clickedKeypoint = keypoints.find((keypoint) => Math.sqrt(Math.pow(x - keypoint.x, 2) + Math.pow(y - keypoint.y, 2)) <= 5);
-
-                if (clickedKeypoint) {
-                    lines.push({ from: selectedKeypoint, to: clickedKeypoint });
-                    connecting = false;
-                    selectedKeypoint = null;
+            // If obj is an array, loop through its elements and call findKey recursively
+            if (Array.isArray(obj)) {
+                for (let i = 0; i < obj.length; i++) {
+                    const result = findKey(obj[i], key);
+                    if (result !== null) {
+                        return `[${i}]${result}`;
+                    }
                 }
-            } else if (selectedKeypoint) {
-                connecting = true;
-            } else {
-                const rect = canvas.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                const newKeypoint = { x, y };
-                keypoints.push(newKeypoint);
+                return null;
             }
 
-            draw();
-        });
+            // If obj is an object, loop through its keys and call findKey recursively
+            if (typeof obj === 'object') {
+                for (const [k, v] of Object.entries(obj)) {
+                    if (k === key) {
+                        return `.${k}`;
+                    }
+                    const result = findKey(v, key);
+                    if (result !== null) {
+                        return `.${k}${result}`;
+                    }
+                }
+                return null;
+            }
 
-        canvas.addEventListener('mousemove', (e) => {
-            if (!connecting) {
-                const rect = canvas.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
+            // If obj is a primitive value, return null
+            return null;
+        }
 
-                if (dragging && selectedKeypoint) {
-                    selectedKeypoint.x = x;
-                    selectedKeypoint.y = y;
+        // Call findKey to search for the key in the object
+        const path = findKey(obj, 'x');
+        if (path === null) {
+            return null;
+        }
+
+        // Return the formatted output
+        return `${path}`;
+    }
+
+    const input3 = '{"labelingInfo":[null,{"pose":{"location":{"오른쪽 무릎":{"x":""}}}}]}';
+    const input4 = '{"result":[{"keypoints":[""]}]}';
+    const output3 = convertInput(input3);
+    const output4 = convertInput(input4);
+    console.log(output3); // outputs "labelingInfo[1].pose.location.오른쪽_무릎.x"
+    console.log(output4);
+
+
+
+
+
+
+    function convertOutput(output) {
+        // split the input string by "."
+        const path = output.split('.');
+
+        // initialize the result object
+        const result = {};
+
+        // create the nested objects and arrays in the result object
+        let curr = result;
+        for (let i = 0; i < path.length; i++) {
+            const element = path[i];
+            const match = /([^\[\]]+)(?:\[(\d+)\])?/.exec(element);
+            const key = match[1].replace(/_/g, ' ');
+            const index = match[2] !== undefined ? parseInt(match[2]) : undefined;
+            if (index !== undefined) {
+                if (curr[key] === undefined) {
+                    curr[key] = [];
+                }
+                if (i === path.length - 1) {
+                    curr[key][index] = '';
                 } else {
-                    selectedKeypoint = keypoints.find((keypoint) => Math.sqrt(Math.pow(x - keypoint.x, 2) + Math.pow(y - keypoint.y, 2)) <= 5);
+                    curr[key][index] = {};
                 }
+                curr = curr[key][index];
+            } else {
+                if (i === path.length - 1) {
+                    curr[key] = '';
+                } else {
+                    curr[key] = {};
+                }
+                curr = curr[key];
             }
-
-            draw();
-        });
-
-        saveButton.addEventListener('click', () => {
-            const json = JSON.stringify({ keypoints, lines });
-            console.log(json);
-        });
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            lines.forEach((line) => {
-                ctx.beginPath();
-                ctx.moveTo(line.from.x, line.from.y);
-                ctx.lineTo(line.to.x, line.to.y);
-                ctx.stroke();
-            });
-
-            keypoints.forEach((keypoint, index) => {
-                ctx.beginPath();
-                ctx.arc(keypoint.x, keypoint.y, 5, 0, 2 * Math.PI);
-                ctx.fillStyle = selectedKeypoint === keypoint ? (connecting ? 'green' : 'red') : 'blue';
-                ctx.fill();
-            });
         }
 
-    </script>
-</body>
+        // convert the result object to a string
+        return JSON.stringify(result);
+    }
 
-</html>
+    const outputs = 'labelingInfo[1].pose.location.오른쪽_무릎.x';
+    const output5 = 'result[0].keypoints[0][0]'
+    const json2 = convertOutput(outputs);
+    console.log(json2);
+    console.log(convertOutput(output5));
+// outputs: {"labelingInfo":[{"pose":{"location":{"오른쪽 무릎":""}}}]}"
+
+
+
+
+
+
+</script>

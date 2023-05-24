@@ -1,16 +1,18 @@
 @font-face {
-    font-family: Pretendard-Regular;
+    font-family: Pretendard;
     src: url('../fonts/Pretendard-Regular.otf');
 }
 
 @font-face {
-    font-family: Pretendard-Medium;
+    font-family: Pretendard;
     src: url('../fonts/Pretendard-Medium.otf');
+    font-weight: medium;
 }
 
 @font-face {
-    font-family: Pretendard-Bold;
+    font-family: Pretendard;
     src: url('../fonts/Pretendard-Bold.otf');
+    font-weight: bold;
 }
 
 
@@ -18,7 +20,7 @@
     margin: 0px;
     padding: 0px;
     box-sizing: border-box;
-    font-family: Pretendard-Regular;
+    font-family: Pretendard;
 }
 
 body,

@@ -85,6 +85,21 @@ app.get('/updatedataset', (req, res) => {
     console.log(Date() + TAB + req.socket.localAddress + TAB + req.url);
 })
 
+app.get('/note2', (req, res) => {
+    res.render('note2');
+    console.log(Date() + TAB + req.socket.localAddress + TAB + req.url);
+})
+
+app.get('/note', (req, res) => {
+    res.render('note');
+    console.log(Date() + TAB + req.socket.localAddress + TAB + req.url);
+})
+
+app.get('/note3', (req, res) => {
+    res.render('note3');
+    console.log(Date() + TAB + req.socket.localAddress + TAB + req.url);
+})
+
 
 /*
 mongoose.connect("mongodb://localhost:27017/labelviewer-db", {useNewUrlParser: true, useUnifiedTopology: true}, function(err){
