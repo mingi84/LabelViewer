@@ -841,6 +841,7 @@
                     if (list.keypoint_list[index].bbox_type !== 0 && list.keypoint_list[index]
                         .bbox_type !== undefined) {
                         ctx.strokeStyle = list.keypoint_list[index].bbox_color;
+                        ctx.lineWidth = 3;
                         ctx.strokeRect(list.keypoint_list[index].bbox[0], list.keypoint_list[index]
                             .bbox[1], list.keypoint_list[index].bbox[2], list.keypoint_list[
                                 index].bbox[3]);
@@ -938,6 +939,7 @@
                             if (list.keypoint_list[index].bbox_type !== 0 && list.keypoint_list[index]
                                 .bbox_type !== undefined) {
                                 ctx.strokeStyle = list.keypoint_list[index].bbox_color;
+                                ctx.lineWidth = 3;
                                 ctx.strokeRect(list.keypoint_list[index].bbox[0], 
                                 list.keypoint_list[index].bbox[1], 
                                 list.keypoint_list[index].bbox[2], 
