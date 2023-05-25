@@ -131,13 +131,16 @@
                         <div class="card w-100" style="width: 18rem;">
                             <div class="card-body d-flex gap-2">
                                 <div class="w-100 " id="image-plus" style="height: 360px; background-size:cover;">
-                                    <div class="toast position-absolute top-50 start-50 translate-middle" id="" role="alert" aria-live="assertive" aria-atomic="true"  data-bs-delay='2000'>
+                                    <div class="toast position-absolute top-50 start-50 translate-middle" id=""
+                                        role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay='2000'>
                                         <div class="toast-header">
                                             <strong class="me-auto">Template Error</strong>
-                                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                                            <button type="button" class="btn-close" data-bs-dismiss="toast"
+                                                aria-label="Close"></button>
                                         </div>
                                         <div class="toast-body">
-                                            Template &lt;<span style="font-size: 600; color: #0D6EFD;" id="toast-templateName"></span>&gt;is not available.                                 
+                                            Template &lt;<span style="font-size: 600; color: #0D6EFD;"
+                                                id="toast-templateName"></span>&gt;is not available.
                                         </div>
                                     </div>
                                     <canvas id="canvas" class="" style=""></canvas>
@@ -377,11 +380,22 @@
         var select_keypoint = templateJson;
         color = select_keypoint.kypt_json.categories[0].color;
         xylocationlist = select_keypoint.kypt_json.annotations[0].keypoints_json;
+        var bboxInfo = select_keypoint.kypt_json.annotations[0].bbox;
         linklines = {
             lines: select_keypoint.kypt_json.categories[0].skeleton
         };
         for (let i = 0; i < JSONlist.length; i++) {
             const listofpoints = [];
+            const bboxArr = [];
+            for (var j = 0; j < bboxInfo.length; j++) {
+                const pathbbox = bboxInfo[j];
+                const bboxparts = pathbbox.split(">>");
+                var valuebbox = getObjectReference(pathbbox, JSONlist[i]);
+                if (valuebbox == "" || valuebbox == undefined) {
+                    valuebbox = "";
+                }
+                bboxArr.push(valuebbox * 0.333);
+            }
             for (let j = 0; j < xylocationlist.length; j++) {
                 const pathx = xylocationlist[j][0];
                 const pathy = xylocationlist[j][1];
@@ -423,7 +437,9 @@
             }
             var formatedkey = {
                 "keypoint_id": ID,
-                "keypoints": listofpoints
+                "keypoints": listofpoints,
+                "bbox_type": select_keypoint.kypt_json.annotations[0].bbox_type,
+                "bbox": bboxArr
             };
             listformatedkeys.push(formatedkey);
         }
@@ -439,49 +455,97 @@
         // Draw keypoints
 
         try {
-            listformatedkeys[index].keypoints.forEach(point => {
-                if (isNaN(point.x) == true || isNaN(point.y) == true) {
-                    throw new Error(listformatedkeys[index].keypoint_id);
-                }
+            if (listformatedkeys[index].keypoints.length > 0) {
+                listformatedkeys[index].keypoints.forEach(point => {
+                    if (isNaN(point.x) == true || isNaN(point.y) == true) {
+                        throw new Error(listformatedkeys[index].keypoint_id);
+                    }
 
-                ctx.beginPath();
-                ctx.arc(point.x, point.y, 3, 0, 2 * Math.PI);
-                ctx.fillStyle = color;
-                ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(point.x, point.y, 3, 0, 2 * Math.PI);
+                    ctx.fillStyle = color;
+                    ctx.fill();
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.closePath();
+
+                });
+
+                // Draw lines
+                linklines.lines.forEach(line => {
+                    const from = listformatedkeys[index].keypoints[line[0]];
+                    const to = listformatedkeys[index].keypoints[line[1]];
+
+                    ctx.beginPath();
+                    ctx.moveTo(from.x, from.y);
+                    ctx.lineTo(to.x, to.y);
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = 4;
+                    ctx.stroke();
+                    ctx.closePath();
+                });
+            }
+
+
+            //Draw lect
+            if (listformatedkeys[index].bbox_type !== 0 && listformatedkeys[index].bbox_type !== undefined) {
+
+                //bbox 그리는 방법 계산
+
+                var bboxpoint = bboxTypeCheck(listformatedkeys[index].bbox_type, listformatedkeys[index].bbox)
                 ctx.strokeStyle = color;
-                ctx.lineWidth = 3;
-                ctx.stroke();
-                ctx.closePath();
+                ctx.strokeRect(bboxpoint[0], bboxpoint[1], bboxpoint[2], bboxpoint[3]);
 
-            });
+            }
 
-            // Draw lines
-            linklines.lines.forEach(line => {
-                const from = listformatedkeys[index].keypoints[line[0]];
-                const to = listformatedkeys[index].keypoints[line[1]];
-
-                ctx.beginPath();
-                ctx.moveTo(from.x, from.y);
-                ctx.lineTo(to.x, to.y);
-                ctx.strokeStyle = color;
-                ctx.lineWidth = 4;
-                ctx.stroke();
-                ctx.closePath();
-            });
-        } catch (err) {            
+        } catch (err) {
             var toastElList = [].slice.call(document.querySelectorAll('.toast'))
             var toastList = toastElList.map(function (toastEl) {
                 return new bootstrap.Toast(toastEl)
             })
             toastList.forEach(toast => toast.show());
 
-            document.getElementById("toast-templateName").innerHTML = document.getElementById("template-name-"+ listformatedkeys[index].keypoint_id).innerText;
+            document.getElementById("toast-templateName").innerHTML = document.getElementById("template-name-" +
+                listformatedkeys[index].keypoint_id).innerText;
 
-            document.getElementById("template-"+ listformatedkeys[index].keypoint_id).checked = false;
+            document.getElementById("template-" + listformatedkeys[index].keypoint_id).checked = false;
 
         }
+    }
 
+    function bboxTypeCheck(type, bboxPoint) {
+        switch (type) {
+            case 1:
+                x = bboxPoint[0];
+                y = bboxPoint[1];
+                w = bboxPoint[2];
+                h = bboxPoint[3];
 
+                bboxPoint = [x, y, w, h];
+
+                break;
+
+            case 2:
+                x = bboxPoint[0];
+                y = bboxPoint[1];
+                w = bboxPoint[2] - bboxPoint[0];
+                h = bboxPoint[3] - bboxPoint[1];
+
+                bboxPoint = [x, y, w, h];
+                break;
+
+            case 3:
+                x = bboxPoint[0] - (w / 2);
+                y = bboxPoint[1] - (h / 2);
+                w = bboxPoint[2];
+                h = bboxPoint[3];
+
+                bboxPoint = [x, y, w, h];
+                break;
+        }
+
+        return bboxPoint;
 
     }
 

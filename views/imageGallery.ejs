@@ -242,10 +242,11 @@
                 keypoint_id: kypt_id,
                 keypoint_name: kyptTempInfo.kypt_name,
                 keyjsonpt: kyptTempInfo.kypt_json.annotations[0].keypoints_json,
-                keyjsoncolor: kyptTempInfo.kypt_json.categories[0].color
+                keyjsoncolor: kyptTempInfo.kypt_json.categories[0].color,
+                bbox_type: kyptTempInfo.kypt_json.annotations[0].bbox_type,
+                bbox: kyptTempInfo.kypt_json.annotations[0].bbox
             }
             xylocationlist.push(xylocListPush);
-            //console.log(xylocationlist);
             linklines.push({
                 keypoint_id: kypt_id,
                 lines: kyptTempInfo.kypt_json.categories[0].skeleton,
@@ -364,7 +365,7 @@
             //보내는 데이터,
             dataType: 'JSON', //문자형식으로 받기 , 
             success: function (result) {
-                console.log(result);
+                //console.log(result);
                 imagePath(result, img_folder, label_folder);
                 document.getElementById("totalcount").innerText = result.totalcount.toLocaleString(
                     'ko-KR');
@@ -647,8 +648,21 @@
 
     function combinedJsonTemplate(JSONlist, templateList) {
         listformatedkeys = [];
+        var bboxInfo = templateList.bbox;
+
         for (let i = 0; i < JSONlist.length; i++) { //JSONlist.length
             const listofpoints = [];
+            const bboxArr = [];
+
+            for (var j = 0; j < bboxInfo.length; j++) {
+                const pathbbox = bboxInfo[j];
+                const bboxparts = pathbbox.split(">>");
+                var valuebbox = getObjectReference(pathbbox, JSONlist[i]);
+                if (valuebbox == "" || valuebbox == undefined) {
+                    valuebbox = "";
+                }
+                bboxArr.push(valuebbox * 0.245);
+            }
             for (let k = 0; k < templateList.keyjsonpt.length; k++) {
                 const pathx = templateList.keyjsonpt[k][0];
                 const pathy = templateList.keyjsonpt[k][1];
@@ -669,7 +683,10 @@
 
             }
             var formatedkey = {
-                "keypoints": listofpoints
+                "keypoints": listofpoints,
+                "bbox_type": templateList.bbox_type,
+                "bbox": bboxArr,
+                "bbox_color": templateList.keyjsoncolor
             };
             listformatedkeys.push(formatedkey);
         }
@@ -766,28 +783,26 @@
             selectedID.push(tmpVal);
         });
         /*선택한 템플릿에 맞는 키포인트를 그린다.*/
-        /*선택한 템플릿에 맞는 키포인트를 그린다.*/
         templateKeyMatch.forEach((list, ind) => {
             selectedID.forEach((selected) => {
                 if (list.keypoint_id == selected) {
-                    list.keypoint_list[index].keypoints.forEach(point => {
-                        pointcolor = point.key;
-                        ctx.beginPath();
-                        ctx.arc(point.x * zthumb_width, point.y * zthumb_height, 4, 0,
-                            2 * Math.PI);
-                        ctx.fillStyle = pointcolor;
-                        ctx.fill();
-                        ctx.strokeStyle = pointcolor;
-                        ctx.lineWidth = 1;
-                        ctx.stroke();
-                        ctx.closePath();
-                    });
+                    if (list.keypoint_list[index].keypoints.length > 0) {
+                        list.keypoint_list[index].keypoints.forEach(point => {
+                            pointcolor = point.key;
+                            ctx.beginPath();
+                            ctx.arc(point.x * zthumb_width, point.y * zthumb_height, 4, 0,
+                                2 * Math.PI);
+                            ctx.fillStyle = pointcolor;
+                            ctx.fill();
+                            ctx.strokeStyle = pointcolor;
+                            ctx.lineWidth = 1;
+                            ctx.stroke();
+                            ctx.closePath();
+                        });
+                    }
                 }
             });
-
-
-
-        })
+        });
 
 
         // Draw lines
@@ -796,25 +811,44 @@
         for (i = 0; i < linklines.length; i++) {
             linklines[i].lines.forEach((line, ind) => {
                 selectedID.forEach((selected) => {
-                    if (linklines[i].keypoint_id == selected) {
-                        var linecolor = linklines[i].linescolor;
-                        const from = templateKeyMatch[i].keypoint_list[index].keypoints[line[
-                            0]];
-                        const to = templateKeyMatch[i].keypoint_list[index].keypoints[line[1]];
+                    if (templateKeyMatch[i].keypoint_list[index].keypoints.length > 0) {
 
-                        ctx.beginPath();
-                        ctx.moveTo(from.x * zthumb_width, from.y * zthumb_height);
-                        ctx.lineTo(to.x * zthumb_width, to.y * zthumb_height);
-                        ctx.strokeStyle = linecolor;
-                        ctx.lineWidth = 3;
-                        ctx.stroke();
-                        ctx.closePath();
+                        if (linklines[i].keypoint_id == selected) {
+                            var linecolor = linklines[i].linescolor;
+                            const from = templateKeyMatch[i].keypoint_list[index].keypoints[line[
+                                0]];
+                            const to = templateKeyMatch[i].keypoint_list[index].keypoints[line[1]];
+
+                            ctx.beginPath();
+                            ctx.moveTo(from.x * zthumb_width, from.y * zthumb_height);
+                            ctx.lineTo(to.x * zthumb_width, to.y * zthumb_height);
+                            ctx.strokeStyle = linecolor;
+                            ctx.lineWidth = 3;
+                            ctx.stroke();
+                            ctx.closePath();
+                        }
                     }
                 });
+
             });
 
         }
 
+        //Draw lect
+        templateKeyMatch.forEach((list, ind) => {
+            selectedID.forEach((selected) => {
+                if (list.keypoint_id == selected) {
+                    if (list.keypoint_list[index].bbox_type !== 0 && list.keypoint_list[index]
+                        .bbox_type !== undefined) {
+                        ctx.strokeStyle = list.keypoint_list[index].bbox_color;
+                        ctx.strokeRect(list.keypoint_list[index].bbox[0], list.keypoint_list[index]
+                            .bbox[1], list.keypoint_list[index].bbox[2], list.keypoint_list[
+                                index].bbox[3]);
+
+                    }
+                }
+            });
+        });
 
     }
 
@@ -824,7 +858,7 @@
     function drawSelectTemplate() {
 
         try {
-            for (index = 0; index < 49; index++) {
+            for (index = 0; index < 50; index++) {
 
                 const canvasindex = "canvas" + (index + 1);
 
@@ -846,18 +880,22 @@
                 templateKeyMatch.forEach((list, ind) => {
                     selectedID.forEach((selected) => {
                         if (list.keypoint_id == selected) {
-                            list.keypoint_list[index].keypoints.forEach(point => {
-                                pointcolor = point.key;
-                                ctx.beginPath();
-                                ctx.arc(point.x * zthumb_width, point.y * zthumb_height, 4, 0,
-                                    2 * Math.PI);
-                                ctx.fillStyle = pointcolor;
-                                ctx.fill();
-                                ctx.strokeStyle = pointcolor;
-                                ctx.lineWidth = 1;
-                                ctx.stroke();
-                                ctx.closePath();
-                            });
+                            if (list.keypoint_list[index].keypoints.length > 0) {
+
+                                list.keypoint_list[index].keypoints.forEach(point => {
+                                    pointcolor = point.key;
+                                    ctx.beginPath();
+                                    ctx.arc(point.x * zthumb_width, point.y * zthumb_height, 4,
+                                        0,
+                                        2 * Math.PI);
+                                    ctx.fillStyle = pointcolor;
+                                    ctx.fill();
+                                    ctx.strokeStyle = pointcolor;
+                                    ctx.lineWidth = 1;
+                                    ctx.stroke();
+                                    ctx.closePath();
+                                });
+                            }
                         }
                     });
 
@@ -867,29 +905,48 @@
 
 
                 // Draw lines
-
                 //console.log(linklines);
                 for (i = 0; i < linklines.length; i++) {
                     linklines[i].lines.forEach((line, ind) => {
                         selectedID.forEach((selected) => {
                             if (linklines[i].keypoint_id == selected) {
-                                var linecolor = linklines[i].linescolor;
-                                const from = templateKeyMatch[i].keypoint_list[index].keypoints[line[
-                                    0]];
-                                const to = templateKeyMatch[i].keypoint_list[index].keypoints[line[1]];
+                                if (templateKeyMatch[i].keypoint_list[index].keypoints.length > 0) {
 
-                                ctx.beginPath();
-                                ctx.moveTo(from.x * zthumb_width, from.y * zthumb_height);
-                                ctx.lineTo(to.x * zthumb_width, to.y * zthumb_height);
-                                ctx.strokeStyle = linecolor;
-                                ctx.lineWidth = 3;
-                                ctx.stroke();
-                                ctx.closePath();
+                                    var linecolor = linklines[i].linescolor;
+                                    const from = templateKeyMatch[i].keypoint_list[index].keypoints[
+                                        line[0]];
+                                    const to = templateKeyMatch[i].keypoint_list[index].keypoints[line[
+                                        1]];
+
+                                    ctx.beginPath();
+                                    ctx.moveTo(from.x * zthumb_width, from.y * zthumb_height);
+                                    ctx.lineTo(to.x * zthumb_width, to.y * zthumb_height);
+                                    ctx.strokeStyle = linecolor;
+                                    ctx.lineWidth = 3;
+                                    ctx.stroke();
+                                    ctx.closePath();
+                                }
                             }
                         });
                     });
-
                 }
+
+                //Draw lect
+                templateKeyMatch.forEach((list, ind) => {
+                    selectedID.forEach((selected) => {
+                        if (list.keypoint_id == selected) {
+                            if (list.keypoint_list[index].bbox_type !== 0 && list.keypoint_list[index]
+                                .bbox_type !== undefined) {
+                                ctx.strokeStyle = list.keypoint_list[index].bbox_color;
+                                ctx.strokeRect(list.keypoint_list[index].bbox[0], 
+                                list.keypoint_list[index].bbox[1], 
+                                list.keypoint_list[index].bbox[2], 
+                                list.keypoint_list[index].bbox[3]);
+
+                            }
+                        }
+                    });
+                });
             }
         } catch (err) {
             return;
@@ -973,6 +1030,9 @@
         z_width = (canvas.width / originwidth); //배율 구하기 x
         z_height = (canvas.height / originheight); // 배율 구하기 y
 
+        zoomx =  canvas.width - originwidth;
+        zoomy = canvas.height - originheight;
+
         var selectedID = [];
         $("input[name='tag-label-lightbox']:checked").each(function () {
             var tmpVal = $(this).val();
@@ -985,17 +1045,20 @@
             /*선택한 템플릿에 맞는 키포인트를 그린다.*/
             templateKeyMatch.forEach((list, ind) => {
                 if (list.keypoint_id == selectedID[j]) {
-                    list.keypoint_list[canvasIndex - 1].keypoints.forEach(point => {
-                        pointcolor = point.key;
-                        ctx.beginPath();
-                        ctx.arc(point.x * z_width, point.y * z_height, 1 * z_width, 0, 2 * Math.PI);
-                        ctx.fillStyle = pointcolor;
-                        ctx.fill();
-                        ctx.strokeStyle = pointcolor;
-                        ctx.lineWidth = 0.5 * z_width;
-                        ctx.stroke();
-                        ctx.closePath();
-                    });
+                    if (list.keypoint_list[j].keypoints.length > 0) {
+
+                        list.keypoint_list[canvasIndex - 1].keypoints.forEach(point => {
+                            pointcolor = point.key;
+                            ctx.beginPath();
+                            ctx.arc(point.x * z_width, point.y * z_height, 1 * z_width, 0, 2 * Math.PI);
+                            ctx.fillStyle = pointcolor;
+                            ctx.fill();
+                            ctx.strokeStyle = pointcolor;
+                            ctx.lineWidth = 0.5 * z_width;
+                            ctx.stroke();
+                            ctx.closePath();
+                        });
+                    }
                 }
 
             });
@@ -1005,20 +1068,45 @@
             for (i = 0; i < linklines.length; i++) {
                 linklines[i].lines.forEach((line, ind) => {
                     if (linklines[i].keypoint_id == selectedID[j]) {
-                        var linecolor = linklines[i].linescolor;
-                        const from = templateKeyMatch[i].keypoint_list[canvasIndex - 1].keypoints[line[0]];
-                        const to = templateKeyMatch[i].keypoint_list[canvasIndex - 1].keypoints[line[1]];
+                        if (templateKeyMatch[i].keypoint_list[j].keypoints.length > 0) {
 
-                        ctx.beginPath();
-                        ctx.moveTo(from.x * z_width, from.y * z_height);
-                        ctx.lineTo(to.x * z_width, to.y * z_height);
-                        ctx.strokeStyle = linecolor;
-                        ctx.lineWidth = 1 * z_width;
-                        ctx.stroke();
-                        ctx.closePath();
+                            var linecolor = linklines[i].linescolor;
+                            const from = templateKeyMatch[i].keypoint_list[canvasIndex - 1].keypoints[line[0]];
+                            const to = templateKeyMatch[i].keypoint_list[canvasIndex - 1].keypoints[line[1]];
+
+                            ctx.beginPath();
+                            ctx.moveTo(from.x * z_width, from.y * z_height);
+                            ctx.lineTo(to.x * z_width, to.y * z_height);
+                            ctx.strokeStyle = linecolor;
+                            ctx.lineWidth = 1 * z_width;
+                            ctx.stroke();
+                            ctx.closePath();
+                        }
                     }
                 });
             }
+        }
+
+
+        for (var j = 0; j < selectedID.length; j++) {
+            //Draw lect
+
+            for (var i = 0; i < templateKeyMatch.length; i++) {
+                ctx.scale(1*z_width *0.645,1*z_height*0.568)
+                if (templateKeyMatch[i].keypoint_id == selectedID[j]) {
+                    ctx.lineWidth = 2 ;
+                    ctx.strokeStyle = templateKeyMatch[i].keypoint_list[canvasIndex - 1].bbox_color;
+                    ctx.strokeRect(templateKeyMatch[i].keypoint_list[canvasIndex - 1].bbox[0] , 
+                    templateKeyMatch[i].keypoint_list[canvasIndex - 1].bbox[1] , 
+                    templateKeyMatch[i].keypoint_list[canvasIndex - 1].bbox[2] , 
+                    templateKeyMatch[i].keypoint_list[canvasIndex - 1].bbox[3] );
+
+                }
+                ctx.scale(1/z_width/0.645,1/z_height/0.568)
+
+            }
+
+
         }
     }
 
