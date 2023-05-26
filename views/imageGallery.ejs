@@ -175,9 +175,7 @@
     $(document).ready(function () {
         sto_id = localStorage.getItem('di_storageid');
         dataset_id = localStorage.getItem('datasetid');
-        
-        console.log(sto_id);
-        
+                
         if (typeof sto_id !== "string" || typeof dataset_id !== "string") {
             window.location.href = _PAGE_URL + "gallerylist";
             return;
@@ -203,15 +201,12 @@
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            //console.log('getdatasetinfo')
             const datasetInfo = await response.json();
-            //console.log(datasetInfo);
             const divgalleryname = document.getElementById('galleryname');
             divgalleryname.innerHTML = '';
             divgalleryname.innerHTML = datasetInfo.dataset_name;
             img_folder = datasetInfo.image_location;
             label_folder = datasetInfo.label_location;
-            //console.log(datasetInfo.kypt_id.length)
             if (datasetInfo.kypt_id.length >= 0) {
                 keytemplates = datasetInfo.kypt_id
                 const divlabeltemp = document.getElementById('divlabeltemplate');
@@ -239,9 +234,7 @@
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            //console.log('getGetKeypointInfo');
             const kyptTempInfo = await response.json();
-            //console.log(kyptTempInfo);
             const bgcolor = colorWithTransparency(kyptTempInfo.kypt_json.categories[0].color, 0.4)
             const divlabeltemp = document.getElementById('divlabeltemplate');
             divlabeltemp.innerHTML += `
@@ -404,12 +397,8 @@
     Imagepath: http://49.50.160.122:3000/errorimages/2022/7/22/9/24863/24863_0_0x80000000_0.jpg
     */
     function imagePath(result, img_folder, label_folder) {
-        //console.log('imagePath');
-        //console.log(img_folder);
 
         var data = result.mediainfo;
-        //console.log(data)
-
         //url 매핑을 위해 url을 만들어준다.
 
         var originParam, excludeParam, jsonParam;
@@ -500,9 +489,7 @@
             fnImgToolbarCustDisplay: myToolbarCustDisplay,
             // ### gallery content ###
             items: pathArr
-        });
-        //console.log('makegallery')
-    }
+        });    }
 
     // Callback on display of a new media in the lightbox
     function myToolbarCustDisplay($customToolbarElements, item) {
@@ -513,12 +500,12 @@
         for (var i = 0; i < templateList.length; i++) {
             template.innerHTML += `
                 <input type="checkbox" class="btn-check" name="tag-label-lightbox" id="lightbox-${templateList[i].keypoint_id}" value ="${templateList[i].keypoint_id}"
-                onclick="clickLabel(this.name); lightboxDrawTemplate();" autocomplete="off" checked>
+                onclick="clickLabel(this.name); lightboxDrawTemplate(${item.mediaNumber});" autocomplete="off" checked>
                     <label class="btn tag-label" for="lightbox-${templateList[i].keypoint_id}"
                     style="background-color: ${templateList[i].keyjsoncolor}; color:#fff;">${templateList[i].keypoint_name}
                     </label>`
         }
-        lightboxDrawTemplate();
+        lightboxDrawTemplate(item.mediaNumber);
     }
 
     /*
@@ -820,7 +807,6 @@
 
         // Draw lines
 
-        //console.log(linklines);
         for (i = 0; i < linklines.length; i++) {
             linklines[i].lines.forEach((line, ind) => {
                 selectedID.forEach((selected) => {
@@ -919,7 +905,6 @@
 
 
                 // Draw lines
-                //console.log(linklines);
                 for (i = 0; i < linklines.length; i++) {
                     linklines[i].lines.forEach((line, ind) => {
                         selectedID.forEach((selected) => {
@@ -972,8 +957,6 @@
     //---------------------Draw Template---------------------------------
 
     function drawCanvas(data, i) {
-        //console.log(data);
-        //console.log(i);
         const canvasindex = "canvas" + i;
         const canvas = document.getElementById(canvasindex);
         const ctx = canvas.getContext('2d');
@@ -1026,13 +1009,7 @@
     var originwidth = "";
     var originheight = "";
 
-    function lightboxDrawTemplate() {
-        let url = document.location.href;
-        var sectionId = url.split("#");
-        var canvasId = sectionId[1].split("/");
-        var canvasIndex = canvasId[3];
-
-
+    function lightboxDrawTemplate(canvasIndex) {
         const canvas = document.getElementById("zoomcanv" + canvasIndex);
         const ctx = canvas.getContext('2d');
 

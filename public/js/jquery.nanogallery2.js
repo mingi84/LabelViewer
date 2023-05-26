@@ -11753,9 +11753,11 @@
         imageNum = 50;
       }
 
-      var newLocationHash = '#' + 'nanogallery/' + G.baseEltID + '/' + page;
+      var newLocationHash = '#' + 'nanogallery';
+
+      //var newLocationHash = '#' + 'nanogallery/' + G.baseEltID + '/' + page;
       if (imageID != '') {
-        newLocationHash += '/' + imageNum;
+        //newLocationHash += '/' + imageNum;
       }
 
       //여기까지 커스텀 -->
