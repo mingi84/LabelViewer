@@ -50,6 +50,9 @@
 
 
     function pageMove(page, datasetID, sourceID) {
+        localStorage.setItem('di_storageid', sourceID);
+        localStorage.setItem('datasetid', datasetID);
+
         var params;
         var url = _PAGE_URL;
         switch (page) {
@@ -57,10 +60,10 @@
                 params = "addFiles";
                 break;
             case "imagegallery":
-                params = "imagegallery?source_list_sto=" + sourceID + "&dataset_id=" + datasetID;
+                params = "imagegallery";
                 break;
             case "edit":
-                params = "addFiles?id=" + datasetID;
+                params = "addFiles";
                 break;
             default:
                 params = "imagegallery";

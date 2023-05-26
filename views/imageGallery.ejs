@@ -135,8 +135,8 @@
     const toastTrigger = document.getElementById('liveToastBtn')
     const toastLiveExample = document.getElementById('liveToast')
     const urlParams = new URLSearchParams(window.location.search);
-    const sto_id = urlParams.get('source_list_sto');
-    const dataset_id = urlParams.get('dataset_id');
+    var sto_id = "";
+    var dataset_id = "";
     var linecolor = [];
     var xylocationlist = [];
     var linklines = [];
@@ -153,13 +153,17 @@
     }
 
     function pageMove(page) {
+        localStorage.setItem('di_storageid', sto_id);
+        localStorage.setItem('datasetid', dataset_id);
+
         var params;
         var url = _PAGE_URL;
         switch (page) {
             case "selecttemplate":
-                params = "selecttemplate?source_list_sto=" + sto_id + "&dataset_id=" + dataset_id;
+                params = "selecttemplate";
                 break;
             case "gallerylist":
+                localStorage.clear();
                 params = "gallerylist"
                 break;
         }
@@ -169,7 +173,16 @@
 
 
     $(document).ready(function () {
-        //console.log(sto_id);
+        sto_id = localStorage.getItem('di_storageid');
+        dataset_id = localStorage.getItem('datasetid');
+        
+        console.log(sto_id);
+        
+        if (typeof sto_id !== "string" || typeof dataset_id !== "string") {
+            window.location.href = _PAGE_URL + "gallerylist";
+            return;
+        }
+
         if (sto_id) {
             getDatasetInfo(1);
         } else {

@@ -223,19 +223,26 @@
     function pageMove(page, id) {
         var params;
         var url = _PAGE_URL;
+
+        localStorage.removeItem('di_storageid');
+        localStorage.removeItem('datasetid');
+
+        localStorage.setItem('di_storageid', sto_id);
+        localStorage.setItem('datasetid', dataset_id);
+
         switch (page) {
             case "imagegallery":
-                params = "imagegallery?source_list_sto=" + sto_id + "&dataset_id=" + dataset_id;
+                params = "imagegallery";
                 break;
             case "createtemplate":
-                params = "createtemplate?source_list_sto=" + sto_id + "&dataset_id=" + dataset_id;
+                params = "createtemplate";
                 break;
             case "gallerylist":
                 params = "gallerylist"
                 break;
             case "edit":
-                params = "createtemplate?source_list_sto=" + sto_id + "&dataset_id=" + dataset_id + "&ketpoint_id=" +
-                    id;
+                localStorage.setItem('ketpointid', id);
+                params = "createtemplate";
                 break;
         }
         window.location.href = url + params;
@@ -243,14 +250,25 @@
     }
 
     const urlParams = new URLSearchParams(window.location.search);
-    const sto_id = urlParams.get('source_list_sto');
-    const dataset_id = urlParams.get('dataset_id');
+    var sto_id = localStorage.getItem('di_storageid');
+    var dataset_id = localStorage.getItem('datasetid');
+    
     $(document).ready(function () {
+        if (typeof sto_id !== "string" || typeof dataset_id !== "string") {
+            window.location.href = _PAGE_URL + "gallerylist";
+            return;
+        }
+
         loadTemplateList();
     });
 
     // after resources (css, images)
     window.addEventListener("load", (event) => {
+        if (typeof sto_id !== "string" || typeof dataset_id !== "string") {
+            window.location.href = _PAGE_URL + "gallerylist";
+            return;
+        }
+
         getDataset();
         loadDIimage();
         var width = document.getElementById("image-plus").getBoundingClientRect().width;

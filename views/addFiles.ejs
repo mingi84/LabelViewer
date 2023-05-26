@@ -28,10 +28,6 @@
         background-color: #F1F1F1;
     }
 </style>
-<!--
-
--->
-
 <body>
     <%- include('./header') %>
     <div class="container my-4">
@@ -189,22 +185,28 @@
 
     let query = window.location.search;
     let param = new URLSearchParams(query);
-    let datasetID = param.get('id');
-
-    $(document).ready(function () {
-        getDIStorage();
-    });
+    var datasetID = localStorage.getItem('datasetid');
 
     window.addEventListener("load", (event) => {
-        if (datasetID !== null) {
+
+        if (typeof datasetID !== "string") {
+            window.location.href = _PAGE_URL + "gallerylist";
+            return;
+        }
+
+        if (typeof datasetID == "string") {
             getDataset(datasetID)
+        }
+        else{
+            getDIStorage();
         }
     });
 
     /*
     Data Injector storagelist를 가져온다.
+    param: 선택한 d/i 스토리지 값
     */
-    function getDIStorage() {
+    function getDIStorage(selectStorage) {
         $.ajax({
             type: 'get', //데이터 전송 타입,
             url: _WEBSERVER_ROOT_URL + 'StorageList', //데이터를 주고받을 파일 주소 입력,
@@ -212,7 +214,7 @@
             //보내는 데이터,
             dataType: 'JSON', //문자형식으로 받기 , 
             success: function (result) {
-                addSourcelist(result);
+                addSourcelist(result,selectStorage);
             },
             error: function () {
                 alert("error");
@@ -269,8 +271,6 @@
             "image_location": imgLocation,
             "label_location": labelLocation        
         }
-
-        console.log(datasetID);
 
         $.ajax({
             type: 'post', //데이터 전송 타입,
@@ -345,11 +345,9 @@
         inputLabel.value = result.image_location;
 
         //데이터인젝터 스토리지 목록을 그린 후에 기존 선택 값을 넣어준다.
-        if (datasetID !== null) {
-            console.log(result.source_list_sto)
-            $("#sourcelist").val(result.source_list_sto).prop("selected", true);
+        if (typeof datasetID == "string") {
+            getDIStorage(result.source_list_sto);
         }
-
     }
 
 
@@ -357,7 +355,7 @@
     /*
      D/I 스토리지 선택 옵션을 만들어준다.
     */
-    function addSourcelist(result) {
+    function addSourcelist(result, storage) {
         //#sourcelist selectbox
         var selectbox = document.querySelector("#sourcelist");
         var objOption = document.createElement("option");
@@ -365,6 +363,11 @@
         for (var i = 0; i < result.storageinfo.length; i++) {
             $('#sourcelist').append(
                 `<option value='${result.storageinfo[i].storageid}'> ${result.storageinfo[i].name}</option>`);
+        }
+
+        //EDIT : 선택한 스토리지가 있는 경우, selected true
+        if(typeof datasetID == "string"){
+            $("#sourcelist").val(storage).prop("selected", true);
         }
     }
 
@@ -376,12 +379,6 @@
     라벨파일 확장자 : name="label-ext", id="type-JSON"
     (api)라벨파일 위치 : id="location-label"
     */
-    /*
-     var option = select.options[select.selectedIndex];
-
-     document.getElementById('value').value = option.value;
-     document.getElementById('text').value = option.text;
-     $('input:radio[name=이름]').is(":checked");*/
 
     function infoValidation() {
         var inputName, inputLocatype, importType, inputDataset, inputImgloca, inputLabelloca, inputLabelext;

@@ -305,17 +305,20 @@
     }
 
     const urlParams = new URLSearchParams(window.location.search);
-    const sto_id = urlParams.get('source_list_sto');
-    const dataset_id = urlParams.get('dataset_id');
 
     function pageMove(page) {
         var params;
         var url = _PAGE_URL;
+
+        sto_id = localStorage.setItem('di_storageid', sto_id);
+        dataset_id = localStorage.setItem('datasetid', dataset_id);
+
         switch (page) {
             case "selecttemplate":
-                params = "selecttemplate?source_list_sto=" + sto_id + "&dataset_id=" + dataset_id;
+                params = "selecttemplate";
                 break;
         }
+
         window.location.href = url + params;
 
     }
@@ -348,7 +351,7 @@
     템플릿 정보를 업데이트한다.
     */
     function updateTemplate(templateInfo) {
-        console.log(JSON.stringify(templateInfo));
+        //console.log(JSON.stringify(templateInfo));
         $.ajax({
             type: 'post', //데이터 전송 타입,
             url: _PAGE_URL + 'apidataset/updatekeyp?keypointId=' + keypointID, //데이터를 주고받을 파일 주소 입력,
@@ -356,7 +359,7 @@
             dataType: 'JSON', //문자형식으로 받기 , 
             contentType: "application/json",
             success: function (result) {
-                console.log(result);
+                //console.log(result);
                 pageMove("selecttemplate");
             },
             error: function () {
@@ -524,8 +527,6 @@
             y2 = "Y2";
         }
 
-        console.log(x1, y1);
-
         document.getElementById("name-x").innerHTML = x1;
         document.getElementById("name-y").innerHTML = y1;
         document.getElementById("name-w").innerHTML = x2;
@@ -600,8 +601,6 @@
             keyinfo.push(y);
 
             keypoints.push(newKeypoint);
-            console.log(keyinfo);
-            console.log(keypoints);
         }
 
         draw();
@@ -639,7 +638,6 @@
             keypoints,
             lines
         });
-        console.log(json);
     }
 
     //클리어 버튼
@@ -683,10 +681,17 @@
 
     let query = window.location.search;
     let param = new URLSearchParams(query);
-    let keypointID = param.get('ketpoint_id');
+    let keypointID = localStorage.getItem('ketpointid');
+    var sto_id = localStorage.getItem('di_storageid');
+    var dataset_id = localStorage.getItem('datasetid');
 
     $(document).ready(function () {
-        if (keypointID !== null) {
+        if (typeof sto_id !== "string" || typeof dataset_id !== "string") {
+            window.location.href = _PAGE_URL + "gallerylist";
+            return;
+        }
+        
+        if (typeof keypointID == "string") {
             getInfo(keypointID);
         }
     });
@@ -726,7 +731,6 @@
     존재하는 정보 화면에 그려주기
     */
     function drawExistInfo(result) {
-        console.log(result)
         document.getElementById("template-name").value = result.kypt_name;
         document.getElementById("template-color").value = result.kypt_json.categories[0].color;
 
@@ -759,6 +763,7 @@
 
         } else {
             document.getElementById("btn-boundingbox").checked = false;
+            typeClick('boundingbox');
             $("#type-boundingbox").hide();
         }
 
@@ -774,7 +779,8 @@
 
         } else {
             document.getElementById("btn-keypoint").checked = false;
-            $("#type-keypoint").hide();
+            $("#type-keypoint").hide(); //키포인트
+            typeClick('keypoint');
         }
     }
 
@@ -784,7 +790,6 @@
     function listkeypoints() {
         listItem = "";
 
-        console.log(keypoints);
         if (keypoints.length > 0) {
             for (i = 0; i < keypoints.length; i++) {
                 // listItem += '<div>index = ' + i + ' x= ' + keypoints[i].x + ' y = ' + keypoints[i].y + '</div>';
@@ -806,13 +811,16 @@
         }
     }
 
-    function noneInputCheck(obj, num){
-        if( typeof obj == "undefined"){
+    function noneInputCheck(obj, num) {
+        if (typeof obj == "undefined") {
             return "";
-        }
-        else{
-            if(num == "x"){return obj.x; }
-            if(num == "y"){return obj.y; }
+        } else {
+            if (num == "x") {
+                return obj.x;
+            }
+            if (num == "y") {
+                return obj.y;
+            }
         }
     }
 
@@ -857,8 +865,6 @@
 
         // Draw keypoints
         for (var i = 0; i < totalkeynum; i++) {
-            console.log(keypointarr[i][0], keypointarr[i][1]);
-
             newKeypoint = {
                 count: i,
                 x: keypointarr[i][0],
@@ -878,7 +884,6 @@
             ctx.fillStyle = 'Black';
             ctx.fillText(keypointname[i], keypointarr[i][0], keypointarr[i][1] + 24);
         }
-        console.log(keypoints);
 
         // Draw lines
         for (var i = 0; i < linkInfo.length; i++) {
@@ -904,7 +909,7 @@
             ctx.stroke();
             ctx.closePath();
         }
-        
+
         inputKeypointinfo(result, result.kypt_json.annotations[0].num_keypoints);
 
     }
