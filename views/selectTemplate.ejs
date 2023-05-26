@@ -235,6 +235,7 @@
                 params = "imagegallery";
                 break;
             case "createtemplate":
+                localStorage.removeItem('ketpointid');
                 params = "createtemplate";
                 break;
             case "gallerylist":
@@ -252,7 +253,7 @@
     const urlParams = new URLSearchParams(window.location.search);
     var sto_id = localStorage.getItem('di_storageid');
     var dataset_id = localStorage.getItem('datasetid');
-    
+
     $(document).ready(function () {
         if (typeof sto_id !== "string" || typeof dataset_id !== "string") {
             window.location.href = _PAGE_URL + "gallerylist";
