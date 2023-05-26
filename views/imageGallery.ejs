@@ -175,7 +175,7 @@
     $(document).ready(function () {
         sto_id = localStorage.getItem('di_storageid');
         dataset_id = localStorage.getItem('datasetid');
-                
+
         if (typeof sto_id !== "string" || typeof dataset_id !== "string") {
             window.location.href = _PAGE_URL + "gallerylist";
             return;
@@ -489,7 +489,8 @@
             fnImgToolbarCustDisplay: myToolbarCustDisplay,
             // ### gallery content ###
             items: pathArr
-        });    }
+        });
+    }
 
     // Callback on display of a new media in the lightbox
     function myToolbarCustDisplay($customToolbarElements, item) {
@@ -539,19 +540,19 @@
     function countPage(attr) {
         xylocationlist = [];
         linklines = [];
-        var pageCnt = document.getElementById("page-count").value;
+        var pageCnt = Number(document.getElementById("page-count").value);
         var pageMax = Number(document.getElementById("page-total").innerText);
 
         if (attr == "up") {
-            if (pageCnt >= pageMax) {
+            if (pageCnt < 1 || pageCnt >= pageMax) {
                 return;
             }
             document.getElementById("page-count").value = Number(pageCnt) + 1;
-
+    
             getDatasetInfo(Number(pageCnt) + 1);
 
         } else if (attr == "down") {
-            if (pageCnt <= 1) {
+            if (pageCnt <= 1 || pageCnt > pageMax) {
                 return;
             }
 
@@ -561,10 +562,10 @@
 
         } else {
             if (attr < 1) {
-                return;
+                attr = 1;
             }
             if (attr > pageMax) {
-                return;
+                attr = pageMax;
             }
             document.getElementById("page-count").value = attr;
             getDatasetInfo(Number(attr));
@@ -938,10 +939,10 @@
                                 .bbox_type !== undefined) {
                                 ctx.strokeStyle = list.keypoint_list[index].bbox_color;
                                 ctx.lineWidth = 3;
-                                ctx.strokeRect(list.keypoint_list[index].bbox[0], 
-                                list.keypoint_list[index].bbox[1], 
-                                list.keypoint_list[index].bbox[2], 
-                                list.keypoint_list[index].bbox[3]);
+                                ctx.strokeRect(list.keypoint_list[index].bbox[0],
+                                    list.keypoint_list[index].bbox[1],
+                                    list.keypoint_list[index].bbox[2],
+                                    list.keypoint_list[index].bbox[3]);
 
                             }
                         }
@@ -1022,7 +1023,7 @@
         z_width = (canvas.width / originwidth); //배율 구하기 x
         z_height = (canvas.height / originheight); // 배율 구하기 y
 
-        zoomx =  canvas.width - originwidth;
+        zoomx = canvas.width - originwidth;
         zoomy = canvas.height - originheight;
 
         var selectedID = [];
@@ -1084,17 +1085,17 @@
             //Draw lect
 
             for (var i = 0; i < templateKeyMatch.length; i++) {
-                ctx.scale(1*z_width *0.645,1*z_height*0.568)
+                ctx.scale(1 * z_width * 0.645, 1 * z_height * 0.568)
                 if (templateKeyMatch[i].keypoint_id == selectedID[j]) {
-                    ctx.lineWidth = 2 ;
+                    ctx.lineWidth = 2;
                     ctx.strokeStyle = templateKeyMatch[i].keypoint_list[canvasIndex - 1].bbox_color;
-                    ctx.strokeRect(templateKeyMatch[i].keypoint_list[canvasIndex - 1].bbox[0] , 
-                    templateKeyMatch[i].keypoint_list[canvasIndex - 1].bbox[1] , 
-                    templateKeyMatch[i].keypoint_list[canvasIndex - 1].bbox[2] , 
-                    templateKeyMatch[i].keypoint_list[canvasIndex - 1].bbox[3] );
+                    ctx.strokeRect(templateKeyMatch[i].keypoint_list[canvasIndex - 1].bbox[0],
+                        templateKeyMatch[i].keypoint_list[canvasIndex - 1].bbox[1],
+                        templateKeyMatch[i].keypoint_list[canvasIndex - 1].bbox[2],
+                        templateKeyMatch[i].keypoint_list[canvasIndex - 1].bbox[3]);
 
                 }
-                ctx.scale(1/z_width/0.645,1/z_height/0.568)
+                ctx.scale(1 / z_width / 0.645, 1 / z_height / 0.568)
 
             }
 
