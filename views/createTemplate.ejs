@@ -328,6 +328,7 @@
     http://127.0.0.1:8008/apidataset/keypwrite
     */
     function sendInfo(templateInfo) {
+        console.log(keypointID);
         if (keypointID !== null) {
             updateTemplate(templateInfo);
             return;
