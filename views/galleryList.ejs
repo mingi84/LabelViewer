@@ -30,29 +30,25 @@
 
 <body>
     <%- include('./header') %>
-        <div class="container my-4">
-            <div class="row row-cols-4 g-4" id="gallerylist">
-                <div class="col" id="add-dataset">
-                    <div class="card w-100 dataset" style="border: 2px dashed #D9D9D9;">
-                        <div class="card-body d-flex justify-content-center align-items-center"
-                            onclick="pageMove('addfiles');">
-                            <p class="card-text">+ Add Dataset</p>
-                        </div>
+    <div class="container my-4">
+        <div class="row row-cols-4 g-4" id="gallerylist">
+            <div class="col" id="add-dataset">
+                <div class="card w-100 dataset" style="border: 2px dashed #D9D9D9;">
+                    <div class="card-body d-flex justify-content-center align-items-center"
+                        onclick="pageMove('addfiles');">
+                        <p class="card-text">+ Add Dataset</p>
                     </div>
                 </div>
             </div>
-            <div class="modal" id="delete-popup" tabindex="-1">
-
-            </div>
         </div>
+        <div class="modal" id="delete-popup" tabindex="-1">
+
+        </div>
+    </div>
 </body>
 <script>
-
-
     function pageMove(page, datasetID, sourceID) {
-        localStorage.setItem('di_storageid', sourceID);
-        localStorage.setItem('datasetid', datasetID);
-
+        localStorage.clear();
         var params;
         var url = _PAGE_URL;
         switch (page) {
@@ -60,9 +56,13 @@
                 params = "addFiles";
                 break;
             case "imagegallery":
+                localStorage.setItem('di_storageid', sourceID);
+                localStorage.setItem('datasetid', datasetID);
                 params = "imagegallery";
                 break;
             case "edit":
+                localStorage.setItem('di_storageid', sourceID);
+                localStorage.setItem('datasetid', datasetID);
                 params = "addFiles";
                 break;
             default:
@@ -75,15 +75,15 @@
 
 
     var dataset = [{
-        "datasetID": 0,
-        "name": "축구1",
-        "updateDate": "2023-04-17"
-    },
-    {
-        "datasetID": 1,
-        "name": "축구2",
-        "updateDate": "2023-04-21"
-    }
+            "datasetID": 0,
+            "name": "축구1",
+            "updateDate": "2023-04-17"
+        },
+        {
+            "datasetID": 1,
+            "name": "축구2",
+            "updateDate": "2023-04-21"
+        }
     ]
 
     $(document).ready(function () {
@@ -108,7 +108,11 @@
             success: function (result) {
                 if (result.length) {
                     for (i = 0; i < result.length; i++) {
-                        var kyptnamelist = { kypt_id: result[i]._id, kypt_name: result[i].kypt_name, kypt_color: result[i].kypt_json.categories[0].color };
+                        var kyptnamelist = {
+                            kypt_id: result[i]._id,
+                            kypt_name: result[i].kypt_name,
+                            kypt_color: result[i].kypt_json.categories[0].color
+                        };
                         keyptTempNameList.push(kyptnamelist);
                     }
                 }
@@ -182,9 +186,19 @@
             //Format UTC Time to Asia/Seoul Timezone
             const date = new Date(dataset[i].dataset_createDate);
             const timezone = 'Asia/Seoul'; // Replace with your desired timezone
-            const formattedDate = date.toLocaleString('ko-KR', { timeZone: timezone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).replace(',', 'T');
+            const formattedDate = date.toLocaleString('ko-KR', {
+                timeZone: timezone,
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            }).replace(',', 'T');
 
-            imagesource = getImagesrc(dataset[i].source_list_sto, dataset[i].dataset_import_type, dataset[i].image_location);
+            imagesource = getImagesrc(dataset[i].source_list_sto, dataset[i].dataset_import_type, dataset[i]
+                .image_location);
 
             cardText += `
                 <div class="col" id="${dataset[i]._id}-card">
@@ -260,7 +274,11 @@
         switch (importtype) {
             case 1: //D/I
                 var result = loadDIimage(storageID);
-                src = {src_img: _WEBSERVER_DI_URL + imagepath + result.mediainfo[0].mediapath + result.mediainfo[0].title, img_count:result.totalcount} 
+                src = {
+                    src_img: _WEBSERVER_DI_URL + imagepath + result.mediainfo[0].mediapath + result.mediainfo[0]
+                        .title,
+                    img_count: result.totalcount
+                }
                 return src;
                 break;
             case 2: //Object storage

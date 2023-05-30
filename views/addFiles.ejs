@@ -188,14 +188,8 @@
     var datasetID = localStorage.getItem('datasetid');
 
     window.addEventListener("load", (event) => {
-
-        if (typeof datasetID !== "string") {
-            window.location.href = _PAGE_URL + "gallerylist";
-            return;
-        }
-
         if (typeof datasetID == "string") {
-            getDataset(datasetID)
+            getDataset(datasetID);
         }
         else{
             getDIStorage();
@@ -214,6 +208,7 @@
             //보내는 데이터,
             dataType: 'JSON', //문자형식으로 받기 , 
             success: function (result) {
+                console.log(result);
                 addSourcelist(result,selectStorage);
             },
             error: function () {
