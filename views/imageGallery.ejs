@@ -207,7 +207,8 @@
             divgalleryname.innerHTML = datasetInfo.dataset_name;
             img_folder = datasetInfo.image_location;
             label_folder = datasetInfo.label_location;
-            if (datasetInfo.kypt_id.length >= 0) {
+            console.log(datasetInfo);
+            if (datasetInfo.kypt_id[0] != null) {
                 keytemplates = datasetInfo.kypt_id
                 const divlabeltemp = document.getElementById('divlabeltemplate');
                 divlabeltemp.innerHTML = '';
