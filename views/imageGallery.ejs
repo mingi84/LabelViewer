@@ -775,8 +775,11 @@
 
         zthumb_width = ($(".nGY2GThumbnailImage").width() / canvas.width); //배율 구하기 x
         zthumb_height = ($(".nGY2GThumbnailImage").height() / canvas.height); // 배율 구하기 y
+
         resizeCanvasToDisplaySize(canvas);
 
+        canvas.width = $(".nGY2GThumbnailImage").width();
+        canvas.height = $(".nGY2GThumbnailImage").height();
 
         var selectedID = [];
         $("input[name='btn-template']:checked").each(function () {
@@ -796,7 +799,7 @@
                             ctx.fillStyle = pointcolor;
                             ctx.fill();
                             ctx.strokeStyle = pointcolor;
-                            ctx.lineWidth = 1;
+                            ctx.lineWidth = 1 *zthumb_width;
                             ctx.stroke();
                             ctx.closePath();
                         });
@@ -823,7 +826,7 @@
                             ctx.moveTo(from.x * zthumb_width, from.y * zthumb_height);
                             ctx.lineTo(to.x * zthumb_width, to.y * zthumb_height);
                             ctx.strokeStyle = linecolor;
-                            ctx.lineWidth = 3;
+                            ctx.lineWidth = 3 * zthumb_width;
                             ctx.stroke();
                             ctx.closePath();
                         }
@@ -834,6 +837,7 @@
 
         }
 
+        /*
         //Draw lect
         templateKeyMatch.forEach((list, ind) => {
             selectedID.forEach((selected) => {
@@ -849,7 +853,29 @@
                     }
                 }
             });
-        });
+        });*/
+
+        for (var j = 0; j < selectedID.length; j++) {
+            //Draw lect
+
+            for (var i = 0; i < templateKeyMatch.length; i++) {
+                ctx.scale(1 * zthumb_width * 0.645, 1 * zthumb_height * 0.568)
+                if (templateKeyMatch[i].keypoint_id == selectedID[j]) {
+                    ctx.lineWidth = 2 * zthumb_width;
+                    ctx.strokeStyle = templateKeyMatch[i].keypoint_list[index].bbox_color;
+                    ctx.strokeRect(templateKeyMatch[i].keypoint_list[index].bbox[0],
+                        templateKeyMatch[i].keypoint_list[index].bbox[1],
+                        templateKeyMatch[i].keypoint_list[index].bbox[2],
+                        templateKeyMatch[i].keypoint_list[index].bbox[3]);
+
+                }
+                ctx.scale(1 / zthumb_width / 0.645, 1 / zthumb_height / 0.568)
+
+            }
+
+
+        }
+        
 
     }
 
