@@ -38,65 +38,65 @@ app.set('view engine', 'ejs')
 var TAB = "\t";
 
 app.get('/', (req, res) => {
-    res.render('gallerylist');
+    res.render('galleryList.ejs');
     console.log(Date() + TAB + req.socket.localAddress + TAB + req.url);
 })
 
 app.get('/drawkey', (req, res) => {
-    res.render('drawkey');
+    res.render('drawkey.ejs');
     console.log(Date() + TAB + req.socket.localAddress + TAB + req.url);
 })
 
 app.get('/drawtemplate', (req, res) => {
-    res.render('drawtemplate');
+    res.render('drawtemplate.ejs');
     console.log(Date() + TAB + req.socket.localAddress + TAB + req.url);
 })
 
 app.get('/galleryList', (req, res) => {
-    res.render('gallerylist');
+    res.render('galleryList.ejs');
     console.log(Date() + TAB + req.socket.localAddress + TAB + req.url);
 })
 app.get('/addFiles', (req, res) => {
-    res.render('addfiles');
+    res.render('addFiles.ejs');
     console.log(Date() + TAB + req.socket.localAddress + TAB + req.url);
 })
 app.get('/selectTemplate', (req, res) => {
-    res.render('selecttemplate');
+    res.render('selectTemplate.ejs');
     console.log(Date() + TAB + req.socket.localAddress + TAB + req.url);
 })
 
 app.get('/createTemplate', (req, res) => {
-    res.render('createtemplate');
+    res.render('createTemplate.ejs');
     console.log(Date() + TAB + req.socket.localAddress + TAB + req.url);
 })
 
 app.get('/imageGallery', (req, res) => {
-    res.render('imagegallery');
+    res.render('imageGallery.ejs');
     console.log(Date() + TAB + req.socket.localAddress + TAB + req.url);
 })
 
 app.get('/posttest', (req, res) => {
-    res.render('posttest');
+    res.render('posttest.ejs');
     console.log(Date() + TAB + req.socket.localAddress + TAB + req.url);
 })
 
 app.get('/updatedataset', (req, res) => {
-    res.render('updatedataset');
+    res.render('updatedataset.ejs');
     console.log(Date() + TAB + req.socket.localAddress + TAB + req.url);
 })
 
 app.get('/note2', (req, res) => {
-    res.render('note2');
+    res.render('note2.ejs');
     console.log(Date() + TAB + req.socket.localAddress + TAB + req.url);
 })
 
 app.get('/note', (req, res) => {
-    res.render('note');
+    res.render('note.ejs');
     console.log(Date() + TAB + req.socket.localAddress + TAB + req.url);
 })
 
 app.get('/note3', (req, res) => {
-    res.render('note3');
+    res.render('note3.ejs');
     console.log(Date() + TAB + req.socket.localAddress + TAB + req.url);
 })
 
