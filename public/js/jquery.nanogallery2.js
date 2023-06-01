@@ -1515,7 +1515,7 @@
     thumbnailCropScaleFactor: 1.5,
     thumbnailLevelUp: false,
     thumbnailAlignment: 'fillWidth',
-    thumbnailWidth: 300,
+    thumbnailWidth: 300, //thumbnail width
     thumbnailL1Width: null,
     thumbnailHeight: 200,
     thumbnailL1Height: null,
@@ -5176,6 +5176,7 @@
             });
           }
         }
+
       }
 
       var areaWidth = G.$E.conTnParent.width();
@@ -5214,7 +5215,6 @@
           }
         }
       }
-
 
       // batch set position (and display animation) to all thumbnails
       // first display newly built thumbnails
@@ -5357,6 +5357,7 @@
         // display the thumbnail
         ThumbnailAppear(GOMidx, cnt);
 
+
         curTn.displayed = true;
         curTn.neverDisplayed = false;
       } else {
@@ -5468,6 +5469,7 @@
           item.resizedContentWidth = curTn.resizedContentWidth;
           item.resizedContentHeight = curTn.resizedContentHeight;
         }
+        drawpointsindex(item.mediaNumber);
       }
 
 
@@ -5511,7 +5513,6 @@
           G.GOM.lastDisplayedIdx = GOMidx;
         }
       }
-
     }
 
     // ---------------------
@@ -5867,7 +5868,7 @@
         newElt[newEltIdx++] = '  </div>';
 
         //Draw Keypoint custom function
-        drawpointsindex(idx);
+        //drawpointsindex(idx);
       }
 
       // ##### layer for tools
@@ -6642,8 +6643,6 @@
         default:
           break;
       }
-
-
     }
 
     // ######################################
@@ -11749,7 +11748,7 @@
       //var newLocationHash = '#' + 'nanogallery/' + G.baseEltID + '/' + albumID; //원본 <-- by.misun url 페이지+이미지 번호
       var page = document.getElementById("page-count").value;
       var imageNum = imageID % 50;
-      if(imageNum == 0){
+      if (imageNum == 0) {
         imageNum = 50;
       }
 
