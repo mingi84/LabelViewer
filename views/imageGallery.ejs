@@ -207,7 +207,6 @@
             divgalleryname.innerHTML = datasetInfo.dataset_name;
             img_folder = datasetInfo.image_location;
             label_folder = datasetInfo.label_location;
-            console.log(datasetInfo);
             if (datasetInfo.kypt_id[0] != null) {
                 keytemplates = datasetInfo.kypt_id
                 const divlabeltemp = document.getElementById('divlabeltemplate');
@@ -549,7 +548,7 @@
                 return;
             }
             document.getElementById("page-count").value = Number(pageCnt) + 1;
-    
+
             getDatasetInfo(Number(pageCnt) + 1);
 
         } else if (attr == "down") {
@@ -771,16 +770,14 @@
 
         const canvas = document.getElementById(canvasindex);
         const ctx = canvas.getContext('2d');
-        //const zoomcanv = document.getElementById(zoomcanvindex)
-        //const zctx = zoomcanv.getContext('2d');
-
-        zthumb_width = ($(".nGY2GThumbnailImage").width() / canvas.width); //배율 구하기 x
-        zthumb_height = ($(".nGY2GThumbnailImage").height() / canvas.height); // 배율 구하기 y
-
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         resizeCanvasToDisplaySize(canvas);
 
         canvas.width = $(".nGY2GThumbnailImage").width();
         canvas.height = $(".nGY2GThumbnailImage").height();
+
+        zthumb_width = ($(".nGY2GThumbnailImage").width()) * 0.0033; //배율 구하기 x
+        zthumb_height = ($(".nGY2GThumbnailImage").height()) * 0.0067; // 배율 구하기 y
 
         var selectedID = [];
         $("input[name='btn-template']:checked").each(function () {
@@ -795,12 +792,12 @@
                         list.keypoint_list[index].keypoints.forEach(point => {
                             pointcolor = point.key;
                             ctx.beginPath();
-                            ctx.arc(point.x * zthumb_width, point.y * zthumb_height, 4, 0,
+                            ctx.arc(point.x * zthumb_width, point.y * zthumb_height, 3, 0,
                                 2 * Math.PI);
                             ctx.fillStyle = pointcolor;
                             ctx.fill();
                             ctx.strokeStyle = pointcolor;
-                            ctx.lineWidth = 1 *zthumb_width;
+                            ctx.lineWidth = 1 * zthumb_width;
                             ctx.stroke();
                             ctx.closePath();
                         });
@@ -827,7 +824,7 @@
                             ctx.moveTo(from.x * zthumb_width, from.y * zthumb_height);
                             ctx.lineTo(to.x * zthumb_width, to.y * zthumb_height);
                             ctx.strokeStyle = linecolor;
-                            ctx.lineWidth = 3 * zthumb_width;
+                            ctx.lineWidth = 3;
                             ctx.stroke();
                             ctx.closePath();
                         }
@@ -876,7 +873,7 @@
 
 
         }
-        
+
 
     }
 
@@ -896,7 +893,11 @@
 
                 resizeCanvasToDisplaySize(canvas);
 
+                canvas.width = $(".nGY2GThumbnailImage").width();
+                canvas.height = $(".nGY2GThumbnailImage").height();
 
+                zthumb_width = ($(".nGY2GThumbnailImage").width()) * 0.0033; //배율 구하기 x
+                zthumb_height = ($(".nGY2GThumbnailImage").height()) * 0.0067; // 배율 구하기 y
 
                 var selectedID = [];
                 $("input[name='btn-template']:checked").each(function () {
@@ -913,7 +914,7 @@
                                 list.keypoint_list[index].keypoints.forEach(point => {
                                     pointcolor = point.key;
                                     ctx.beginPath();
-                                    ctx.arc(point.x * zthumb_width, point.y * zthumb_height, 4,
+                                    ctx.arc(point.x * zthumb_width, point.y * zthumb_height, 3,
                                         0,
                                         2 * Math.PI);
                                     ctx.fillStyle = pointcolor;
@@ -959,6 +960,7 @@
                 }
 
                 //Draw lect
+                ctx.scale(1 * zthumb_width * 0.645, 1 * zthumb_height * 0.568)
                 templateKeyMatch.forEach((list, ind) => {
                     selectedID.forEach((selected) => {
                         if (list.keypoint_id == selected) {
@@ -975,6 +977,7 @@
                         }
                     });
                 });
+                ctx.scale(1 / zthumb_width / 0.645, 1 / zthumb_height / 0.568)
             }
         } catch (err) {
             return;
@@ -1049,9 +1052,6 @@
         resizeCanvasToDisplaySize(canvas);
         z_width = (canvas.width / originwidth); //배율 구하기 x
         z_height = (canvas.height / originheight); // 배율 구하기 y
-
-        zoomx = canvas.width - originwidth;
-        zoomy = canvas.height - originheight;
 
         var selectedID = [];
         $("input[name='tag-label-lightbox']:checked").each(function () {
