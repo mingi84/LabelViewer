@@ -4,6 +4,7 @@ const router = express.Router();
 
 // Controller 를 불러와서 exports 메소드 사용
 const controller = require("../controllers/labelcontrol");
+const mediacontroller = require("../controllers/mediaController");
 
 // Main
 router.get('/', controller.datasetget); // http://127.0.0.1:8008/apidataset
@@ -35,6 +36,18 @@ router.get('/getkeyp', controller.getKeypById); //http://127.0.0.1:8008/apidatas
 
 // Delete Key by ID
 router.get('/delkeyp', controller.delKeypById); //http://127.0.0.1:8008/apidataset/delkeyp?keypointId=6447230bc8466699848eacfe
+
+
+
+
+// Main
+router.get('/medialist', mediacontroller.medialistget); // http://127.0.0.1:8008/apidataset/medialist
+
+// Write
+router.post('/mediawrite', mediacontroller.mediawrite); // http://127.0.0.1:8008/apidataset/mediawrite  
+
+// delete
+router.delete('/media/:mediaid', mediacontroller.mediaDelete); // http://127.0.0.1:8008/apidataset/mediadelete  
 
 
 module.exports = router;
