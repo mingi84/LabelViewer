@@ -31,6 +31,10 @@ const mediainfoSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  mediapage: {
+    type: Number,
+    required: true
+  },
   media_createDate: {
     type: Date,
     default: Date.now,

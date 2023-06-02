@@ -9,9 +9,10 @@ const { query } = require('express');
 
 
 exports.medialistget = async function (req, res) {
-    console.log("------------!!MediaListtb!!------------");
+    console.log("------------!!MediaInfo!!------------");
+    const storageid = req.body.storageid;
     try {
-        const mediainfoall = await mediainfo.find({});
+        const mediainfoall = await mediainfo.find({ storageid });
         res.json(mediainfoall);
     } catch (err) {
         console.error("Error fetching data from datasettb:", err);
@@ -39,7 +40,8 @@ exports.mediawrite = async function (req, res) {
         'mediapath': req.body.mediapath,
         'type': req.body.type,
         'addtime': req.body.addtime,
-        'mediastate': req.body.mediastate
+        'mediastate': req.body.mediastate,
+        'mediapage': req.body.mediapage
       };
 
       const result = await mediainfo.findOneAndUpdate({ mediaid }, updatedMedia, { new: true });
@@ -57,7 +59,8 @@ exports.mediawrite = async function (req, res) {
         'mediapath': req.body.mediapath,
         'type': req.body.type,
         'addtime': req.body.addtime,
-        'mediastate': req.body.mediastate
+        'mediastate': req.body.mediastate,
+        'mediapage': req.body.mediapage
       });
 
       const result = await newMedia.save();
