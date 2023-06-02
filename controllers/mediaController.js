@@ -13,6 +13,10 @@ exports.medialistget = async function (req, res) {
     const storageid = req.body.storageid;
     try {
         const mediainfoall = await mediainfo.find({ storageid });
+        if (mediainfoall.length === 0) {
+          // No media records found
+          return res.status(404).json({ message: "No media records found" });
+        }
         res.json(mediainfoall);
     } catch (err) {
         console.error("Error fetching data from datasettb:", err);
