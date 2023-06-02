@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 // Model
 const datasettb = require("../models/datasetSchema");
 const keypointtb = require("../models/keypointSchema");
+const mediainfotb = require("../models/medialistSchema");
+
 
 // KST Setting
 var moment = require('moment-timezone');
@@ -262,3 +264,7 @@ exports.delKeypById = async function (req, res) {
         res.status(500).json({ message: 'Error deleting dataset', error: err });
     }
 };
+
+
+
+
