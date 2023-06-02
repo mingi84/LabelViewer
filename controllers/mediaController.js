@@ -9,20 +9,17 @@ const { query } = require('express');
 
 
 exports.medialistget = async function (req, res) {
-    console.log("------------!!MediaInfo!!------------");
-    const storageid = req.query.storageid;
-    try {
-        const mediainfoall = await mediainfo.find({ storageid });
-        if (mediainfoall.length === 0) {
-          // No media records found
-          res.json(mediainfoall);
-        }
-        res.json(mediainfoall);
-    } catch (err) {
-        console.error("Error fetching data from datasettb:", err);
-        res.status(500).json({ error: "Internal server error" });
-    }
+  console.log("------------!!MediaInfo!!------------");
+  const storageid = req.query.storageid;
+  try {
+    const mediainfoall = await mediainfo.find({ storageid });
+    res.json(mediainfoall);
+  } catch (err) {
+    console.error("Error fetching data from datasettb:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
+
 
 // 작성
 exports.mediawrite = async function (req, res) {
