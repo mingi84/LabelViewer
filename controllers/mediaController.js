@@ -10,7 +10,7 @@ const { query } = require('express');
 
 exports.medialistget = async function (req, res) {
     console.log("------------!!MediaInfo!!------------");
-    const storageid = req.body.storageid;
+    const storageid = req.query.storageid;
     try {
         const mediainfoall = await mediainfo.find({ storageid });
         if (mediainfoall.length === 0) {
