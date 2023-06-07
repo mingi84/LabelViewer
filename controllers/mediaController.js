@@ -10,9 +10,9 @@ const { query } = require('express');
 
 exports.medialistget = async function (req, res) {
   console.log("------------!!MediaInfo!!------------");
-  const storageid = req.query.storageid;
+  const { storageid, mediastate } = req.query;
   try {
-    const mediainfoall = await mediainfo.find({ storageid });
+    const mediainfoall = await mediainfo.find({ storageid, mediastate });
     res.json(mediainfoall);
   } catch (err) {
     console.error("Error fetching data from datasettb:", err);
