@@ -1684,8 +1684,8 @@
       navigationFilterSelectedAll: '<i class="nGY2Icon-ccw"></i>',
       navigationPaginationPrevious: '<i class="nGY2Icon-ngy2_chevron-left"></i>',
       navigationPaginationNext: '<i class="nGY2Icon-ngy2_chevron-right"></i>',
-      thumbnailSelected: '<i style="color:#bff;" class="nGY2Icon-ok-circled"></i>',
-      thumbnailUnselected: '<i style="color:#bff;" class="nGY2Icon-circle-empty"></i>',
+      thumbnailSelected: '<i class="fa-solid fa-square-check"  style="font-size:24px;"></i>',
+      thumbnailUnselected: '<i class="fa-regular fa-square" style="font-size:24px;"></i>',
       thumbnailFeatured: '<i style="color:#dd5;" class="nGY2Icon-star"></i>',
       thumbnailCounter: '<i class="nGY2Icon-picture"></i>',
       thumbnailShare: '<i class="nGY2Icon-ngy2_share2"></i>',
@@ -1695,7 +1695,7 @@
       thumbnailDisplay: '<i class="nGY2Icon-resize-full"></i>',
       thumbnailCustomTool1: 'T1',
       thumbnailCustomTool2: 'T2',
-      thumbnailCustomTool3: 'T3',
+      thumbnailCustomTool3: '<i class="fa-regular fa-square" style="font-size:24px;"></i>',
       thumbnailCustomTool4: 'T4',
       thumbnailCustomTool5: 'T5',
       thumbnailCustomTool6: 'T6',
@@ -1740,8 +1740,9 @@
       shareMail: '<i style="color:#555;" class="nGY2Icon-mail-alt"></i>',
       labelButton: ``,
       copyButton: `<i class="fa-solid fa-clone nGY2Icon mx-2" onclick="getPath();"></i>`,
+      selectImage: '<i class="fa-regular fa-square nGY2Icon-select align-self-center" style="font-size: 30px;"></i>',
       viewerCustomTool1: 'T1',
-      viewerCustomTool2: 'T2',
+      viewerCustomTool2: '',
       viewerCustomTool3: 'T3',
       viewerCustomTool4: 'T4',
       viewerCustomTool5: 'T5',
@@ -10306,6 +10307,10 @@
           StopPropagationPreventDefault(e);
           AddToCart(G.VOM.items[G.VOM.content.current.vIdx].ngy2ItemIdx, 'lightbox');
           break;
+        case 'selectimage':
+          StopPropagationPreventDefault(e);
+          selectLightboxImage(G.VOM.content.current.NGY2Item(),G.VOM.items[G.VOM.content.current.vIdx].ngy2ItemIdx, 'lightbox');
+          break;
       }
 
       // custom button
@@ -10451,7 +10456,7 @@
           r += 'nGEvent" data-ngy2action="share">' + G.O.icons.viewerShare + '</div>';
           break;
         case 'label':
-          r += '"><div class="label"><div class="title nGEvent" itemprop="name"></div><div class="description nGEvent" itemprop="description"></div></div></div>';
+          r += '"><div class="label p-1"><div class="title nGEvent" itemprop="name"></div><div class="description nGEvent" itemprop="description"></div></div></div>';
           break;
         case 'shoppingcart':
           r += 'closeButton nGEvent" data-ngy2action="shoppingcart">' + G.O.icons.viewerShoppingcart + '</div>';
@@ -10462,6 +10467,9 @@
         case 'copyButton':
           r += ' nGvent" data-ngy2action="copy">' + G.O.icons.copyButton + '</div>';
           break;
+        case 'selectImage':
+            r += ' nGvent" data-ngy2action="selectimage"><div class="checkpoint">' + G.O.icons.selectImage + '</div></div>';
+            break;
         default:
           // custom button
           if (e.indexOf('custom') == 0) {
@@ -11592,6 +11600,8 @@
                 LightboxClose();
                 break;
               case 32: // SPACE
+              selectLightboxImage(G.VOM.content.current.NGY2Item(),G.VOM.items[G.VOM.content.current.vIdx].ngy2ItemIdx, 'lightbox');
+              break;
               case 13: // ENTER
                 SlideshowToggle();
                 break;

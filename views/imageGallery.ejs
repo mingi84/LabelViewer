@@ -10,6 +10,8 @@
     <script language="javascript" type="text/javascript" src="js/bootstrap.bundle.js"></script>
     <script language="javascript" type="text/javascript" src="js/fontawesome.all.min.js"></script>
     <script language="javascript" type="text/javascript" src="js/jquery.nanogallery2.js"></script>
+    <script src="js/xlsx.full.min.js"></script>
+    <script src="js/FileSaver.min.js"></script>
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="css/fontawesome.all.css">
     <link rel="stylesheet" type="text/css" href="css/nanogallery2.min.css">
@@ -28,11 +30,11 @@
 
     ::-webkit-scrollbar {
         width: 8px;
+        height: 8px;
         /* 스크롤바의 너비 */
     }
 
     ::-webkit-scrollbar-thumb {
-        height: 30%;
         /* 스크롤바의 길이 */
         background: #217af4;
         /* 스크롤바의 색상 */
@@ -47,6 +49,10 @@
 
     .labelcanvasgallery {
         display: block;
+    }
+
+    .nGY2GThumbnailSubSelected {
+        box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
     }
 </style>
 <!--
@@ -75,8 +81,14 @@
                 </div>
             </div>
             <div class="col-2 d-flex align-items-end justify-content-end">
-                <button type="button" class="btn btn-outline-secondary" id="btn-edit-gallery"
-                    onclick="pageMove('selecttemplate')">Set Template</button>
+                <button type="button" class="btn btn-secondary mx-1" id="btn-edit-gallery" onclick="showFilelist();"
+                    data-bs-toggle="modal" data-bs-target="#modal-filelist">
+                    <i class="fa-solid fa-list-check"></i>                    
+                    File List</button>
+                <button type="button" class="btn btn-outline-secondary mx-1" id="btn-edit-gallery"
+                    onclick="pageMove('selecttemplate')">
+                    <i class="fa-solid fa-gear"></i>
+                    Set Template</button>
             </div>
         </div>
 
@@ -107,15 +119,52 @@
             </div>
         </div>
 
-        <div class="toast-container position-fixed bottom-0 end-0 p-3">
-            <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="toast-header">
-                    <strong class="me-auto">Bootstrap</strong>
-                    <small>11 mins ago</small>
-                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>s
-                <div class="toast-body">
-                    Hello, world! This is a toast message.
+        <!-- Modal -->
+        <div class="modal fade modal-xl" id="modal-filelist" data-bs-backdrop="static" data-bs-keyboard="false"
+            tabindex="-1" aria-labelledby="modal-filelist" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">File List</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" style="overflow: auto;">
+                        <div class="d-flex justify-content-between my-2">
+                            <div class="d-flex">
+                                <div class="me-2">
+                                    Total :
+                                    <span id="filelist-totalcount"></span>
+                                </div>
+                                <div class="ms-2">
+                                    Selected File :
+                                    <span id="filelist-checkedcount">0</span>
+                                </div>
+                            </div>
+                            <!--
+                            <div class="d-flex">
+                                <div class="form-check me-2">
+                                    <input class="form-check-input" type="checkbox" value="" id="filelist-checked" checked>
+                                    <label class="form-check-label" for="filelist-checked">
+                                      Checked
+                                    </label>
+                                </div>
+                                <div class="form-check ms-2">
+                                    <input class="form-check-input" type="checkbox" value="" id="filelist-notchecked" checked>
+                                    <label class="form-check-label" for="filelist-notchecked">
+                                      Not Checked
+                                    </label>
+                                </div>
+                            </div>
+                        -->
+                        </div>
+                        <table class="table border rounded" id="filelist">
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="downloadExcel();">
+                            <i class="fa-solid fa-download"></i>
+                            Download</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -144,6 +193,7 @@
     var labelKeypoint;
     var templateList;
     var templateKeyMatch = [];
+    var totalcount = 0;
 
     if (toastTrigger) {
         const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample)
@@ -373,7 +423,10 @@
             success: function (result) {
                 //console.log(result);
                 imagePath(result, img_folder, label_folder);
+                totalcount = result.totalcount;
                 document.getElementById("totalcount").innerText = result.totalcount.toLocaleString(
+                    'ko-KR');
+                document.getElementById("filelist-totalcount").innerText = result.totalcount.toLocaleString(
                     'ko-KR');
                 if (result.totalcount % 50 == 0) {
                     document.getElementById("page-total").innerText = parseInt(result.totalcount / 50);
@@ -404,6 +457,7 @@
         var originParam, excludeParam, jsonParam;
         var pathArr = [];
         var jsonArr = [];
+        var pagecount = document.getElementById("page-count").value;
 
         for (i = 0; i < data.length; i++) {
             //originParam = result.errorinfo[i].thumbnailpath;
@@ -425,11 +479,19 @@
                     }
                 });
 
-
                 object = {
                     src: originParam,
                     srct: originParam,
-                    title: data[i].title
+                    title: data[i].title,
+                    customData: {
+                        type: data[i].type,
+                        mediaid: data[i].mediaid,
+                        addtime: data[i].addtime,
+                        storageid: data[i].storageid,
+                        mediapath: data[i].mediapath,
+                        mediapage: Number(pagecount)
+                    }
+
                 }
                 pathArr.push(object);
                 jsonArr.push(jsonParam);
@@ -440,8 +502,6 @@
     }
 
     /*갤러리를 보여준다*/
-
-
 
     function makeGallery(pathArr, jsonArr) {
         var myLightboxTool = function (customElementName, $customIcon, item) {
@@ -472,29 +532,232 @@
             galleryMaxItems: 50,
             lazyLoad: false, // Disable lazy loading
             pagination: false, // Disable pagination
+            thumbnailHoverEffect2: 'labelAppear75',
             thumbnailGutterWidth: 5,
             thumbnailGutterHeight: 5,
             thumbnailOpenImage: true,
+            thumbnailToolbarImage: {
+                topLeft: '',
+                topRight: 'custom3',
+                bottomLeft: '',
+                bottomRight: ''
+            },
             viewerToolbar: {
                 standard: 'minimizeButton, label, shareButton, fullscreenButton',
                 minimized: 'minimizeButton, label, fullscreenButton, downloadButton, infoButton'
             },
             viewerTools: {
-                topLeft: 'label',
-                topRight: 'custom2 ,labelButton, copyButton, playPauseButton, zoomButton, fullscreenButton, viewerShoppingcart, closeButton '
+                topLeft: 'selectImage, label',
+                topRight: 'custom2 ,labelButton, copyButton, playPauseButton, zoomButton, fullscreenButton, closeButton '
             },
             icons: {
-                viewerCustomTool2: ''
+                viewerCustomTool3: '<i class="fa-regular fa-square" style="font-size:24px;"></i>',
             },
             fnImgToolbarCustDisplay: myToolbarCustDisplay,
+            fnThumbnailInit: myTnInit,
+            fnThumbnailToolCustAction: myTnTool,
             // ### gallery content ###
             items: pathArr
         });
+
+        checkList = getSelectedMedialist();
     }
+
+
+    // click/touch on custom tool/button
+    function myTnTool(action, item) {
+        switch (action) {
+            case 'custom3':
+                // switch favorite status
+                checkImageSelected(item);
+                break;
+        }
+    }
+
+    var checkList = [];
+    // Add custom elements after one thumbnail is build
+    function myTnInit($e, item, GOMidx) {
+
+        var pagecount = document.getElementById("page-count").value;
+
+        var list = checkList;
+
+        for (var i = 0; i < list.length; i++) {
+            if (item.customData.mediapage == list[i].mediapage) {
+                if (item.customData.mediaid == list[i].mediaid) {
+                    if (list[i].mediastate == 1) {
+                        item.$elt.find('[data-ngy2action="custom3"]').html(
+                            '<i class="fa-solid fa-square-check"  style="font-size:24px;"></i>');
+                        item.selected = true;
+                    }
+                }
+            }
+        }
+
+    }
+
+    //Lightbox Checkbox check 
+    function checkImageSelected(item) {
+        var checkState;
+
+        if (item.selected == true) {
+            item.$elt.find('[data-ngy2action="custom3"]').html(
+                '<i class="fa-regular fa-square" style="font-size:24px;"></i>');
+            item.selected = false;
+            checkState = 0;
+        } else {
+            item.$elt.find('[data-ngy2action="custom3"]').html(
+                '<i class="fa-solid fa-square-check"  style="font-size:24px;"></i>');
+            item.selected = true;
+            checkState = 1;
+        }
+
+        makeCheckedImageInfo(item, checkState);
+    }
+
+    function makeCheckedImageInfo(item, checkstate) {
+        var pagecount = document.getElementById("page-count").value;
+
+        var filelistJSON = {
+            storageid: item.customData.storageid,
+            mediaid: item.customData.mediaid,
+            title: item.title,
+            mediapath: item.src,
+            type: item.customData.type,
+            addtime: item.customData.addtime,
+            mediastate: checkstate,
+            mediapage: Number(pagecount)
+        }
+
+        $.ajax({
+            type: 'post', //데이터 전송 타입,
+            url: _PAGE_URL + 'apidataset/mediawrite',
+            data: JSON.stringify(filelistJSON), //보내는 데이터,
+            dataType: 'JSON', //문자형식으로 받기 , 
+            contentType: "application/json",
+            success: function (result) {
+                //console.log(result)
+            },
+            error: function () {
+                alert("error");
+            }
+        });
+    }
+
+    function getSelectedMedialist() {
+        var data = "";
+        $.ajax({
+            type: 'get', //데이터 전송 타입,
+            url: _PAGE_URL + 'apidataset/medialist?storageid=' + Number(sto_id) + '&mediastate=1',
+            dataType: 'JSON', //문자형식으로 받기 , 
+            contentType: "application/json",
+            async: false,
+            success: function (result) {
+                //console.log(result)
+                data = result;
+            },
+            error: function () {
+                alert("error");
+            }
+        });
+        return data;
+    }
+
+
+    /*filelist button click
+    파일리스트 보여줌
+    */
+    function showFilelist() {
+        const fileInfo = getSelectedMedialist();
+        var totalcount = document.getElementById("filelist-totalcount").innerHTML;
+        document.getElementById("filelist-checkedcount").innerHTML = fileInfo.length.toLocaleString('ko-KR');;
+
+        if (fileInfo.length > 0) {
+            document.getElementById("filelist").innerHTML = "";
+            document.getElementById("filelist").innerHTML = `
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">File Name</th>
+                    <th scope="col">File Location</th>
+                </tr>
+            </thead>
+            <tbody id="filelist-body"></tbody>`;
+
+            var tablerow = "";
+
+            if (fileInfo.length <= 10) {
+                fileInfo.forEach((file, idx) => {
+                    tablerow += `
+                    <tr>
+                        <th scope="row">${idx + 1}</th>
+                        <td>${file.title}</td>
+                        <td>${file.mediapath}</td>
+                    </tr>
+                    `
+                });
+
+            }
+
+            if (fileInfo.length > 10) {
+
+                for (i = 0; i < 5; i++) {
+                    tablerow += `
+                    <tr>
+                        <th scope="row">${i+1}</th>
+                        <td>${fileInfo[i].title}</td>
+                        <td>${fileInfo[i].mediapath}</td>
+                    </tr>
+                    `;
+                }
+
+                tablerow +=
+                    `<tr><th scope="row" colspan="3" style="text-align: center;"><i class="fa-solid fa-ellipsis-vertical"></i></th></tr>`;
+
+                for (i = 5; i > 0; i--) {
+                    tablerow += `
+                    <tr>
+                        <th scope="row">${fileInfo.length - i + 1}</th>
+                        <td>${fileInfo[fileInfo.length - i].title}</td>
+                        <td>${fileInfo[fileInfo.length - i].mediapath}</td>
+                    </tr>
+                    `;
+                }
+            }
+
+            document.getElementById("filelist-body").innerHTML = tablerow;
+        }
+
+    }
+
+    //Lightbox Image Select(checkbox) State
+    function selectLightboxImage(item, index) {
+        var checkState;
+
+        if (item.selected == true) { //체크가 되어있던 경우
+            $('.checkpoint').html('<i class="fa-regular fa-square" style="font-size:30px;"></i>');
+            item.$elt.find('[data-ngy2action="custom3"]').html(
+                '<i class="fa-regular fa-square" style="font-size:24px;"></i>');
+
+            item.selected = false;
+            checkState = 0;
+
+        } else { //체크가 되어있지 않은 경우
+            $('.checkpoint').html('<i class="fa-solid fa-square-check" style="font-size:30px;"></i>');
+            item.$elt.find('[data-ngy2action="custom3"]').html(
+                '<i class="fa-solid fa-square-check"  style="font-size:24px;"></i>');
+
+            item.selected = true;
+            checkState = 1;
+        }
+
+        makeCheckedImageInfo(item, checkState);
+    }
+
 
     // Callback on display of a new media in the lightbox
     function myToolbarCustDisplay($customToolbarElements, item) {
-
+        //[lightbox]Draw template
         const template = document.getElementById("lightbox-template");
         template.innerHTML = "";
         t_template = JSON.stringify(templateList);
@@ -507,6 +770,14 @@
                     </label>`
         }
         lightboxDrawTemplate(item.mediaNumber);
+
+        //[lightbox]Draw checkbox
+        if (item.selected == true) { //checked
+            $('.checkpoint').html('<i class="fa-solid fa-square-check" style="font-size:30px;"></i>');
+        } else { //not checked
+            $('.checkpoint').html('<i class="fa-regular fa-square"  style="font-size:30px;"></i>');
+        }
+
     }
 
     /*
@@ -1149,6 +1420,59 @@
         // Alert the copied text
         alert("Copy Image URL : " + copyText.value);
     }
+
+    /*
+    Excel Download
+    */
+
+   // ArrayBuffer
+   function s2ab(s) {
+        var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+        var view = new Uint8Array(buf); //create uint8array as viewer
+        for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+        return buf;
+    }
+
+    //download filelist
+    function downloadExcel() {
+        const filelist = getSelectedMedialist();
+        var wb = XLSX.utils.book_new();
+    
+        // sheet명 생성
+        wb.SheetNames.push("sheet 1");
+
+        // 이중 배열 형태로 데이터가 들어간다.
+        var wsData = [
+            ['total_count', 'selected_count'],
+            [Number(totalcount), filelist.length],
+            ['file_name', 'file_location']
+        ];
+
+        filelist.forEach(file => {
+            var arr = [file.title, file.mediapath];
+            wsData.push(arr);
+        });
+
+        // 배열 데이터로 시트 데이터 생성
+        var ws = XLSX.utils.aoa_to_sheet(wsData);
+
+        // 시트 데이터를 시트에 넣기 ( 시트 명이 없는 시트인경우 첫번째 시트에 데이터가 들어감 )
+        wb.Sheets["sheet 1"] = ws;
+
+
+        // 엑셀 파일 쓰기
+        var wbout = XLSX.write(wb, {
+            bookType: 'xlsx',
+            type: 'binary'
+        });
+
+        // 파일 다운로드
+        saveAs(new Blob([s2ab(wbout)], {
+            type: "application/octet-stream"
+        }), 'labelviewer_filelist_'+ document.getElementById("galleryname").innerText +'.xlsx');
+
+    }
+
 </script>
 
 </html>
