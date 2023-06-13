@@ -1,3 +1,7 @@
+
+require('dotenv').config();
+const { MONGODB_URL } = process.env;
+
 // imports
 const express = require('express');
 const path = require('path');
@@ -115,7 +119,7 @@ console.log("before db");
 
 (async () => {
     try {
-      await mongoose.connect("mongodb://localhost:27017/labelviewer-db", {
+      await mongoose.connect(MONGODB_URL, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
       });
