@@ -8879,7 +8879,6 @@
 
     // Gallery clicked or toolbar touched -> retrieve & execute action
     function GalleryClicked(e) {
-
       var r = GalleryEventRetrieveElementl(e, false);
 
       if (r.GOMidx == -1) {
@@ -9332,7 +9331,6 @@
     // with internal or external viewer
     // ########################################################
     function DisplayPhotoIdx(ngy2ItemIdx) {
-
       if (!G.O.thumbnailOpenInLightox) {
         return;
       }
@@ -9621,6 +9619,9 @@
       G.VOM.content.previous.vIdx = G.VOM.IdxNext();
       G.VOM.content.next.vIdx = G.VOM.IdxPrevious();
 
+      console.log(G.VOM.content);
+      console.log(G.VOM.content.current.NGY2Item().mediaMarkup);
+
       var sMedia = '<div class="nGY2ViewerMediaPan"><div class="nGY2ViewerMediaLoaderDisplayed"></div>' + G.VOM.content.previous.NGY2Item().mediaMarkup + '</div>'; // previous media
       sMedia += '<div class="nGY2ViewerMediaPan"><div class="nGY2ViewerMediaLoaderDisplayed"></div>' + G.VOM.content.current.NGY2Item().mediaMarkup + '</div>'; // current media
       sMedia += '<div class="nGY2ViewerMediaPan"><div class="nGY2ViewerMediaLoaderDisplayed"></div>' + G.VOM.content.next.NGY2Item().mediaMarkup + '</div>'; // next media
@@ -9674,7 +9675,7 @@
           vtbAlign = 'text-align:right;';
           break;
       }
-      var sTB = '<div class="toolbarContainer nGEvent' + vtbBg1 + '" style="visibility:' + (G.O.viewerToolbar.display ? "visible" : "hidden") + ';' + vtbAlign + '"><div class="toolbar nGEvent' + vtbBg2 + '"></div></div>';
+      var sTB = '<div class="toolbarContainer nGEvent' + vtbBg1 + '" style="visibility:' + (G.O.viewerToolbar.display ? "visible" : "hidden") + ';' + vtbAlign + '"><div id="customToolbar"></div><div class="toolbar nGEvent' + vtbBg2 + '"></div></div>';
       G.VOM.$toolbar = jQuery(sTB).appendTo(G.VOM.$viewer);
 
       if (G.VOM.toolbarMode == 'min' || (G.O.viewerToolbar.autoMinimize > 0 && G.O.viewerToolbar.autoMinimize >= G.GOM.cache.viewport.w)) {
@@ -9839,8 +9840,13 @@
       G.VOM.gallery.firstDisplay = true;
       if (G.O.viewerGallery != 'none') {
 
-        var tw = G.O.viewerGalleryTWidth;
-        var th = G.O.viewerGalleryTHeight;
+        //lightbox - thumbnail
+        //var tw = G.O.viewerGalleryTWidth; //40
+        //var th = G.O.viewerGalleryTHeight; //40
+
+        var tw = 80;
+        var th = 80;
+
         var gutter = 2;
 
         var t = '';
@@ -10309,7 +10315,7 @@
           break;
         case 'selectimage':
           StopPropagationPreventDefault(e);
-          selectLightboxImage(G.VOM.content.current.NGY2Item(),G.VOM.items[G.VOM.content.current.vIdx].ngy2ItemIdx, 'lightbox');
+          selectLightboxImage(G.VOM.content.current.NGY2Item(), G.VOM.items[G.VOM.content.current.vIdx].ngy2ItemIdx, 'lightbox');
           break;
       }
 
@@ -10468,8 +10474,8 @@
           r += ' nGvent" data-ngy2action="copy">' + G.O.icons.copyButton + '</div>';
           break;
         case 'selectImage':
-            r += ' nGvent" data-ngy2action="selectimage"><div class="checkpoint">' + G.O.icons.selectImage + '</div></div>';
-            break;
+          r += ' nGvent" data-ngy2action="selectimage"><div class="checkpoint">' + G.O.icons.selectImage + '</div></div>';
+          break;
         default:
           // custom button
           if (e.indexOf('custom') == 0) {
@@ -10935,6 +10941,8 @@
       G.VOM.content.next.$media.append(spreloader + nextItem.mediaMarkup);
       ViewerSetMediaVisibility(G.VOM.content.next, 0);
       ViewerSetMediaVisibility(G.VOM.content.previous, 0);
+
+      const nowImage = ngy2item;
       if (nextItem.mediaKind == 'img') {
         G.VOM.ImageLoader.loadImage(VieweImgSizeRetrieved, nextItem);
       } else {
@@ -11153,13 +11161,12 @@
       var galleryHeight = 0;
       var cBottom = 0;
       // Height of the thumbnails gallery
-      if (G.O.viewerGallery != 'none') {
-        galleryHeight = G.O.viewerGalleryTHeight + 10;
+      if (G.O.viewerGallery != 'none') { //lightbox toolbar custom
+        galleryHeight = G.O.viewerGalleryTHeight + 10 + 50;
       }
       if (G.O.viewerGallery == 'bottom') {
         cBottom = galleryHeight;
       }
-
 
       switch (G.O.viewerToolbar.position) {
         case 'top':
@@ -11462,7 +11469,6 @@
         G.GOM.hammertime = new NGHammer(G.$E.conTn[0]);
         // G.GOM.hammertime.domEvents = true;
 
-
         // PAN on gallery (pagination)
         G.GOM.hammertime.on('pan', function (ev) {
           if (!G.VOM.viewerDisplayed) {
@@ -11600,8 +11606,8 @@
                 LightboxClose();
                 break;
               case 32: // SPACE
-              selectLightboxImage(G.VOM.content.current.NGY2Item(),G.VOM.items[G.VOM.content.current.vIdx].ngy2ItemIdx, 'lightbox');
-              break;
+                selectLightboxImage(G.VOM.content.current.NGY2Item(), G.VOM.items[G.VOM.content.current.vIdx].ngy2ItemIdx, 'lightbox');
+                break;
               case 13: // ENTER
                 SlideshowToggle();
                 break;
@@ -11615,6 +11621,65 @@
                 break;
               case 35: // END
               case 36: // BEGIN
+                break;
+              case 81: // Q, previous
+                if (document.getElementById("previouspage")) {
+                  $('#imageGallery').nanogallery2('closeViewer');
+
+                  var resolvedFlag = true;
+
+                  let mypromise = function functionOne(testInput) {
+                    countPage('down');
+
+                    return new Promise((resolve, reject) => {
+                      setTimeout(
+                        () => {
+                          console.log("Inside the promise");
+                          if (resolvedFlag == true) {
+                            resolve("Resolved");
+                          } else {
+                            reject("Rejected")
+                          }
+                        }, 1000
+                      );
+                    });
+                  };
+                  mypromise().then((res) => {
+                    LightboxOpen(49)
+                  }).catch((error) => {
+                    console.log(`Handling error as we received ${error}`);
+                  });
+                }
+                break;
+              case 87: // W, next
+                if (document.getElementById("nextpage")) {
+                  $('#imageGallery').nanogallery2('closeViewer');
+                  var resolvedFlag = true;
+
+                  let mypromise = function functionOne(testInput) {
+                    countPage('up');
+
+                    return new Promise((resolve, reject) => {
+                      setTimeout(
+                        () => {
+                          console.log("Inside the promise");
+                          if (resolvedFlag == true) {
+                            resolve("Resolved");
+                          } else {
+                            reject("Rejected")
+                          }
+                        }, 1000
+                      );
+                    });
+                  };
+                  mypromise().then((res) => {
+                    LightboxOpen(0)
+                  }).catch((error) => {
+                    console.log(`Handling error as we received ${error}`);
+                  });
+
+                }
+                break;
             }
           }
         }
@@ -11751,25 +11816,11 @@
         }
         return;
       }
-      //console.log(G);
-      //console.log(G.baseEltID);
 
-
-      //var newLocationHash = '#' + 'nanogallery/' + G.baseEltID + '/' + albumID; //원본 <-- by.misun url 페이지+이미지 번호
-      var page = document.getElementById("page-count").value;
-      var imageNum = imageID % 50;
-      if (imageNum == 0) {
-        imageNum = 50;
-      }
-
-      var newLocationHash = '#' + 'nanogallery';
-
-      //var newLocationHash = '#' + 'nanogallery/' + G.baseEltID + '/' + page;
+      var newLocationHash = '#' + 'nanogallery/' + G.baseEltID + '/' + albumID;
       if (imageID != '') {
-        //newLocationHash += '/' + imageNum;
+        newLocationHash += '/' + imageID;
       }
-
-      //여기까지 커스텀 -->
 
       var lH = location.hash;
       if (G.O.debugMode) {
