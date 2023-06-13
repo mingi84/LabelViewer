@@ -474,7 +474,7 @@
                 });
 
                 object = {
-                    src: originParam+"?t="+Date.now(),
+                    src: originParam,
                     srct: originParam+"?t="+Date.now(),
                     title: data[i].title,
                     customData: {
@@ -506,7 +506,7 @@
         $('#imageGallery').nanogallery2('destroy');
         $("#imageGallery").nanogallery2({
             // ### gallery settings ###
-            galleryDisplayMode: pagination,
+            //galleryDisplayMode: pagination,
             thumbnailHeight: 300,
             thumbnailWidth: "auto",
             itemsBaseURL: _WEBSERVER_DI_URL,
@@ -1469,8 +1469,8 @@
     /*
     custombutton: https://codepen.io/Kris-B/pen/GWpWBR
     */
-    function getPath() {
-        var path = jQuery('.nGY2ViewerMedia').attr("src");
+    function getPath(item, idx) { //item, idx, lightbox
+        var path = item.src;
         var copyText = document.getElementById("copyinput");
         copyText.value = path;
 
@@ -1478,7 +1478,7 @@
         copyText.select();
         copyText.setSelectionRange(0, 99999); // For mobile devices
 
-        // Copy the text inside the text field
+        // Copy the text inside the text fieldf
         navigator.clipboard.writeText(copyText.value);
 
         // Alert the copied text

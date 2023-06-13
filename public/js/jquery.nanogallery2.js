@@ -1739,7 +1739,7 @@
       shareVK: '<i style="color:#3b5998;" class="nGY2Icon-vkontakte"></i>',
       shareMail: '<i style="color:#555;" class="nGY2Icon-mail-alt"></i>',
       labelButton: ``,
-      copyButton: `<i class="fa-solid fa-clone nGY2Icon mx-2" onclick="getPath();"></i>`,
+      copyButton: `<i class="fa-solid fa-clone nGY2Icon mx-2"></i>`,
       selectImage: '<i class="fa-regular fa-square nGY2Icon-select align-self-center" style="font-size: 30px;"></i>',
       viewerCustomTool1: 'T1',
       viewerCustomTool2: '',
@@ -10316,6 +10316,10 @@
         case 'selectimage':
           StopPropagationPreventDefault(e);
           selectLightboxImage(G.VOM.content.current.NGY2Item(), G.VOM.items[G.VOM.content.current.vIdx].ngy2ItemIdx, 'lightbox');
+          break;
+
+        case 'copy':
+          getPath(G.VOM.content.current.NGY2Item(), G.VOM.items[G.VOM.content.current.vIdx].ngy2ItemIdx, 'lightbox');
           break;
       }
 
