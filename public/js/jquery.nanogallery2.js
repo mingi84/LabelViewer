@@ -11629,59 +11629,13 @@
               case 81: // Q, previous
                 if (document.getElementById("previouspage")) {
                   $('#imageGallery').nanogallery2('closeViewer');
-
-                  var resolvedFlag = true;
-
-                  let mypromise = function functionOne(testInput) {
                     countPage('down');
-
-                    return new Promise((resolve, reject) => {
-                      setTimeout(
-                        () => {
-                          console.log("Inside the promise");
-                          if (resolvedFlag == true) {
-                            resolve("Resolved");
-                          } else {
-                            reject("Rejected")
-                          }
-                        }, 1000
-                      );
-                    });
-                  };
-                  mypromise().then((res) => {
-                    LightboxOpen(49)
-                  }).catch((error) => {
-                    console.log(`Handling error as we received ${error}`);
-                  });
                 }
                 break;
               case 87: // W, next
                 if (document.getElementById("nextpage")) {
                   $('#imageGallery').nanogallery2('closeViewer');
-                  var resolvedFlag = true;
-
-                  let mypromise = function functionOne(testInput) {
                     countPage('up');
-
-                    return new Promise((resolve, reject) => {
-                      setTimeout(
-                        () => {
-                          console.log("Inside the promise");
-                          if (resolvedFlag == true) {
-                            resolve("Resolved");
-                          } else {
-                            reject("Rejected")
-                          }
-                        }, 1000
-                      );
-                    });
-                  };
-                  mypromise().then((res) => {
-                    LightboxOpen(0)
-                  }).catch((error) => {
-                    console.log(`Handling error as we received ${error}`);
-                  });
-
                 }
                 break;
             }

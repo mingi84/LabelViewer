@@ -475,7 +475,7 @@
 
                 object = {
                     src: originParam,
-                    srct: originParam+"?t="+Date.now(),
+                    srct: originParam,
                     title: data[i].title,
                     customData: {
                         type: data[i].type,
@@ -549,6 +549,9 @@
                 topLeft: 'selectImage, label',
                 topRight: 'custom2 ,labelButton, copyButton, playPauseButton, zoomButton, fullscreenButton, closeButton '
             },
+            viewerGallery: 'none', //lightbox thumbnail
+            viewerGalleryTWidth: 50,
+            viewerGalleryTHeight: 50,
             icons: {
                 viewerCustomTool3: '<i class="fa-regular fa-square" style="font-size:24px;"></i>',
             },
@@ -598,8 +601,6 @@
                 }
             }
         }
-
-        console.log("gallery open")
 
     }
 
@@ -803,9 +804,6 @@
             document.getElementById("customToolbar").innerHTML = "";
         }
 
-
-        console.log(item.mediaNumber)
-
     }
 
     /*
@@ -824,20 +822,14 @@
         switch (val) {
             case 'previous':
                 if (document.getElementById("previouspage")) {
-                    // class가 존재함
-                    //$('#imageGallery').nanogallery2('closeViewer');
-                    //countPage('down');
-                    //$('#imageGallery').nanogallery2('displayItem', '0/1');
-
+                    $('#imageGallery').nanogallery2('closeViewer');
+                    countPage('down');
                 }
                 break;
             case 'next':
                 if (document.getElementById("nextpage")) {
-                    // class가 존재함
-                    //$('#imageGallery').nanogallery2('closeViewer');
-                    //countPage('up');
-                    //$('#imageGallery').nanogallery2('displayItem', '0/1');
-
+                    $('#imageGallery').nanogallery2('closeViewer');
+                    countPage('up');
                 }
                 break;
         }
