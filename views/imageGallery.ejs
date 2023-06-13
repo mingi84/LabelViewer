@@ -404,8 +404,6 @@
 
 
     function getImage(pageCount, stoid, img_folder, label_folder) {
-        var env_path = 'D:\\MgnSData\\Datas\\';
-
         $.ajax({
             type: 'get', //데이터 전송 타입,
             url: _WEBSERVER_ROOT_URL +
@@ -458,7 +456,7 @@
             originParam = img_folder + data[i].mediapath + data[i].title;
             if (originParam != "") {
 
-                excludeParam = 'D:\\MgnSData\\Datas\\';
+                excludeParam = _ORIGIN_LOCATION;
                 originParam = originParam.replace(excludeParam, img_folder);
                 originParam = originParam.replace("Thumb_", "");
 
@@ -506,7 +504,6 @@
         $('#imageGallery').nanogallery2('destroy');
         $("#imageGallery").nanogallery2({
             // ### gallery settings ###
-            //galleryDisplayMode: pagination,
             thumbnailHeight: 300,
             thumbnailWidth: "auto",
             itemsBaseURL: _WEBSERVER_DI_URL,
@@ -1161,24 +1158,6 @@
             });
 
         }
-
-        /*
-        //Draw lect
-        templateKeyMatch.forEach((list, ind) => {
-            selectedID.forEach((selected) => {
-                if (list.keypoint_id == selected) {
-                    if (list.keypoint_list[index].bbox_type !== 0 && list.keypoint_list[index]
-                        .bbox_type !== undefined) {
-                        ctx.strokeStyle = list.keypoint_list[index].bbox_color;
-                        ctx.lineWidth = 3;
-                        ctx.strokeRect(list.keypoint_list[index].bbox[0], list.keypoint_list[index]
-                            .bbox[1], list.keypoint_list[index].bbox[2], list.keypoint_list[
-                                index].bbox[3]);
-
-                    }
-                }
-            });
-        });*/
 
         for (var j = 0; j < selectedID.length; j++) {
             //Draw lect

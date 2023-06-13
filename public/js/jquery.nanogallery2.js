@@ -9619,9 +9619,6 @@
       G.VOM.content.previous.vIdx = G.VOM.IdxNext();
       G.VOM.content.next.vIdx = G.VOM.IdxPrevious();
 
-      console.log(G.VOM.content);
-      console.log(G.VOM.content.current.NGY2Item().mediaMarkup);
-
       var sMedia = '<div class="nGY2ViewerMediaPan"><div class="nGY2ViewerMediaLoaderDisplayed"></div>' + G.VOM.content.previous.NGY2Item().mediaMarkup + '</div>'; // previous media
       sMedia += '<div class="nGY2ViewerMediaPan"><div class="nGY2ViewerMediaLoaderDisplayed"></div>' + G.VOM.content.current.NGY2Item().mediaMarkup + '</div>'; // current media
       sMedia += '<div class="nGY2ViewerMediaPan"><div class="nGY2ViewerMediaLoaderDisplayed"></div>' + G.VOM.content.next.NGY2Item().mediaMarkup + '</div>'; // next media
